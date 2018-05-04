@@ -10,6 +10,8 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
  * FluttercouchPlugin
  */
 public class FluttercouchPlugin implements MethodCallHandler {
+
+
   /**
    * Plugin registration.
    */

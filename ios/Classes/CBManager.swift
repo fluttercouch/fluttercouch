@@ -6,3 +6,8 @@
 //
 
 import Foundation
+import CouchbaseLiteSwift
+
+public class CBManager {
+    
+}
