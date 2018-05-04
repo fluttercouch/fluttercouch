@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.couchbase.lite.CouchbaseLiteException;
 
+import java.net.URISyntaxException;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
@@ -44,6 +45,7 @@ public class FluttercouchPlugin implements MethodCallHandler {
                     e.printStackTrace();
                     result.error("errInit", "error initializing database", e.toString());
                 }
+                break;
             case("saveDocument"):
                 Map<String, Object> _document = call.arguments();
                 try {
@@ -78,6 +80,40 @@ public class FluttercouchPlugin implements MethodCallHandler {
                     e.printStackTrace();
                     result.error("errGet", "error getting the document with id: " + _id, e.toString());
                 }
+                break;
+            case("setReplicatorEndpoint"):
+                String _endpoint = call.arguments();
+                try {
+                    String _result = mCbManager.setReplicatorEndpoint(_endpoint);
+                    result.success(_result);
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                    result.error("errURI", "error setting the replicator endpoint uri to " + _endpoint, e.toString());
+                }
+                break;
+            case("setReplicatorType"):
+                String _type = call.arguments();
+                try {
+                    result.success(mCbManager.setReplicatorType(_type));
+                } catch (CouchbaseLiteException e) {
+                    e.printStackTrace();
+                    result.error("errReplType", "error setting replication type to " + _type, e.toString());
+                }
+                break;
+            case("setReplicatorBasicAuthentication"):
+                Map<String, String> _auth = call.arguments();
+                try {
+                    result.success(mCbManager.setReplicatorBasicAuthentication(_auth));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    result.error("errAuth", "error setting authentication for replicator", null);
+                }
+                break;
+            case("startReplicator"):
+                mCbManager.startReplicator();
+                break;
+            case("stopReplicator"):
+                mCbManager.stopReplicator();
                 break;
             default:
                 result.notImplemented();
