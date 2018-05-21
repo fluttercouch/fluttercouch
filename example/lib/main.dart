@@ -1,32 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttercouch/fluttercouch.dart';
+import 'package:scoped_model/scoped_model.dart';
 
-void main() => runApp(new MyApp());
+class AppModel extends Model with Fluttercouch {
+  String _databaseName;
+  Map<dynamic, dynamic> docExample = {"nome": "Prova"};
 
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => new _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  Map<String, dynamic> _docExample = {"name": "Prova"};
-
-  @override
-  initState() {
-    super.initState();
+  AppModel() {
     initPlatformState();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
   initPlatformState() async {
-    Map<String, dynamic> docExample;
-    String databaseName;
-
-    // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-      databaseName = await Fluttercouch.initDatabaseWithName("infodiocesi");
-      Fluttercouch.setReplicatorEndpoint("ws://:4984/infodiocesi");
+      _databaseName = await Fluttercouch.initDatabaseWithName("infodiocesi");
+      Fluttercouch.setReplicatorEndpoint("ws://10.0.2.2:4984/infodiocesi");
       Fluttercouch.setReplicatorType("PUSH_AND_PULL");
       Fluttercouch.setReplicatorBasicAuthentication(<String,String>{
         "username": "defaultUser",
@@ -34,31 +22,47 @@ class _MyAppState extends State<MyApp> {
       });
       Fluttercouch.startReplicator();
       docExample = await Fluttercouch.getDocumentWithId("diocesi_tab");
+      notifyListeners();
     } on PlatformException {
     }
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted)
-      return;
-
-    setState(() {
-      _docExample = docExample;
-    });
   }
+}
 
-  @override
+void main() => runApp(new MyApp());
+
+class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return new MaterialApp(
-      home: new Scaffold(
-        appBar: new AppBar(
-          title: new Text('Plugin example app'),
-        ),
-        body: new Center(
-          child: new Text('${_docExample['nome']}\n${_docExample['introText']}'),
-        ),
+      title: 'Fluttercouch example application',
+      home: new ScopedModel<AppModel>(
+        model: new AppModel(),
+        child: new Home(),
+
+      )
+    );
+  }
+}
+
+class Home extends StatelessWidget {
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text('Fluttercouch example application'),
       ),
+      body: new Center(
+        child: new Column(
+        children: <Widget>[
+          new Text("This is an example app"),
+          new ScopedModelDescendant<AppModel>(
+            builder: (context, child, model) => new Text(
+              '${model.docExample['nome']}\n${model.docExample['introText']}',
+              style: Theme.of(context).textTheme.display1,
+            ),
+          ),
+        ],
+      ),
+    ),
     );
   }
 }

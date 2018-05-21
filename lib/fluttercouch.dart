@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-class Fluttercouch {
+abstract class Fluttercouch {
   static const MethodChannel _channel =
       const MethodChannel('it.oltrenuovefrontiere.fluttercouch');
 
@@ -44,9 +44,9 @@ class Fluttercouch {
     }
   }
 
-  static Future<Map<String, dynamic>> getDocumentWithId(String _id) async {
+  static Future<Map<dynamic, dynamic>> getDocumentWithId(String _id) async {
     try {
-      final Map<String, dynamic> result =
+      final Map<dynamic, dynamic> result =
           await _channel.invokeMethod('getDocumentWithId', _id);
       return result;
     } on PlatformException {
