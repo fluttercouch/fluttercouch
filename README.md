@@ -1,6 +1,6 @@
 # fluttercouch
 
-A new flutter plugin project.
+With Fluttercouch is possible to use Couchbase Mobile Native SDK in Flutter Projects.
 
 ## Getting Started
 
