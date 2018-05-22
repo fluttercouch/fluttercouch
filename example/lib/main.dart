@@ -13,15 +13,15 @@ class AppModel extends Model with Fluttercouch {
 
   initPlatformState() async {
     try {
-      _databaseName = await Fluttercouch.initDatabaseWithName("infodiocesi");
-      Fluttercouch.setReplicatorEndpoint("ws://10.0.2.2:4984/infodiocesi");
-      Fluttercouch.setReplicatorType("PUSH_AND_PULL");
-      Fluttercouch.setReplicatorBasicAuthentication(<String,String>{
+      _databaseName = await initDatabaseWithName("infodiocesi");
+      setReplicatorEndpoint("ws://10.0.2.2:4984/infodiocesi");
+      setReplicatorType("PUSH_AND_PULL");
+      setReplicatorBasicAuthentication(<String,String>{
         "username": "defaultUser",
         "password": "defaultPassword"
       });
-      Fluttercouch.startReplicator();
-      docExample = await Fluttercouch.getDocumentWithId("diocesi_tab");
+      startReplicator();
+      docExample = await getDocumentWithId("diocesi_tab");
       notifyListeners();
     } on PlatformException {
     }

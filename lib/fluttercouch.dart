@@ -6,7 +6,7 @@ abstract class Fluttercouch {
   static const MethodChannel _channel =
       const MethodChannel('it.oltrenuovefrontiere.fluttercouch');
 
-  static Future<String> get platformVersion async {
+  Future<String> get platformVersion async {
     try {
       final String version = await _channel.invokeMethod('getPlatformVersion');
       return version;
@@ -15,7 +15,7 @@ abstract class Fluttercouch {
     }
   }
 
-  static Future<String> initDatabaseWithName(String _name) async {
+  Future<String> initDatabaseWithName(String _name) async {
     try {
       final String result =
           await _channel.invokeMethod('initDatabaseWithName', _name);
@@ -25,7 +25,7 @@ abstract class Fluttercouch {
     }
   }
 
-  static Future<String> saveDocument(Map<String, dynamic> _map) async {
+  Future<String> saveDocument(Map<String, dynamic> _map) async {
     try {
       final String result = await _channel.invokeMethod('saveDocument', _map);
       return result;
@@ -34,7 +34,7 @@ abstract class Fluttercouch {
     }
   }
 
-  static Future<String> saveDocumentWithId(
+  Future<String> saveDocumentWithId(
       String _id, Map<String, dynamic> _map) async {
     try {
       final String result = await _channel.invokeMethod('saveDocument', <String, dynamic>{'id': _id, 'map': _map});
@@ -44,7 +44,7 @@ abstract class Fluttercouch {
     }
   }
 
-  static Future<Map<dynamic, dynamic>> getDocumentWithId(String _id) async {
+  Future<Map<dynamic, dynamic>> getDocumentWithId(String _id) async {
     try {
       final Map<dynamic, dynamic> result =
           await _channel.invokeMethod('getDocumentWithId', _id);
@@ -54,7 +54,7 @@ abstract class Fluttercouch {
     }
   }
 
-  static Future<String> setReplicatorEndpoint(String _endpoint) async {
+  Future<String> setReplicatorEndpoint(String _endpoint) async {
     try {
       final String result =
           await _channel.invokeMethod('setReplicatorEndpoint', _endpoint);
@@ -64,7 +64,7 @@ abstract class Fluttercouch {
     }
   }
 
-  static Future<String> setReplicatorType(String _type) async {
+  Future<String> setReplicatorType(String _type) async {
     try {
       final String result =
           await _channel.invokeMethod('setReplicatorType', _type);
@@ -74,7 +74,7 @@ abstract class Fluttercouch {
     }
   }
 
-  static Future<String> setReplicatorBasicAuthentication(
+  Future<String> setReplicatorBasicAuthentication(
       Map<String, String> _auth) async {
     try {
       final String result = await _channel.invokeMethod('setReplicatorBasicAuthentication', _auth);
@@ -84,7 +84,7 @@ abstract class Fluttercouch {
     }
   }
 
-  static Future<Null> startReplicator() async {
+  Future<Null> startReplicator() async {
     try {
       await _channel.invokeMethod('startReplicator');
     } on PlatformException {
@@ -92,7 +92,7 @@ abstract class Fluttercouch {
     }
   }
 
-  static Future<Null> stopReplicator() async {
+  Future<Null> stopReplicator() async {
     try {
       await _channel.invokeMethod('stopReplicator');
     } on PlatformException {
