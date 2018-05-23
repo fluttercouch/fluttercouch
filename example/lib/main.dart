@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttercouch/fluttercouch.dart';
+import 'package:fluttercouch/document.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class AppModel extends Model with Fluttercouch {
   String _databaseName;
-  Map<dynamic, dynamic> docExample = {"nome": "Prova"};
+  Document docExample;
 
   AppModel() {
     initPlatformState();
@@ -56,7 +57,7 @@ class Home extends StatelessWidget {
           new Text("This is an example app"),
           new ScopedModelDescendant<AppModel>(
             builder: (context, child, model) => new Text(
-              '${model.docExample['nome']}\n${model.docExample['introText']}',
+              '${model.docExample.getString("nome")}',
               style: Theme.of(context).textTheme.display1,
             ),
           ),

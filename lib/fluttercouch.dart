@@ -1,19 +1,10 @@
 import 'dart:async';
-
+import 'package:fluttercouch/document.dart';
 import 'package:flutter/services.dart';
 
 abstract class Fluttercouch {
   static const MethodChannel _channel =
       const MethodChannel('it.oltrenuovefrontiere.fluttercouch');
-
-  Future<String> get platformVersion async {
-    try {
-      final String version = await _channel.invokeMethod('getPlatformVersion');
-      return version;
-    } on PlatformException {
-      throw 'Unable to getPlatformVersion';
-    }
-  }
 
   Future<String> initDatabaseWithName(String _name) async {
     try {
@@ -44,14 +35,10 @@ abstract class Fluttercouch {
     }
   }
 
-  Future<Map<dynamic, dynamic>> getDocumentWithId(String _id) async {
-    try {
-      final Map<dynamic, dynamic> result =
-          await _channel.invokeMethod('getDocumentWithId', _id);
-      return result;
-    } on PlatformException {
-      throw 'unable to get the document with id $_id';
-    }
+  Future<Document> getDocumentWithId(String _id) async {
+    Map<dynamic, dynamic> _docResult;
+    _docResult = await _getDocumentWithId(_id);
+    return Document(_docResult);
   }
 
   Future<String> setReplicatorEndpoint(String _endpoint) async {
@@ -97,6 +84,15 @@ abstract class Fluttercouch {
       await _channel.invokeMethod('stopReplicator');
     } on PlatformException {
       throw 'unable to set replicator authentication';
+    }
+  }
+
+  Future<Map<dynamic, dynamic>> _getDocumentWithId(String _id) async {
+    try {
+      final Map<dynamic, dynamic> result = await _channel.invokeMethod('getDocumentWithId', _id);
+      return result;
+    } on PlatformException {
+      throw 'unable to get the document with id $_id';
     }
   }
 }
