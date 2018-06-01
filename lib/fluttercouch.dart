@@ -26,19 +26,19 @@ abstract class Fluttercouch {
   }
 
   Future<String> saveDocumentWithId(
-      String _id, Map<String, dynamic> _map) async {
+      String _id, Document _doc) async {
     try {
-      final String result = await _channel.invokeMethod('saveDocument', <String, dynamic>{'id': _id, 'map': _map});
+      final String result = await _channel.invokeMethod('saveDocument', <String, dynamic>{'id': _id, 'map': _doc.toMap()});
       return result;
     } on PlatformException {
-      throw 'unable to save the document with setted id $_id';
+      throw 'unable to save the document with set id $_id';
     }
   }
 
   Future<Document> getDocumentWithId(String _id) async {
     Map<dynamic, dynamic> _docResult;
     _docResult = await _getDocumentWithId(_id);
-    return Document(_docResult);
+    return Document(_docResult["doc"], _docResult["id"]);
   }
 
   Future<String> setReplicatorEndpoint(String _endpoint) async {

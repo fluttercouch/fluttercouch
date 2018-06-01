@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttercouch/fluttercouch.dart';
 import 'package:fluttercouch/document.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:fluttercouch/mutable_document.dart';
 
 class AppModel extends Model with Fluttercouch {
   String _databaseName;
@@ -24,6 +25,8 @@ class AppModel extends Model with Fluttercouch {
       startReplicator();
       docExample = await getDocumentWithId("diocesi_tab");
       notifyListeners();
+      MutableDocument mutableDoc = MutableDocument();
+      mutableDoc.setString("prova", )
     } on PlatformException {
     }
 

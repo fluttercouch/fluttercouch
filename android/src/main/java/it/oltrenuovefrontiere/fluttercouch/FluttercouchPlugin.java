@@ -74,7 +74,9 @@ public class FluttercouchPlugin implements MethodCallHandler {
             case("getDocumentWithId"):
                 String _id = call.arguments();
                 try {
-                    Map<String, Object> _map = mCbManager.getDocumentWithId(_id);
+                    Map<String, Object> _map = new Map<String, Object>;
+                    _map.put("doc", mCbManager.getDocumentWithId(_id));
+                    _map.put("id", _id); // Is a bit redundant, but is necessary for standard return data in dart implementation
                     result.success(_map);
                 } catch (CouchbaseLiteException e) {
                     e.printStackTrace();

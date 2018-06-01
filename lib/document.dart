@@ -1,11 +1,20 @@
+import 'mutable_document.dart';
+
 class Document {
   Map<String, dynamic> _internalState;
+  String _id;
 
-  Document(Map<dynamic, dynamic> _map) {
-    _internalState = _stringMapFromDynamic(_map);
+  Document([Map<dynamic, dynamic> _map, String _id]) {
+    if (_map != null) {
+      _internalState = stringMapFromDynamic(_map);
+    } else {
+      _internalState = Map<String, dynamic>();
+    }
+
+    _id != null ? this._id = _id : _id = "random UUID";
   }
 
-  Map<String, dynamic> _stringMapFromDynamic(Map<dynamic, dynamic> _map) {
+  Map<String, dynamic> stringMapFromDynamic(Map<dynamic, dynamic> _map) {
     return Map.castFrom<dynamic, dynamic, String, dynamic>(_map);
   }
 
@@ -54,7 +63,20 @@ class Document {
     }
   }
 
+  List<Object> getList(String key) {
+    Object _result = getValue(key);
+    return _result is List<Object> ? _result : null;
+  }
+
   Map<String, dynamic> toMap() {
     return _internalState;
+  }
+
+  MutableDocument toMutable() {
+    return MutableDocument(_internalState);
+  }
+
+  String getId() {
+    return _id;
   }
 }
