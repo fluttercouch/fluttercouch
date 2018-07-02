@@ -1,0 +1,26 @@
+selectResultsFromAll
+    If in the query_builder is passed an SelectResult.all() is true, otherwise is false.
+
+databaseName
+    The name of the database set in a From query using from().
+
+where
+    Contains a String representation of the expression passed into where() method of From, Joins.
+
+groupBy
+    Contains a String representation of the expression passed into groupBy() method of From.
+
+joins
+    Contains a String representation of the expression passed into join() method of From.
+
+limit
+    Contains a String representation of the expression passed into limit() method of From, GroupBy, Having, Joins, OrderBy.
+
+offset
+    Contains a String representation of the optional expression passed into limit() method of From, GroupBy, Having, Joins, OrderBy.
+
+orderBy
+    Contains a String representation of the expression passed into orderBy() method of From, GroupBy, Having, Joins.
+
+selectDistinct
+    It is true if the query is to be built using QueryBuilder.selectDistinct() instead of QueryBuilder.select()

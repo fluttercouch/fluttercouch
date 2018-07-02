@@ -1,6 +1,14 @@
 package it.oltrenuovefrontiere.fluttercouch;
 
-import com.couchbase.lite.*;
+import com.couchbase.lite.BasicAuthenticator;
+import com.couchbase.lite.CouchbaseLiteException;
+import com.couchbase.lite.Database;
+import com.couchbase.lite.DatabaseConfiguration;
+import com.couchbase.lite.Endpoint;
+import com.couchbase.lite.MutableDocument;
+import com.couchbase.lite.Replicator;
+import com.couchbase.lite.ReplicatorConfiguration;
+import com.couchbase.lite.URLEndpoint;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -17,6 +25,10 @@ public class CBManager {
 
     public static CBManager getInstance() {
         return mInstance;
+    }
+
+    public Database getDatabase() {
+        return mDatabase;
     }
 
     public String saveDocument(Map<String, Object> _map) throws CouchbaseLiteException {
@@ -48,7 +60,7 @@ public class CBManager {
         return mReplConfig.getTarget().toString();
     }
 
-    public String setReplicatorType (String _type) throws CouchbaseLiteException {
+    public String setReplicatorType(String _type) throws CouchbaseLiteException {
         ReplicatorConfiguration.ReplicatorType settedType = ReplicatorConfiguration.ReplicatorType.PULL;
         if (_type.equals("PUSH")) {
             settedType = ReplicatorConfiguration.ReplicatorType.PUSH;

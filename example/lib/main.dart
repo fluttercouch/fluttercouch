@@ -4,10 +4,17 @@ import 'package:fluttercouch/fluttercouch.dart';
 import 'package:fluttercouch/document.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:fluttercouch/mutable_document.dart';
+import 'package:fluttercouch/query/query.dart';
+import 'package:fluttercouch/query/query_builder.dart';
+import 'package:fluttercouch/query/select_result.dart';
+import 'package:fluttercouch/query/expression.dart';
+import 'package:fluttercouch/query/result_set.dart';
+import 'package:fluttercouch/query/select.dart';
 
 class AppModel extends Model with Fluttercouch {
   String _databaseName;
   Document docExample;
+  Query query;
 
   AppModel() {
     initPlatformState();
@@ -26,7 +33,9 @@ class AppModel extends Model with Fluttercouch {
       docExample = await getDocumentWithId("diocesi_tab");
       notifyListeners();
       MutableDocument mutableDoc = MutableDocument();
-      mutableDoc.setString("prova", )
+      mutableDoc.setString("prova", "");
+      query = QueryBuilder.select(SelectResult.all()).from(_databaseName).where(Expression.property("type").equalTo(Expression.string("SDK")));
+      query.execute();
     } on PlatformException {
     }
 
