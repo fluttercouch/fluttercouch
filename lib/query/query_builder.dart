@@ -1,24 +1,19 @@
-import 'package:fluttercouch/query/select_result_from.dart';
+import 'package:fluttercouch/query/select.dart';
 
-import 'select.dart';
 import 'select_result.dart';
 
 class QueryBuilder {
-  static Select select(SelectResult result) {
+  static Select select(List<SelectResult> _selectResult) {
     var query = Select();
-    query.options["selectDistinct"] = "false";
-    if (result is SelectResult_From) {
-      query.options["selectResultsFromAll"] = result.selectResultFromAll;
-    }
+    query.options["selectDistinct"] = false;
+    query.options["selectResult"] = _selectResult;
     return query;
   }
 
-  static Select selectDistinct(SelectResult result) {
+  static Select selectDistinct(List<SelectResult> _selectResult) {
     var query = Select();
-    query.options["selectDistinct"] = "true";
-    if (result is SelectResult_From) {
-      query.options["selectResultsFromAll"] = result.selectResultFromAll;
-    }
+    query.options["selectDistinct"] = true;
+    query.options["selectResult"] = _selectResult;
     return query;
   }
 }

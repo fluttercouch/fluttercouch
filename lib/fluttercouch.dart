@@ -1,6 +1,7 @@
 import 'dart:async';
-import 'package:fluttercouch/document.dart';
+
 import 'package:flutter/services.dart';
+import 'package:fluttercouch/document.dart';
 
 abstract class Fluttercouch {
   static const MethodChannel _channel =
@@ -25,10 +26,10 @@ abstract class Fluttercouch {
     }
   }
 
-  Future<String> saveDocumentWithId(
-      String _id, Document _doc) async {
+  Future<String> saveDocumentWithId(String _id, Document _doc) async {
     try {
-      final String result = await _channel.invokeMethod('saveDocument', <String, dynamic>{'id': _id, 'map': _doc.toMap()});
+      final String result = await _channel.invokeMethod(
+          'saveDocument', <String, dynamic>{'id': _id, 'map': _doc.toMap()});
       return result;
     } on PlatformException {
       throw 'unable to save the document with set id $_id';
@@ -64,7 +65,8 @@ abstract class Fluttercouch {
   Future<String> setReplicatorBasicAuthentication(
       Map<String, String> _auth) async {
     try {
-      final String result = await _channel.invokeMethod('setReplicatorBasicAuthentication', _auth);
+      final String result = await _channel.invokeMethod(
+          'setReplicatorBasicAuthentication', _auth);
       return result;
     } on PlatformException {
       throw 'unable to set replicator authentication';
@@ -89,7 +91,8 @@ abstract class Fluttercouch {
 
   Future<Map<dynamic, dynamic>> _getDocumentWithId(String _id) async {
     try {
-      final Map<dynamic, dynamic> result = await _channel.invokeMethod('getDocumentWithId', _id);
+      final Map<dynamic, dynamic> result =
+      await _channel.invokeMethod('getDocumentWithId', _id);
       return result;
     } on PlatformException {
       throw 'unable to get the document with id $_id';

@@ -1,13 +1,11 @@
 import 'package:fluttercouch/query/parameters.dart';
-import 'package:fluttercouch/query/result_set.dart';
-
-import 'query.dart';
-import 'result.dart';
+import 'package:fluttercouch/query/query.dart';
 
 class Limit extends Query {
-
   Limit() {
-    super.options = new Map<String, String>();
-    super.param = new Parameters();
+    this.options = new Map<String, dynamic>();
+    this.param = new Parameters();
   }
+
+  Map<String, dynamic> toJson() => options;
 }

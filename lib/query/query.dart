@@ -1,18 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+
 import 'parameters.dart';
 
 class Query {
-
-  Map<String, String> options;
+  Map<String, dynamic> options;
   Parameters param;
 
   static const MethodChannel _channel =
   const MethodChannel('it.oltrenuovefrontiere.fluttercouch');
 
   Query() {
-    this.options = new Map<String, String>();
+    this.options = new Map<String, dynamic>();
     this.param = new Parameters();
   }
 
@@ -37,4 +37,6 @@ class Query {
   setParameters(Parameters parameters) {
     param = parameters;
   }
+
+  Map<String, dynamic> toJson() => options;
 }

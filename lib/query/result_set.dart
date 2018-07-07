@@ -3,7 +3,6 @@ import 'dart:collection';
 import 'result.dart';
 
 class ResultSet extends Object with IterableMixin<Result> {
-
   List<Result> _internalState;
 
   ResultSet(List<Result> _list) {

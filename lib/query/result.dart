@@ -36,7 +36,7 @@ class Result {
     }
   }
 
-    //TODO: implement getBlob()
+  //TODO: implement getBlob()
 
   bool getBoolean({int index, String key}) {
     var result = getValue(index: index, key: key);
@@ -99,7 +99,7 @@ class Result {
     return result;
   }
 
-    //TODO: implement iterator()
+  //TODO: implement iterator()
 
   List<dynamic> toList() {
     return _internalList;

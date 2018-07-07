@@ -1,12 +1,37 @@
-import 'select_result_as.dart';
-import 'select_result_from.dart';
+import 'dart:convert';
+
+import 'package:fluttercouch/query/expression/expression.dart';
 
 class SelectResult {
-  static SelectResult_From all() {
-    return SelectResult_From()..selectResultFromAll = "true";
+  Expression _internalExpression;
+
+  SelectResult._internal(Expression _expression) {
+    this._internalExpression = _expression;
   }
 
-  static SelectResult_As property(String property) {
-    return SelectResult_As()..content = property;
+  factory SelectResult.all() {
+    return SelectResult._internal(Expression.string("all"));
+  }
+
+  factory SelectResult.property(String _property) {
+    return SelectResult._internal((Expression.property(_property)));
+  }
+
+  factory SelectResult.expression(Expression _expression) {
+    return SelectResult._internal(_expression);
+  }
+
+  SelectResult from(String _alias) {
+    _internalExpression.internalExpressionStack.add({"from": _alias});
+    return this;
+  }
+
+  SelectResult As(String _alias) {
+    _internalExpression.internalExpressionStack.add({"as": _alias});
+    return this;
+  }
+
+  toJson() {
+    return json.encode(_internalExpression.internalExpressionStack);
   }
 }

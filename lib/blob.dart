@@ -1,3 +1,1 @@
-class Blob {
-  
-}
+class Blob {}
