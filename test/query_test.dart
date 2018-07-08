@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fluttercouch/query/array_function.dart';
 import 'package:fluttercouch/query/expression/expression.dart';
 import 'package:fluttercouch/query/expression/meta.dart';
+import 'package:fluttercouch/query/functions.dart';
 import 'package:fluttercouch/query/join.dart';
 import 'package:fluttercouch/query/ordering.dart';
 import 'package:fluttercouch/query/query.dart';
@@ -129,27 +130,71 @@ void main() {
     });
 
     test("join", () {
-      Query query = QueryBuilder.select([
-        SelectResult.expression(Expression.property("name").from("airline")),
-        SelectResult.expression(
-            Expression.property("callsign").from("airline")),
+      Query query = QueryBuilder
+          .select([
+        SelectResult
+            .expression(Expression.property("name").from("airline")),
+        SelectResult
+            .expression(Expression.property("callsign").from("airline")),
         SelectResult.expression(
             Expression.property("destinationairport").from("route")),
         SelectResult.expression(Expression.property("stops").from("route")),
-        SelectResult.expression(Expression.property("airline").from("route"))
+        SelectResult
+            .expression(Expression.property("airline").from("route"))
       ])
           .from("airline")
-          .join(Join.join("database", as: "route")
-          .on(Meta.id.from("airline").equalTo(
-          Expression.property("airlineid").from("route"))))
-          .where(Expression.property("type").from("route").equalTo(
-          Expression.string("route"))
-          .and(Expression.property("type").from("airline").equalTo(
-          Expression.string("airline")))
-          .and(Expression.property("sourceairport").from("route").equalTo(
-          Expression.string("RIX"))));
+          .join(Join.join("database", as: "route").on(Meta.id
+          .from("airline")
+          .equalTo(Expression.property("airlineid").from("route"))))
+          .where(Expression
+          .property("type")
+          .from("route")
+          .equalTo(Expression.string("route"))
+          .and(Expression
+          .property("type")
+          .from("airline")
+          .equalTo(Expression.string("airline")))
+          .and(Expression
+          .property("sourceairport")
+          .from("route")
+          .equalTo(Expression.string("RIX"))));
       expect(json.encode(query),
           '{"selectDistinct":false,"selectResult":["[{\\"property\\":\\"name\\"},{\\"from\\":\\"airline\\"}]","[{\\"property\\":\\"callsign\\"},{\\"from\\":\\"airline\\"}]","[{\\"property\\":\\"destinationairport\\"},{\\"from\\":\\"route\\"}]","[{\\"property\\":\\"stops\\"},{\\"from\\":\\"route\\"}]","[{\\"property\\":\\"airline\\"},{\\"from\\":\\"route\\"}]"],"from":"airline","joins":"[{\\"join\\":\\"database\\",\\"as\\":\\"route\\"},{\\"on\\":\\"[{\\\\\\"meta\\\\\\":\\\\\\"id\\\\\\"},{\\\\\\"from\\\\\\":\\\\\\"airline\\\\\\"},{\\\\\\"equalTo\\\\\\":[{\\\\\\"property\\\\\\":\\\\\\"airlineid\\\\\\"},{\\\\\\"from\\\\\\":\\\\\\"route\\\\\\"}]}]\\"}]","where":"[{\\"property\\":\\"type\\"},{\\"from\\":\\"route\\"},{\\"equalTo\\":[{\\"string\\":\\"route\\"}]},{\\"and\\":[{\\"property\\":\\"type\\"},{\\"from\\":\\"airline\\"},{\\"equalTo\\":[{\\"string\\":\\"airline\\"}]}]},{\\"and\\":[{\\"property\\":\\"sourceairport\\"},{\\"from\\":\\"route\\"},{\\"equalTo\\":[{\\"string\\":\\"RIX\\"}]}]}]"}');
+    });
+
+    test("groupBy", () {
+      Query query = QueryBuilder
+          .select([
+        SelectResult.expression(Functions.count(Expression.string("*"))),
+        SelectResult.property("country"),
+        SelectResult.property("tz")
+      ])
+          .from("database")
+          .where(Expression
+          .property("type")
+          .equalTo(Expression.string("airport"))
+          .and(Expression
+          .property("geo.alt")
+          .greaterThanOrEqualTo(Expression.intValue(300))))
+          .groupBy([Expression.property("country"), Expression.property("tz")])
+          .orderBy(Ordering
+          .expression(Functions.count(Expression.string("*")))
+          .descending());
+      expect(json.encode(query),
+          '{"selectDistinct":false,"selectResult":["[{\\"count\\":\\"[{\\\\\\"string\\\\\\":\\\\\\"*\\\\\\"}]\\"}]","[{\\"property\\":\\"country\\"}]","[{\\"property\\":\\"tz\\"}]"],"from":"database","where":"[{\\"property\\":\\"type\\"},{\\"equalTo\\":[{\\"string\\":\\"airport\\"}]},{\\"and\\":[{\\"property\\":\\"geo.alt\\"},{\\"greaterThanOrEqualTo\\":[{\\"intValue\\":300}]}]}]","groupBy":["[{\\"property\\":\\"country\\"}]","[{\\"property\\":\\"tz\\"}]"],"orderBy":"[{\\"count\\":\\"[{\\\\\\"string\\\\\\":\\\\\\"*\\\\\\"}]\\"},{\\"orderingSortOrder\\":\\"descending\\"}]"}');
+    });
+
+    test("orderBy", () {
+      Query query = QueryBuilder
+          .select(
+          [SelectResult.expression(Meta.id), SelectResult.property("name")])
+          .from("database")
+          .where(
+          Expression.property("type").equalTo(Expression.string("hotel")))
+          .orderBy(Ordering.property("name").ascending())
+          .limit(Expression.intValue(10));
+      expect(json.encode(query),
+          '{"selectDistinct":false,"selectResult":["[{\\"meta\\":\\"id\\"},{\\"from\\":\\"airline\\"},{\\"equalTo\\":[{\\"property\\":\\"airlineid\\"},{\\"from\\":\\"route\\"}]}]","[{\\"property\\":\\"name\\"}]"],"from":"database","where":"[{\\"property\\":\\"type\\"},{\\"equalTo\\":[{\\"string\\":\\"hotel\\"}]}]","orderBy":"[{\\"property\\":\\"name\\"},{\\"orderingSortOrder\\":\\"ascending\\"}]","limit":"[{\\"intValue\\":10}]"}');
     });
   });
 }

@@ -67,8 +67,8 @@ abstract class Expression {
     return _addExpression("greaterThan", expression);
   }
 
-  Expression greaterThanOrEqual(Expression expression) {
-    return _addExpression("greaterThanOrEqual", expression);
+  Expression greaterThanOrEqualTo(Expression expression) {
+    return _addExpression("greaterThanOrEqualTo", expression);
   }
 
   // implement in(Expression... expressions) but lacking variable arguments number feature in Dart

@@ -29,10 +29,10 @@ class Where extends Query {
     return resultQuery;
   }
 
-  GroupBy groupBy(Expression expression) {
+  GroupBy groupBy(List<Expression> expressionList) {
     var resultQuery = new GroupBy();
     resultQuery.options = this.options;
-    resultQuery.options["groupBy"] = expression;
+    resultQuery.options["groupBy"] = expressionList;
     return resultQuery;
   }
 

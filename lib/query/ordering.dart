@@ -5,42 +5,31 @@ import 'package:fluttercouch/query/expression/expression.dart';
 class Ordering {
   Expression _internalExpression;
 
-  Ordering();
-
   Ordering._internal(Expression _expression) {
     this._internalExpression = _expression;
   }
 
   factory Ordering.property(String _property) {
-    return OrderingSortOrder(
-        (Expression.property(_property).internalExpressionStack));
+    return Ordering._internal(Expression.property(_property));
   }
 
   factory Ordering.expression(Expression _expression) {
-    return OrderingSortOrder(_expression.internalExpressionStack);
+    return Ordering._internal(_expression);
   }
 
   toJson() {
     return json.encode(_internalExpression.internalExpressionStack);
   }
-}
 
-class OrderingSortOrder extends Ordering {
-  List<Map<String, dynamic>> _internalStack = List();
-
-  OrderingSortOrder(List<Map<String, dynamic>> _internalStack) {
-    this._internalStack.add(_internalStack);
+  Ordering ascending() {
+    this._internalExpression.internalExpressionStack.add(
+        {"orderingSortOrder": "ascending"});
+    return this;
   }
 
-  factory OrderingSortOrder.ascending() {
-    return OrderingSortOrder({"orderingSortOrder": "ascending"});
-  }
-
-  factory OrderingSortOrder.descending() {
-    return OrderingSortOrder({"orderingSortOrder": "descending"});
-  }
-
-  toJson() {
-    return json.encode(_internalExpression.internalExpressionStack);
+  Ordering descending() {
+    this._internalExpression.internalExpressionStack.add(
+        {"orderingSortOrder": "descending"});
+    return this;
   }
 }

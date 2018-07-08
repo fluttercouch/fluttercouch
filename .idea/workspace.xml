@@ -2,43 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="93cacefd-ce56-4744-bec7-e305a79d4494" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/lib/query/array_function.dart" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/lib/query/expression/meta.dart" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/lib/query/expression/meta_expression.dart" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/lib/query/expression/property_expression.dart" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/lib/query/expression/variable_expression.dart" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/lib/query/function.dart" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/lib/query/join.dart" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/lib/query/ordering.dart" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/lib/query/functions.dart" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/example/lib/main.dart" afterPath="$PROJECT_DIR$/example/lib/main.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/blob.dart" afterPath="$PROJECT_DIR$/lib/blob.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/fluttercouch.dart" afterPath="$PROJECT_DIR$/lib/fluttercouch.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/mutable_document.dart" afterPath="$PROJECT_DIR$/lib/mutable_document.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/expression.dart" afterPath="$PROJECT_DIR$/lib/query/expression/expression.dart" />
+      <change beforePath="$PROJECT_DIR$/lib/query/expression/expression.dart" afterPath="$PROJECT_DIR$/lib/query/expression/expression.dart" />
       <change beforePath="$PROJECT_DIR$/lib/query/from.dart" afterPath="$PROJECT_DIR$/lib/query/from.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/group_by.dart" afterPath="$PROJECT_DIR$/lib/query/group_by.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/having.dart" afterPath="$PROJECT_DIR$/lib/query/having.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/joins.dart" afterPath="$PROJECT_DIR$/lib/query/joins.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/limit.dart" afterPath="$PROJECT_DIR$/lib/query/limit.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/meta_expression.dart" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lib/query/order_by.dart" afterPath="$PROJECT_DIR$/lib/query/order_by.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/parameters.dart" afterPath="$PROJECT_DIR$/lib/query/parameters.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/property_expression.dart" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lib/query/query.dart" afterPath="$PROJECT_DIR$/lib/query/query.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/query_builder.dart" afterPath="$PROJECT_DIR$/lib/query/query_builder.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/query_options.txt" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lib/query/result.dart" afterPath="$PROJECT_DIR$/lib/query/result.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/result_set.dart" afterPath="$PROJECT_DIR$/lib/query/result_set.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/select.dart" afterPath="$PROJECT_DIR$/lib/query/select.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/select_result.dart" afterPath="$PROJECT_DIR$/lib/query/select_result.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/select_result_as.dart" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lib/query/select_result_from.dart" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/lib/query/variable_expression.dart" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/lib/query/function.dart" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/lib/query/ordering.dart" afterPath="$PROJECT_DIR$/lib/query/ordering.dart" />
       <change beforePath="$PROJECT_DIR$/lib/query/where.dart" afterPath="$PROJECT_DIR$/lib/query/where.dart" />
-      <change beforePath="$PROJECT_DIR$/test/document_test.dart" afterPath="$PROJECT_DIR$/test/document_test.dart" />
-      <change beforePath="$PROJECT_DIR$/test/expression_test.dart" afterPath="$PROJECT_DIR$/test/expression_test.dart" />
-      <change beforePath="$PROJECT_DIR$/test/fluttercouch_test.dart" afterPath="$PROJECT_DIR$/test/fluttercouch_test.dart" />
       <change beforePath="$PROJECT_DIR$/test/query_test.dart" afterPath="$PROJECT_DIR$/test/query_test.dart" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
@@ -60,7 +30,7 @@
         <entry file="file://$PROJECT_DIR$/test/query_test.dart">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="419">
-              <caret line="144" column="7" lean-forward="true" selection-start-line="144" selection-start-column="7" selection-end-line="144" selection-end-column="7" />
+              <caret line="197" column="7" lean-forward="true" selection-start-line="197" selection-start-column="7" selection-end-line="197" selection-end-column="7" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
               </folding>
@@ -68,67 +38,85 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="function.dart" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lib/query/function.dart">
+      <file leaf-file-name="document.dart" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/document.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="392">
-              <caret line="41" column="68" lean-forward="true" selection-start-line="41" selection-start-column="68" selection-end-line="41" selection-end-column="68" />
-              <folding>
-                <element signature="e#0#22#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="meta_expression.dart" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lib/query/expression/meta_expression.dart">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" column="3" lean-forward="false" selection-start-line="5" selection-start-column="3" selection-end-line="5" selection-end-column="3" />
+            <state relative-caret-position="-556">
+              <caret line="14" column="3" lean-forward="true" selection-start-line="14" selection-start-column="3" selection-end-line="14" selection-end-column="3" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="property_expression.dart" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lib/query/expression/property_expression.dart">
+      <file leaf-file-name="mutable_document.dart" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/mutable_document.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" column="3" lean-forward="false" selection-start-line="5" selection-start-column="3" selection-end-line="5" selection-end-column="3" />
+            <state relative-caret-position="195">
+              <caret line="13" column="55" lean-forward="false" selection-start-line="13" selection-start-column="55" selection-end-line="13" selection-end-column="55" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="variable_expression.dart" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lib/query/expression/variable_expression.dart">
+      <file leaf-file-name="document_test.dart" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/document_test.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" column="2" lean-forward="false" selection-start-line="5" selection-start-column="2" selection-end-line="5" selection-end-column="2" />
+            <state relative-caret-position="330">
+              <caret line="23" column="42" lean-forward="false" selection-start-line="23" selection-start-column="42" selection-end-line="23" selection-end-column="42" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="join.dart" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lib/query/join.dart">
+      <file leaf-file-name="fluttercouch_test.dart" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/test/fluttercouch_test.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" column="53" lean-forward="false" selection-start-line="5" selection-start-column="2" selection-end-line="5" selection-end-column="53" />
-              <folding>
-                <element signature="e#0#22#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="15">
+              <caret line="1" column="0" lean-forward="true" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ordering.dart" pinned="false" current-in-tab="true">
+      <file leaf-file-name="fluttercouch.dart" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/fluttercouch.dart">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="165">
+              <caret line="14" column="35" lean-forward="false" selection-start-line="14" selection-start-column="35" selection-end-line="14" selection-end-column="35" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="where.dart" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/query/where.dart">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="389">
+              <caret line="35" column="4" lean-forward="false" selection-start-line="35" selection-start-column="4" selection-end-line="35" selection-end-column="4" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ordering.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/query/ordering.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="328">
-              <caret line="29" column="44" lean-forward="true" selection-start-line="29" selection-start-column="44" selection-end-line="29" selection-end-column="44" />
+            <state relative-caret-position="240">
+              <caret line="16" column="43" lean-forward="true" selection-start-line="16" selection-start-column="43" selection-end-line="16" selection-end-column="43" />
               <folding>
-                <element signature="e#0#63#0" expanded="true" />
+                <element signature="e#0#22#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="functions.dart" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/query/functions.dart">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="185">
+              <caret line="47" column="21" lean-forward="false" selection-start-line="47" selection-start-column="21" selection-end-line="47" selection-end-column="21" />
+              <folding>
+                <element signature="e#0#22#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -137,32 +125,10 @@
       <file leaf-file-name="expression.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/query/expression/expression.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
-              <caret line="128" column="16" lean-forward="true" selection-start-line="128" selection-start-column="16" selection-end-line="128" selection-end-column="16" />
+            <state relative-caret-position="110">
+              <caret line="29" column="30" lean-forward="false" selection-start-line="29" selection-start-column="30" selection-end-line="29" selection-end-column="30" />
               <folding>
-                <element signature="e#0#68#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="limit.dart" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lib/query/limit.dart">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="6" column="8" lean-forward="false" selection-start-line="6" selection-start-column="8" selection-end-line="6" selection-end-column="8" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="from.dart" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lib/query/from.dart">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="525">
-              <caret line="35" column="12" lean-forward="false" selection-start-line="35" selection-start-column="12" selection-end-line="35" selection-end-column="12" />
-              <folding>
-                <element signature="e#0#63#0" expanded="true" />
+                <element signature="e#0#22#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -193,8 +159,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/lib/query/Query.dart" />
-        <option value="$PROJECT_DIR$/lib/query/QueryBuilder.dart" />
         <option value="$PROJECT_DIR$/lib/blob.dart" />
         <option value="$PROJECT_DIR$/lib/query/SelectResult.dart" />
         <option value="$PROJECT_DIR$/lib/query/Joins.dart" />
@@ -229,21 +193,23 @@
         <option value="$PROJECT_DIR$/lib/query/limit.dart" />
         <option value="$PROJECT_DIR$/lib/query/order_by.dart" />
         <option value="$PROJECT_DIR$/lib/query/expression/ordering.dart" />
-        <option value="$PROJECT_DIR$/lib/query/where.dart" />
         <option value="$PROJECT_DIR$/lib/query/having.dart" />
         <option value="$PROJECT_DIR$/lib/query/group_by.dart" />
         <option value="$PROJECT_DIR$/lib/query/joins.dart" />
         <option value="$PROJECT_DIR$/lib/query/expression/array_function.dart" />
         <option value="$PROJECT_DIR$/lib/query/array_function.dart" />
-        <option value="$PROJECT_DIR$/lib/query/from.dart" />
         <option value="$PROJECT_DIR$/lib/query/join.dart" />
-        <option value="$PROJECT_DIR$/lib/query/expression/expression.dart" />
         <option value="$PROJECT_DIR$/lib/query/expression/meta_expression.dart" />
         <option value="$PROJECT_DIR$/lib/query/expression/property_expression.dart" />
-        <option value="$PROJECT_DIR$/test/query_test.dart" />
         <option value="$PROJECT_DIR$/lib/query/Function.dart" />
+        <option value="$PROJECT_DIR$/lib/query/expression/expression.dart" />
+        <option value="$PROJECT_DIR$/lib/query/where.dart" />
+        <option value="$PROJECT_DIR$/lib/query/from.dart" />
         <option value="$PROJECT_DIR$/lib/query/function.dart" />
+        <option value="$PROJECT_DIR$/lib/query/functions.dart" />
         <option value="$PROJECT_DIR$/lib/query/ordering.dart" />
+        <option value="$PROJECT_DIR$/lib/document.dart" />
+        <option value="$PROJECT_DIR$/test/query_test.dart" />
       </list>
     </option>
   </component>
@@ -280,19 +246,6 @@
               <item name="fluttercouch" type="b2602c69:ProjectViewProjectNode" />
               <item name="fluttercouch" type="462c0819:PsiDirectoryNode" />
               <item name="lib" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="fluttercouch" type="b2602c69:ProjectViewProjectNode" />
-              <item name="fluttercouch" type="462c0819:PsiDirectoryNode" />
-              <item name="lib" type="462c0819:PsiDirectoryNode" />
-              <item name="query" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="fluttercouch" type="b2602c69:ProjectViewProjectNode" />
-              <item name="fluttercouch" type="462c0819:PsiDirectoryNode" />
-              <item name="lib" type="462c0819:PsiDirectoryNode" />
-              <item name="query" type="462c0819:PsiDirectoryNode" />
-              <item name="expression" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="fluttercouch" type="b2602c69:ProjectViewProjectNode" />
@@ -341,7 +294,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Flutter Test.join">
+  <component name="RunManager" selected="Flutter Test.tests in test">
     <configuration default="true" type="AndroidJUnit" factoryName="Android JUnit">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <module name="" />
@@ -376,24 +329,23 @@
       <module name="" />
       <envs />
     </configuration>
-    <configuration name="ArrayFunction" type="FlutterTestConfigType" factoryName="Flutter Test" temporary="true" nameIsGenerated="true">
-      <option name="testName" value="ArrayFunction" />
-      <option name="testFile" value="$PROJECT_DIR$/test/query_test.dart" />
-    </configuration>
-    <configuration name="In" type="FlutterTestConfigType" factoryName="Flutter Test" temporary="true" nameIsGenerated="true">
-      <option name="testName" value="In" />
+    <configuration name="groupBy" type="FlutterTestConfigType" factoryName="Flutter Test" temporary="true" nameIsGenerated="true">
+      <option name="testName" value="groupBy" />
       <option name="testFile" value="$PROJECT_DIR$/test/query_test.dart" />
     </configuration>
     <configuration name="join" type="FlutterTestConfigType" factoryName="Flutter Test" temporary="true" nameIsGenerated="true">
       <option name="testName" value="join" />
       <option name="testFile" value="$PROJECT_DIR$/test/query_test.dart" />
     </configuration>
-    <configuration name="like" type="FlutterTestConfigType" factoryName="Flutter Test" temporary="true" nameIsGenerated="true">
-      <option name="testName" value="like" />
+    <configuration name="orderBy" type="FlutterTestConfigType" factoryName="Flutter Test" temporary="true" nameIsGenerated="true">
+      <option name="testName" value="orderBy" />
       <option name="testFile" value="$PROJECT_DIR$/test/query_test.dart" />
     </configuration>
     <configuration name="regex" type="FlutterTestConfigType" factoryName="Flutter Test" temporary="true" nameIsGenerated="true">
       <option name="testName" value="regex" />
+      <option name="testFile" value="$PROJECT_DIR$/test/query_test.dart" />
+    </configuration>
+    <configuration name="tests in query_test.dart" type="FlutterTestConfigType" factoryName="Flutter Test" temporary="true" nameIsGenerated="true">
       <option name="testFile" value="$PROJECT_DIR$/test/query_test.dart" />
     </configuration>
     <configuration name="tests in test" type="FlutterTestConfigType" factoryName="Flutter Test" nameIsGenerated="true">
@@ -454,19 +406,19 @@
     <list size="7">
       <item index="0" class="java.lang.String" itemvalue="Flutter.example/lib/main.dart" />
       <item index="1" class="java.lang.String" itemvalue="Flutter Test.tests in test" />
-      <item index="2" class="java.lang.String" itemvalue="Flutter Test.ArrayFunction" />
-      <item index="3" class="java.lang.String" itemvalue="Flutter Test.In" />
-      <item index="4" class="java.lang.String" itemvalue="Flutter Test.like" />
-      <item index="5" class="java.lang.String" itemvalue="Flutter Test.regex" />
-      <item index="6" class="java.lang.String" itemvalue="Flutter Test.join" />
+      <item index="2" class="java.lang.String" itemvalue="Flutter Test.regex" />
+      <item index="3" class="java.lang.String" itemvalue="Flutter Test.join" />
+      <item index="4" class="java.lang.String" itemvalue="Flutter Test.tests in query_test.dart" />
+      <item index="5" class="java.lang.String" itemvalue="Flutter Test.groupBy" />
+      <item index="6" class="java.lang.String" itemvalue="Flutter Test.orderBy" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Flutter Test.join" />
-        <item index="1" class="java.lang.String" itemvalue="Flutter Test.regex" />
-        <item index="2" class="java.lang.String" itemvalue="Flutter Test.like" />
-        <item index="3" class="java.lang.String" itemvalue="Flutter Test.In" />
-        <item index="4" class="java.lang.String" itemvalue="Flutter Test.ArrayFunction" />
+        <item index="0" class="java.lang.String" itemvalue="Flutter Test.orderBy" />
+        <item index="1" class="java.lang.String" itemvalue="Flutter Test.groupBy" />
+        <item index="2" class="java.lang.String" itemvalue="Flutter Test.tests in query_test.dart" />
+        <item index="3" class="java.lang.String" itemvalue="Flutter Test.join" />
+        <item index="4" class="java.lang.String" itemvalue="Flutter Test.regex" />
       </list>
     </recent_temporary>
   </component>
@@ -484,38 +436,46 @@
       <option name="presentableId" value="Default" />
       <updated>1526678152312</updated>
     </task>
+    <task id="LOCAL-00001" summary="Partial Query Implementation">
+      <created>1530995525866</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1530995525866</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="In - 2018.07.07 at 20h 11m 39s.xml">
-      <configuration name="In" configurationId="FlutterTestConfigType" />
+    <history-entry file="groupBy - 2018.07.07 at 23h 14m 21s.xml">
+      <configuration name="groupBy" configurationId="FlutterTestConfigType" />
     </history-entry>
-    <history-entry file="In - 2018.07.07 at 20h 12m 01s.xml">
-      <configuration name="In" configurationId="FlutterTestConfigType" />
+    <history-entry file="groupBy - 2018.07.08 at 04h 55m 58s.xml">
+      <configuration name="groupBy" configurationId="FlutterTestConfigType" />
     </history-entry>
-    <history-entry file="join - 2018.07.07 at 20h 52m 04s.xml">
-      <configuration name="join" configurationId="FlutterTestConfigType" />
+    <history-entry file="groupBy - 2018.07.08 at 04h 56m 15s.xml">
+      <configuration name="groupBy" configurationId="FlutterTestConfigType" />
     </history-entry>
-    <history-entry file="join - 2018.07.07 at 20h 55m 34s.xml">
-      <configuration name="join" configurationId="FlutterTestConfigType" />
+    <history-entry file="groupBy - 2018.07.08 at 05h 04m 37s.xml">
+      <configuration name="groupBy" configurationId="FlutterTestConfigType" />
     </history-entry>
-    <history-entry file="join - 2018.07.07 at 20h 56m 03s.xml">
-      <configuration name="join" configurationId="FlutterTestConfigType" />
+    <history-entry file="groupBy - 2018.07.08 at 05h 11m 57s.xml">
+      <configuration name="groupBy" configurationId="FlutterTestConfigType" />
     </history-entry>
-    <history-entry file="join - 2018.07.07 at 20h 56m 23s.xml">
-      <configuration name="join" configurationId="FlutterTestConfigType" />
+    <history-entry file="groupBy - 2018.07.08 at 05h 12m 47s.xml">
+      <configuration name="groupBy" configurationId="FlutterTestConfigType" />
     </history-entry>
-    <history-entry file="join - 2018.07.07 at 20h 58m 07s.xml">
-      <configuration name="join" configurationId="FlutterTestConfigType" />
+    <history-entry file="orderBy - 2018.07.08 at 05h 15m 11s.xml">
+      <configuration name="orderBy" configurationId="FlutterTestConfigType" />
     </history-entry>
-    <history-entry file="join - 2018.07.07 at 20h 58m 43s.xml">
-      <configuration name="join" configurationId="FlutterTestConfigType" />
+    <history-entry file="tests_in_test - 2018.07.08 at 05h 23m 27s.xml">
+      <configuration name="tests in test" configurationId="FlutterTestConfigType" />
     </history-entry>
-    <history-entry file="like - 2018.07.07 at 20h 16m 02s.xml">
-      <configuration name="like" configurationId="FlutterTestConfigType" />
+    <history-entry file="tests_in_test - 2018.07.08 at 05h 24m 52s.xml">
+      <configuration name="tests in test" configurationId="FlutterTestConfigType" />
     </history-entry>
-    <history-entry file="regex - 2018.07.07 at 20h 17m 56s.xml">
-      <configuration name="regex" configurationId="FlutterTestConfigType" />
+    <history-entry file="tests_in_test - 2018.07.08 at 05h 25m 33s.xml">
+      <configuration name="tests in test" configurationId="FlutterTestConfigType" />
     </history-entry>
   </component>
   <component name="TodoView">
@@ -529,6 +489,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="238" y="23" width="1264" height="980" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32946634" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -566,6 +527,14 @@
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
+    <MESSAGE value="Partial Query Implementation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Partial Query Implementation" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -580,11 +549,11 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="Dart">
           <url>file://$PROJECT_DIR$/lib/query/select_result.dart</url>
-          <line>11</line>
+          <line>12</line>
           <option name="timeStamp" value="38" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="39" />
+      <option name="time" value="41" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -689,46 +658,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
           <caret line="222" column="2" lean-forward="false" selection-start-line="222" selection-start-column="2" selection-end-line="222" selection-end-column="2" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/fluttercouch_test.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="3" column="13" lean-forward="false" selection-start-line="3" selection-start-column="13" selection-end-line="3" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/mutable_document.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" column="55" lean-forward="false" selection-start-line="13" selection-start-column="55" selection-end-line="13" selection-end-column="55" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/document_test.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="23" column="42" lean-forward="false" selection-start-line="23" selection-start-column="42" selection-end-line="23" selection-end-column="42" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/document.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="604">
-          <caret line="41" column="43" lean-forward="false" selection-start-line="41" selection-start-column="43" selection-end-line="41" selection-end-column="43" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/fluttercouch.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="14" column="35" lean-forward="false" selection-start-line="14" selection-start-column="35" selection-end-line="14" selection-end-column="35" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -861,9 +790,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="108">
           <caret line="11" column="45" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#63#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -881,9 +808,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
           <caret line="17" column="44" lean-forward="true" selection-start-line="17" selection-start-column="44" selection-end-line="17" selection-end-column="44" />
-          <folding>
-            <element signature="e#0#63#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -892,76 +817,6 @@
         <state relative-caret-position="270">
           <caret line="23" column="21" lean-forward="false" selection-start-line="23" selection-start-column="21" selection-end-line="23" selection-end-column="21" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/query/having.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="23" column="20" lean-forward="true" selection-start-line="23" selection-start-column="20" selection-end-line="23" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/query/joins.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="24" column="24" lean-forward="false" selection-start-line="24" selection-start-column="24" selection-end-line="24" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/query/order_by.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="13" column="30" lean-forward="false" selection-start-line="13" selection-start-column="30" selection-end-line="13" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/query/select.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="17" column="43" lean-forward="false" selection-start-line="17" selection-start-column="43" selection-end-line="17" selection-end-column="43" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/query/where.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="347">
-          <caret line="24" column="21" lean-forward="true" selection-start-line="24" selection-start-column="21" selection-end-line="24" selection-end-column="21" />
-          <folding>
-            <element signature="e#0#50#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/query/from.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="525">
-          <caret line="35" column="12" lean-forward="false" selection-start-line="35" selection-start-column="12" selection-end-line="35" selection-end-column="12" />
-          <folding>
-            <element signature="e#0#63#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/query/limit.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="6" column="8" lean-forward="false" selection-start-line="6" selection-start-column="8" selection-end-line="6" selection-end-column="8" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/query/expression/expression.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="128" column="16" lean-forward="true" selection-start-line="128" selection-start-column="16" selection-end-line="128" selection-end-column="16" />
-          <folding>
-            <element signature="e#0#68#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -981,34 +836,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/query/expression/variable_expression.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="2" lean-forward="false" selection-start-line="5" selection-start-column="2" selection-end-line="5" selection-end-column="2" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/query_test.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="419">
-          <caret line="144" column="7" lean-forward="true" selection-start-line="144" selection-start-column="7" selection-end-line="144" selection-end-column="7" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/query/function.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="392">
-          <caret line="41" column="68" lean-forward="true" selection-start-line="41" selection-start-column="68" selection-end-line="41" selection-end-column="68" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lib/query/join.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="75">
@@ -1019,13 +846,149 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/query/ordering.dart">
+    <entry file="file://$PROJECT_DIR$/lib/query/from.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="328">
-          <caret line="29" column="44" lean-forward="true" selection-start-line="29" selection-start-column="44" selection-end-line="29" selection-end-column="44" />
+        <state relative-caret-position="260">
+          <caret line="33" column="3" lean-forward="false" selection-start-line="33" selection-start-column="3" selection-end-line="33" selection-end-column="3" />
           <folding>
             <element signature="e#0#63#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/query/having.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="23" column="20" lean-forward="true" selection-start-line="23" selection-start-column="20" selection-end-line="23" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/query/select.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="17" column="43" lean-forward="false" selection-start-line="17" selection-start-column="43" selection-end-line="17" selection-end-column="43" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/query/limit.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="6" column="8" lean-forward="false" selection-start-line="6" selection-start-column="8" selection-end-line="6" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/query/joins.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="24" column="24" lean-forward="false" selection-start-line="24" selection-start-column="24" selection-end-line="24" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/query/expression/variable_expression.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" column="1" lean-forward="true" selection-start-line="6" selection-start-column="1" selection-end-line="6" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/query/order_by.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="16" column="45" lean-forward="true" selection-start-line="16" selection-start-column="45" selection-end-line="16" selection-end-column="45" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/query/where.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="389">
+          <caret line="35" column="4" lean-forward="false" selection-start-line="35" selection-start-column="4" selection-end-line="35" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/query/expression/expression.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="110">
+          <caret line="29" column="30" lean-forward="false" selection-start-line="29" selection-start-column="30" selection-end-line="29" selection-end-column="30" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/query/functions.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="185">
+          <caret line="47" column="21" lean-forward="false" selection-start-line="47" selection-start-column="21" selection-end-line="47" selection-end-column="21" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/query/ordering.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" column="43" lean-forward="true" selection-start-line="16" selection-start-column="43" selection-end-line="16" selection-end-column="43" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/fluttercouch.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="14" column="35" lean-forward="false" selection-start-line="14" selection-start-column="35" selection-end-line="14" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/query_test.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="419">
+          <caret line="197" column="7" lean-forward="true" selection-start-line="197" selection-start-column="7" selection-end-line="197" selection-end-column="7" />
+          <folding>
+            <element signature="e#0#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/document.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-556">
+          <caret line="14" column="3" lean-forward="true" selection-start-line="14" selection-start-column="3" selection-end-line="14" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/mutable_document.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="55" lean-forward="false" selection-start-line="13" selection-start-column="55" selection-end-line="13" selection-end-column="55" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/document_test.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="23" column="42" lean-forward="false" selection-start-line="23" selection-start-column="42" selection-end-line="23" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/fluttercouch_test.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="0" lean-forward="true" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
