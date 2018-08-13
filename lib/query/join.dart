@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:fluttercouch/query/expression/expression.dart';
 
 class Join {
@@ -39,6 +37,6 @@ class Join {
   }
 
   toJson() {
-    return json.encode(_internalStack);
+    return _internalStack;
   }
 }

@@ -50,10 +50,10 @@ class From extends Query {
     return resultQuery;
   }
 
-  OrderBy orderBy(Ordering ordering) {
+  OrderBy orderBy(List<Ordering> orderingList) {
     var resultQuery = new OrderBy();
     resultQuery.options = this.options;
-    resultQuery.options["orderBy"] = ordering;
+    resultQuery.options["orderBy"] = orderingList;
     return resultQuery;
   }
 

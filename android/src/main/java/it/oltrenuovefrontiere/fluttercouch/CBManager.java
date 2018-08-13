@@ -4,6 +4,7 @@ import com.couchbase.lite.BasicAuthenticator;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseConfiguration;
+import com.couchbase.lite.Document;
 import com.couchbase.lite.Endpoint;
 import com.couchbase.lite.MutableDocument;
 import com.couchbase.lite.Replicator;
@@ -12,13 +13,15 @@ import com.couchbase.lite.URLEndpoint;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class CBManager {
     private static final CBManager mInstance = new CBManager();
-    private Database mDatabase;
+    private HashMap<String, Database> mDatabase = new HashMap<>();
     private ReplicatorConfiguration mReplConfig;
     private Replicator mReplicator;
+    private String defaultDatabase = "defaultDatabase";
 
     private CBManager() {
     }
@@ -28,35 +31,57 @@ public class CBManager {
     }
 
     public Database getDatabase() {
-        return mDatabase;
+        return mDatabase.get(defaultDatabase);
+    }
+
+    public Database getDatabase(String name) {
+        if (mDatabase.containsKey(name)) {
+            return mDatabase.get(name);
+        }
+        return null;
     }
 
     public String saveDocument(Map<String, Object> _map) throws CouchbaseLiteException {
         MutableDocument mutableDoc = new MutableDocument(_map);
-        mDatabase.save(mutableDoc);
+        mDatabase.get(defaultDatabase).save(mutableDoc);
         String returnedId = mutableDoc.getId();
         return returnedId;
     }
 
     public String saveDocumentWithId(String _id, Map<String, Object> _map) throws CouchbaseLiteException {
         MutableDocument mutableDoc = new MutableDocument(_id, _map);
-        mDatabase.save(mutableDoc);
+        mDatabase.get(defaultDatabase).save(mutableDoc);
         String returnedId = mutableDoc.getId();
         return returnedId;
     }
 
     public Map<String, Object> getDocumentWithId(String _id) throws CouchbaseLiteException {
-        return mDatabase.getDocument(_id).toMap();
+        Database defaultDb = getDatabase();
+        if (defaultDatabase != null) {
+            try {
+                Document document = defaultDb.getDocument(_id);
+                if (document != null) {
+                    return document.toMap();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
     }
 
-    public void initDatabaseWithName(String _name) throws Exception, CouchbaseLiteException {
-        DatabaseConfiguration config = new DatabaseConfiguration(FluttercouchPlugin.getContextFromReflection());
-        mDatabase = new Database(_name, config);
+    public void initDatabaseWithName(String _name) throws CouchbaseLiteException {
+        DatabaseConfiguration config = new DatabaseConfiguration(FluttercouchPlugin.context);
+        if (!mDatabase.containsKey(_name)) {
+            defaultDatabase = _name;
+            mDatabase.put(_name, new Database(_name, config));
+        }
     }
 
     public String setReplicatorEndpoint(String _endpoint) throws URISyntaxException {
         Endpoint targetEndpoint = new URLEndpoint(new URI(_endpoint));
-        mReplConfig = new ReplicatorConfiguration(mDatabase, targetEndpoint);
+        mReplConfig = new ReplicatorConfiguration(mDatabase.get(defaultDatabase), targetEndpoint);
         return mReplConfig.getTarget().toString();
     }
 

@@ -1,15 +1,17 @@
 package it.oltrenuovefrontiere.fluttercouch;
 
-import android.app.Application;
 import android.content.Context;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Query;
 
+import org.json.JSONObject;
+
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.flutter.plugin.common.JSONMethodCodec;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -22,13 +24,18 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 public class FluttercouchPlugin implements MethodCallHandler {
 
     CBManager mCbManager = CBManager.getInstance();
+    static Context context;
 
     /**
      * Plugin registration.
      */
     public static void registerWith(Registrar registrar) {
+        context = registrar.context();
         final MethodChannel channel = new MethodChannel(registrar.messenger(), "it.oltrenuovefrontiere.fluttercouch");
         channel.setMethodCallHandler(new FluttercouchPlugin());
+
+        final MethodChannel jsonChannel = new MethodChannel(registrar.messenger(), "it.oltrenuovefrontiere.fluttercouchJson", JSONMethodCodec.INSTANCE);
+        jsonChannel.setMethodCallHandler(new FluttercouchPlugin());
     }
 
     /**
@@ -38,17 +45,9 @@ public class FluttercouchPlugin implements MethodCallHandler {
      * @throws Exception
      */
 
-    public static Context getContextFromReflection() throws Exception {
-        Application _application = (Application) Class.forName("android.app.ActivityThread").getMethod("currentApplication").invoke(null, (Object[]) null);
-        return _application.getApplicationContext();
-    }
-
     @Override
     public void onMethodCall(MethodCall call, Result result) {
         switch (call.method) {
-            case ("getPlatformVersion"):
-                result.success("Android " + android.os.Build.VERSION.RELEASE);
-                break;
             case ("initDatabaseWithName"):
                 String _name = call.arguments();
                 try {
@@ -139,6 +138,11 @@ public class FluttercouchPlugin implements MethodCallHandler {
                     e.printStackTrace();
                     result.error("errExecutingQuery", "error executing query ", e.toString());
                 }
+                break;
+            case ("execute"):
+                JSONObject queryJson = call.arguments();
+                Query queryFromJson = new QueryJson(queryJson).toCouchbaseQuery();
+
                 break;
             default:
                 result.notImplemented();

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:fluttercouch/query/expression/expression.dart';
 
 class SelectResult {
@@ -32,6 +30,6 @@ class SelectResult {
   }
 
   toJson() {
-    return json.encode(_internalExpression.internalExpressionStack);
+    return _internalExpression.internalExpressionStack;
   }
 }

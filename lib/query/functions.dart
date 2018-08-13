@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:fluttercouch/query/expression/expression.dart';
 
 class Functions extends Object with Expression {
@@ -154,6 +152,6 @@ class Functions extends Object with Expression {
   }
 
   toJson() {
-    return json.encode(internalExpressionStack);
+    return internalExpressionStack;
   }
 }

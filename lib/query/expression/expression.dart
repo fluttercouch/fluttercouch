@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:fluttercouch/query/expression/meta_expression.dart';
 import 'package:fluttercouch/query/expression/property_expression.dart';
 import 'package:fluttercouch/query/expression/variable_expression.dart';
@@ -132,7 +130,7 @@ abstract class Expression {
   }
 
   toJson() {
-    return json.encode(internalExpressionStack);
+    return internalExpressionStack;
   }
 
   Expression _addExpression(String selector, Expression expression,

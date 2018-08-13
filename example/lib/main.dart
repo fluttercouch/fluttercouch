@@ -4,6 +4,8 @@ import 'package:fluttercouch/document.dart';
 import 'package:fluttercouch/fluttercouch.dart';
 import 'package:fluttercouch/mutable_document.dart';
 import 'package:fluttercouch/query/expression/expression.dart';
+import 'package:fluttercouch/query/expression/meta.dart';
+import 'package:fluttercouch/query/ordering.dart';
 import 'package:fluttercouch/query/query.dart';
 import 'package:fluttercouch/query/query_builder.dart';
 import 'package:fluttercouch/query/select_result.dart';
@@ -32,10 +34,15 @@ class AppModel extends Model with Fluttercouch {
       notifyListeners();
       MutableDocument mutableDoc = MutableDocument();
       mutableDoc.setString("prova", "");
-      query = QueryBuilder
-          .select(SelectResult.all())
-          .from(_databaseName)
-          .where(Expression.property("type").equalTo(Expression.string("SDK")));
+      Query query = QueryBuilder
+          .select(
+          [SelectResult.expression(Meta.id), SelectResult.property("name")])
+          .from("database")
+          .where(
+          Expression.property("type").equalTo(Expression.string("hotel")))
+          .orderBy(
+          [Ordering.property("name").ascending(), Ordering.expression(Meta.id)])
+          .limit(Expression.intValue(10));
       query.execute();
     } on PlatformException {}
   }
@@ -67,7 +74,7 @@ class Home extends StatelessWidget {
             new ScopedModelDescendant<AppModel>(
               builder: (context, child, model) =>
               new Text(
-                '${model.docExample.getString("nome")}',
+                'Ciao',
                 style: Theme
                     .of(context)
                     .textTheme

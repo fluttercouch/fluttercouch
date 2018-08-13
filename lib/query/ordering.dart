@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:fluttercouch/query/expression/expression.dart';
 
 class Ordering {
@@ -18,7 +16,7 @@ class Ordering {
   }
 
   toJson() {
-    return json.encode(_internalExpression.internalExpressionStack);
+    return _internalExpression.internalExpressionStack;
   }
 
   Ordering ascending() {
