@@ -5,27 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="93cacefd-ce56-4744-bec7-e305a79d4494" name="Default" comment="">
+      <change beforePath="" afterPath="$PROJECT_DIR$/example/ios/Runner/CBManager.swift" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/android/build.gradle" afterPath="$PROJECT_DIR$/android/build.gradle" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/it/oltrenuovefrontiere/fluttercouch/CBManager.java" afterPath="$PROJECT_DIR$/android/src/main/java/it/oltrenuovefrontiere/fluttercouch/CBManager.java" />
       <change beforePath="$PROJECT_DIR$/android/src/main/java/it/oltrenuovefrontiere/fluttercouch/FluttercouchPlugin.java" afterPath="$PROJECT_DIR$/android/src/main/java/it/oltrenuovefrontiere/fluttercouch/FluttercouchPlugin.java" />
       <change beforePath="$PROJECT_DIR$/example/android/.idea/caches/build_file_checksums.ser" afterPath="$PROJECT_DIR$/example/android/.idea/caches/build_file_checksums.ser" />
-      <change beforePath="$PROJECT_DIR$/example/android/.idea/misc.xml" afterPath="$PROJECT_DIR$/example/android/.idea/misc.xml" />
-      <change beforePath="$PROJECT_DIR$/example/android/app/build.gradle" afterPath="$PROJECT_DIR$/example/android/app/build.gradle" />
-      <change beforePath="$PROJECT_DIR$/example/lib/main.dart" afterPath="$PROJECT_DIR$/example/lib/main.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/array_function.dart" afterPath="$PROJECT_DIR$/lib/query/array_function.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/expression/expression.dart" afterPath="$PROJECT_DIR$/lib/query/expression/expression.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/from.dart" afterPath="$PROJECT_DIR$/lib/query/from.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/functions.dart" afterPath="$PROJECT_DIR$/lib/query/functions.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/group_by.dart" afterPath="$PROJECT_DIR$/lib/query/group_by.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/having.dart" afterPath="$PROJECT_DIR$/lib/query/having.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/join.dart" afterPath="$PROJECT_DIR$/lib/query/join.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/joins.dart" afterPath="$PROJECT_DIR$/lib/query/joins.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/ordering.dart" afterPath="$PROJECT_DIR$/lib/query/ordering.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/query.dart" afterPath="$PROJECT_DIR$/lib/query/query.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/select_result.dart" afterPath="$PROJECT_DIR$/lib/query/select_result.dart" />
-      <change beforePath="$PROJECT_DIR$/lib/query/where.dart" afterPath="$PROJECT_DIR$/lib/query/where.dart" />
-      <change beforePath="$PROJECT_DIR$/test/query_test.dart" afterPath="$PROJECT_DIR$/test/query_test.dart" />
+      <change beforePath="$PROJECT_DIR$/example/ios/Runner.xcodeproj/project.pbxproj" afterPath="$PROJECT_DIR$/example/ios/Runner.xcodeproj/project.pbxproj" />
+      <change beforePath="$PROJECT_DIR$/example/ios/Runner/AppDelegate.swift" afterPath="$PROJECT_DIR$/example/ios/Runner/AppDelegate.swift" />
+      <change beforePath="$PROJECT_DIR$/example/ios/Runner/Info.plist" afterPath="$PROJECT_DIR$/example/ios/Runner/Info.plist" />
+      <change beforePath="$PROJECT_DIR$/ios/Classes/SwiftFluttercouchPlugin.swift" afterPath="$PROJECT_DIR$/ios/Classes/SwiftFluttercouchPlugin.swift" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -49,20 +36,60 @@
         <entry file="file://$PROJECT_DIR$/test/query_test.dart">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="2370">
-              <caret line="169" column="34" lean-forward="false" selection-start-line="169" selection-start-column="34" selection-end-line="169" selection-end-column="34" />
+              <caret line="169" column="30" lean-forward="false" selection-start-line="169" selection-start-column="30" selection-end-line="169" selection-end-column="30" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.dart" pinned="false" current-in-tab="true">
+      <file leaf-file-name="main.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="640">
-              <caret line="58" column="28" lean-forward="true" selection-start-line="58" selection-start-column="28" selection-end-line="58" selection-end-column="28" />
+            <state relative-caret-position="765">
+              <caret line="51" column="0" lean-forward="false" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CBManager.swift" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/ios/Classes/CBManager.swift">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FluttercouchPlugin.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ios/Classes/FluttercouchPlugin.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FluttercouchPlugin.m" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ios/Classes/FluttercouchPlugin.m">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SwiftFluttercouchPlugin.swift" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ios/Classes/SwiftFluttercouchPlugin.swift">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -93,6 +120,11 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="database_refactoring" />
+      </map>
+    </option>
   </component>
   <component name="GradleLocalSettings">
     <option name="externalProjectsViewState">
@@ -102,7 +134,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/lib/query/SelectResult.dart" />
         <option value="$PROJECT_DIR$/lib/query/Joins.dart" />
         <option value="$PROJECT_DIR$/lib/query/select_result_as.dart" />
         <option value="$PROJECT_DIR$/lib/query/parameters.dart" />
@@ -151,8 +182,9 @@
         <option value="$PROJECT_DIR$/lib/query/having.dart" />
         <option value="$PROJECT_DIR$/lib/query/joins.dart" />
         <option value="$PROJECT_DIR$/lib/query/where.dart" />
-        <option value="$PROJECT_DIR$/example/lib/main.dart" />
         <option value="$PROJECT_DIR$/test/query_test.dart" />
+        <option value="$PROJECT_DIR$/example/lib/main.dart" />
+        <option value="$PROJECT_DIR$/lib/database.dart" />
       </list>
     </option>
   </component>
@@ -166,8 +198,8 @@
     <packageJsonPaths />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="127" />
-    <option name="y" value="23" />
+    <option name="x" value="297" />
+    <option name="y" value="28" />
     <option name="width" value="1245" />
     <option name="height" value="1002" />
   </component>
@@ -186,41 +218,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="fluttercouch" type="b2602c69:ProjectViewProjectNode" />
-              <item name="fluttercouch" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="fluttercouch" type="b2602c69:ProjectViewProjectNode" />
-              <item name="fluttercouch" type="462c0819:PsiDirectoryNode" />
-              <item name="lib" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="fluttercouch" type="b2602c69:ProjectViewProjectNode" />
-              <item name="fluttercouch" type="462c0819:PsiDirectoryNode" />
-              <item name="lib" type="462c0819:PsiDirectoryNode" />
-              <item name="query" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="fluttercouch" type="b2602c69:ProjectViewProjectNode" />
-              <item name="fluttercouch" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="fluttercouch" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-        <option name="show-excluded-files" value="false" />
-      </pane>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
-      <pane id="Scratches" />
       <pane id="AndroidView">
         <subPane>
           <expand>
@@ -246,6 +243,25 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
+      <pane id="Scratches" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="fluttercouch" type="b2602c69:ProjectViewProjectNode" />
+              <item name="fluttercouch" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="fluttercouch" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+        <option name="show-excluded-files" value="false" />
+      </pane>
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -392,10 +408,10 @@
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Flutter Test.tests in query_test.dart" />
-        <item index="1" class="java.lang.String" itemvalue="Flutter Test.Query execution" />
-        <item index="2" class="java.lang.String" itemvalue="Flutter Test.orderBy" />
-        <item index="3" class="java.lang.String" itemvalue="Flutter Test.groupBy" />
+        <item index="0" class="java.lang.String" itemvalue="Flutter Test.Query execution" />
+        <item index="1" class="java.lang.String" itemvalue="Flutter Test.orderBy" />
+        <item index="2" class="java.lang.String" itemvalue="Flutter Test.groupBy" />
+        <item index="3" class="java.lang.String" itemvalue="Flutter Test.tests in query_test.dart" />
         <item index="4" class="java.lang.String" itemvalue="Flutter Test.join" />
       </list>
     </recent_temporary>
@@ -429,7 +445,14 @@
       <option name="project" value="LOCAL" />
       <updated>1531020370573</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Android implementation of Query (partial)">
+      <created>1534197137460</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1534197137460</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -477,8 +500,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="127" y="23" width="1245" height="1002" extended-state="0" />
-    <editor active="true" />
+    <frame x="297" y="28" width="1245" height="1002" extended-state="0" />
     <layout>
       <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -496,7 +518,7 @@
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24937657" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24937657" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Device File Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -522,7 +544,8 @@
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
     <MESSAGE value="Partial Query Implementation" />
     <MESSAGE value="Dart implementation of Query" />
-    <option name="LAST_COMMIT_MESSAGE" value="Dart implementation of Query" />
+    <MESSAGE value="Android implementation of Query (partial)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Android implementation of Query (partial)" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
@@ -566,41 +589,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../../flutter/packages/flutter/lib/src/foundation/binding.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="156">
-          <caret line="363" column="44" lean-forward="false" selection-start-line="363" selection-start-column="44" selection-end-line="363" selection-end-column="44" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../flutter/packages/flutter/lib/src/widgets/framework.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="3686" column="27" lean-forward="false" selection-start-line="3686" selection-start-column="27" selection-end-line="3686" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pubspec.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/example/pubspec.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="22" lean-forward="false" selection-start-line="10" selection-start-column="22" selection-end-line="10" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/blob.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" column="2" lean-forward="false" selection-start-line="1" selection-start-column="2" selection-end-line="1" selection-end-column="2" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/example/.flutter-plugins">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -879,10 +867,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/lib/database.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/test/query_test.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2370">
-          <caret line="169" column="34" lean-forward="false" selection-start-line="169" selection-start-column="34" selection-end-line="169" selection-end-column="34" />
+          <caret line="169" column="30" lean-forward="false" selection-start-line="169" selection-start-column="30" selection-end-line="169" selection-end-column="30" />
           <folding />
         </state>
       </provider>
@@ -897,11 +893,43 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="640">
-          <caret line="58" column="28" lean-forward="true" selection-start-line="58" selection-start-column="28" selection-end-line="58" selection-end-column="28" />
+        <state relative-caret-position="765">
+          <caret line="51" column="0" lean-forward="false" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ios/Classes/FluttercouchPlugin.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ios/Classes/FluttercouchPlugin.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ios/Classes/SwiftFluttercouchPlugin.swift">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ios/Classes/CBManager.swift">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>

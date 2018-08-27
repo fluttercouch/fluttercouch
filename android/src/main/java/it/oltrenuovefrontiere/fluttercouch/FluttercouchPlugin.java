@@ -142,7 +142,6 @@ public class FluttercouchPlugin implements MethodCallHandler {
             case ("execute"):
                 JSONObject queryJson = call.arguments();
                 Query queryFromJson = new QueryJson(queryJson).toCouchbaseQuery();
-
                 break;
             default:
                 result.notImplemented();
