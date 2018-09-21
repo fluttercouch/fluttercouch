@@ -1,6 +1,7 @@
 package it.oltrenuovefrontiere.fluttercouch;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Query;
@@ -17,6 +18,8 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * FluttercouchPlugin
@@ -139,7 +142,7 @@ public class FluttercouchPlugin implements MethodCallHandler {
                     result.error("errExecutingQuery", "error executing query ", e.toString());
                 }
                 break;
-            case ("execute"):
+            case ("execute")
                 JSONObject queryJson = call.arguments();
                 Query queryFromJson = new QueryJson(queryJson).toCouchbaseQuery();
                 break;
