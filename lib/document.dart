@@ -63,9 +63,22 @@ class Document {
     }
   }
 
-  List<Object> getList(String key) {
-    Object _result = getValue(key);
-    return _result is List<Object> ? _result : null;
+  List<T> getList<T>(String key) {
+    List<dynamic> _result = getValue(key);
+    return List.castFrom<dynamic, T>(_result);
+  }
+
+  List<Map<K, V>> getListOfMap<K,V>(String key) {
+    List<dynamic> _result = getValue(key);
+    return _result
+        .cast<Map<dynamic, dynamic>>()
+        .map((item) => item.cast<K,V>())
+        .toList();
+  }
+
+  Map<K,V> getMap<K,V>(String key) {
+    Map<dynamic, dynamic> _result = getValue(key);
+    return Map.castFrom<dynamic, dynamic, K, V>(_result);
   }
 
   Map<String, dynamic> toMap() {
@@ -78,5 +91,13 @@ class Document {
 
   String getId() {
     return _id;
+  }
+
+  bool isNotEmpty() {
+    return _internalState.isNotEmpty;
+  }
+
+  bool isEmpty() {
+    return _internalState.isEmpty;
   }
 }
