@@ -65,20 +65,32 @@ class Document {
 
   List<T> getList<T>(String key) {
     List<dynamic> _result = getValue(key);
-    return List.castFrom<dynamic, T>(_result);
+    if (_result != null) {
+      return List.castFrom<dynamic, T>(_result);
+    } else {
+      return null;
+    }
   }
 
-  List<Map<K, V>> getListOfMap<K,V>(String key) {
+  List<Map<K, V>> getListOfMap<K, V>(String key) {
     List<dynamic> _result = getValue(key);
-    return _result
-        .cast<Map<dynamic, dynamic>>()
-        .map((item) => item.cast<K,V>())
-        .toList();
+    if (_result != null) {
+      return _result
+          .cast<Map<dynamic, dynamic>>()
+          .map((item) => item.cast<K, V>())
+          .toList();
+    } else {
+      return null;
+    }
   }
 
-  Map<K,V> getMap<K,V>(String key) {
+  Map<K, V> getMap<K, V>(String key) {
     Map<dynamic, dynamic> _result = getValue(key);
-    return Map.castFrom<dynamic, dynamic, K, V>(_result);
+    if (_result != null) {
+      return Map.castFrom<dynamic, dynamic, K, V>(_result);
+    } else {
+      return null;
+    }
   }
 
   Map<String, dynamic> toMap() {
