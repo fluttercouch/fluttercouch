@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.JSONMethodCodec;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -34,19 +35,16 @@ public class FluttercouchPlugin implements MethodCallHandler {
      */
     public static void registerWith(Registrar registrar) {
         context = registrar.context();
+        final FluttercouchPlugin flutterCouchPlugin = new FluttercouchPlugin();
         final MethodChannel channel = new MethodChannel(registrar.messenger(), "it.oltrenuovefrontiere.fluttercouch");
-        channel.setMethodCallHandler(new FluttercouchPlugin());
+        channel.setMethodCallHandler(flutterCouchPlugin);
 
-        final MethodChannel jsonChannel = new MethodChannel(registrar.messenger(), "it.oltrenuovefrontiere.fluttercouchJson", JSONMethodCodec.INSTANCE);
-        jsonChannel.setMethodCallHandler(new FluttercouchPlugin());
+        //final MethodChannel jsonChannel = new MethodChannel(registrar.messenger(), "it.oltrenuovefrontiere.fluttercouchJson", JSONMethodCodec.INSTANCE);
+        //jsonChannel.setMethodCallHandler(new FluttercouchPlugin());
+
+        final EventChannel eventChannel = new EventChannel(registrar.messenger(), "it.oltrenuovefrontiere.fluttercouch/replicationEventChannel");
+        eventChannel.setStreamHandler(new ReplicationEventListener(flutterCouchPlugin.mCbManager));
     }
-
-    /**
-     * Get ApplicationContext through reflection for database initialization.
-     *
-     * @return Context
-     * @throws Exception
-     */
 
     @Override
     public void onMethodCall(MethodCall call, Result result) {
@@ -126,11 +124,17 @@ public class FluttercouchPlugin implements MethodCallHandler {
                     result.error("errAuth", "error setting authentication for replicator", null);
                 }
                 break;
+            case ("initReplicator"):
+                mCbManager.initReplicator();
+                result.success("");
+                break;
             case ("startReplicator"):
                 mCbManager.startReplicator();
+                result.success("");
                 break;
             case ("stopReplicator"):
                 mCbManager.stopReplicator();
+                result.success("");
                 break;
             case ("executeQuery"):
                 HashMap<String, String> _queryMap = call.arguments();
@@ -142,7 +146,7 @@ public class FluttercouchPlugin implements MethodCallHandler {
                     result.error("errExecutingQuery", "error executing query ", e.toString());
                 }
                 break;
-            case ("execute")
+            case ("execute"):
                 JSONObject queryJson = call.arguments();
                 Query queryFromJson = new QueryJson(queryJson).toCouchbaseQuery();
                 break;
