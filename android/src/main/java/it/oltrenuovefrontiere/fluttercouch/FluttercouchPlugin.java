@@ -132,6 +132,15 @@ public class FluttercouchPlugin implements MethodCallHandler {
                     e.printStackTrace();;
                     result.error("errAuth", "invalid session ID", null);
                 }
+                break;
+            case ("setReplicatorContinuous"):
+                Boolean _continuous = call.arguments();
+                try {
+                    result.success(mCbManager.setReplicatorContinuous(_continuous));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    result.error("errContinuous", "unable to set replication to continuous", null);
+                }
             case ("initReplicator"):
                 mCbManager.initReplicator();
                 result.success("");

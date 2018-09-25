@@ -65,6 +65,15 @@ abstract class Fluttercouch {
     }
   }
 
+  Future<bool> setReplicatorContinuous(bool _continuous) async {
+    try {
+      final bool result = await _methodChannel.invokeMethod('setReplicatorContinuous', _continuous);
+      return result;
+    } on PlatformException {
+      throw 'unable to set replicator continuous setting to $_continuous';
+    }
+  }
+
   Future<String> setReplicatorBasicAuthentication(
       Map<String, String> _auth) async {
     try {

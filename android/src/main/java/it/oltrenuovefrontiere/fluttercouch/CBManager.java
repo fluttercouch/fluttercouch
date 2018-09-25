@@ -118,6 +118,11 @@ public class CBManager {
         return mReplConfig.getAuthenticator().toString();
     }
 
+    public boolean setReplicatorContinuous(boolean _continuous) {
+        mReplConfig.setContinuous(_continuous);
+        return mReplConfig.isContinuous();
+    }
+
     public void initReplicator() {
         mReplicator = new Replicator(mReplConfig);
     }
