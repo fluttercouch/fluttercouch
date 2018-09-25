@@ -9,6 +9,7 @@ import com.couchbase.lite.Endpoint;
 import com.couchbase.lite.MutableDocument;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.ReplicatorConfiguration;
+import com.couchbase.lite.SessionAuthenticator;
 import com.couchbase.lite.URLEndpoint;
 import com.couchbase.litecore.C4Replicator;
 
@@ -102,6 +103,15 @@ public class CBManager {
     public String setReplicatorBasicAuthentication(Map<String, String> _auth) throws Exception {
         if (_auth.containsKey("username") && _auth.containsKey("password")) {
             mReplConfig.setAuthenticator(new BasicAuthenticator(_auth.get("username"), _auth.get("password")));
+        } else {
+            throw new Exception();
+        }
+        return mReplConfig.getAuthenticator().toString();
+    }
+
+    public String setReplicatorSessionAuthentication(String sessionID) throws Exception {
+        if (sessionID != null) {
+            mReplConfig.setAuthenticator(new SessionAuthenticator(sessionID));
         } else {
             throw new Exception();
         }
