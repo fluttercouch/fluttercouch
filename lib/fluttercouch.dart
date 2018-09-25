@@ -72,7 +72,16 @@ abstract class Fluttercouch {
           'setReplicatorBasicAuthentication', _auth);
       return result;
     } on PlatformException {
-      throw 'unable to set replicator authentication';
+      throw 'unable to set replicator basic authentication';
+    }
+  }
+
+  Future<String> setReplicatorSessionAuthentication(String _sessionID) async {
+    try {
+      final String result = await _methodChannel.invokeMethod('setReplicatorSessionAuthentication', _sessionID);
+      return result;
+    } on PlatformException {
+      throw 'unable to set replicator basic authentication';
     }
   }
 

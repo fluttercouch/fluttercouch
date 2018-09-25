@@ -124,6 +124,14 @@ public class FluttercouchPlugin implements MethodCallHandler {
                     result.error("errAuth", "error setting authentication for replicator", null);
                 }
                 break;
+            case ("setReplicatorSessionAuthentication"):
+                String _sessionID = call.arguments();
+                try {
+                    result.success(mCbManager.setReplicatorSessionAuthentication(_sessionID));
+                } catch (Exception e) {
+                    e.printStackTrace();;
+                    result.error("errAuth", "invalid session ID", null);
+                }
             case ("initReplicator"):
                 mCbManager.initReplicator();
                 result.success("");
