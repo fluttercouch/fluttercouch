@@ -10,6 +10,7 @@ import com.couchbase.lite.MutableDocument;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.ReplicatorConfiguration;
 import com.couchbase.lite.URLEndpoint;
+import com.couchbase.litecore.C4Replicator;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -107,13 +108,20 @@ public class CBManager {
         return mReplConfig.getAuthenticator().toString();
     }
 
-    public void startReplicator() {
+    public void initReplicator() {
         mReplicator = new Replicator(mReplConfig);
+    }
+
+    public void startReplicator() {
         mReplicator.start();
     }
 
     public void stopReplicator() {
         mReplicator.stop();
         mReplicator = null;
+    }
+
+    public Replicator getReplicator() {
+        return mReplicator;
     }
 }
