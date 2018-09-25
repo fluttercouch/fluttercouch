@@ -5,8 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="93cacefd-ce56-4744-bec7-e305a79d4494" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/lib/document.dart" afterPath="$PROJECT_DIR$/lib/document.dart" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -36,11 +36,31 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="document.dart" pinned="false" current-in-tab="true">
+      <file leaf-file-name="document.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/document.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="668">
+            <state relative-caret-position="432">
               <caret line="91" column="18" lean-forward="false" selection-start-line="91" selection-start-column="18" selection-end-line="91" selection-end-column="18" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/example/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="15">
+              <caret line="1" column="11" lean-forward="false" selection-start-line="1" selection-start-column="11" selection-end-line="1" selection-end-column="11" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="135">
+              <caret line="9" column="19" lean-forward="true" selection-start-line="9" selection-start-column="19" selection-end-line="9" selection-end-column="19" />
               <folding />
             </state>
           </provider>
@@ -86,8 +106,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/lib/query/parameters.dart" />
-        <option value="$PROJECT_DIR$/lib/query/result_set.dart" />
         <option value="$PROJECT_DIR$/lib/query/result.dart" />
         <option value="$PROJECT_DIR$/lib/query/select_result_from.dart" />
         <option value="$PROJECT_DIR$/lib/query/expression.dart" />
@@ -137,6 +155,8 @@
         <option value="$PROJECT_DIR$/example/pubspec.yaml" />
         <option value="$PROJECT_DIR$/lib/fluttercouch.dart" />
         <option value="$PROJECT_DIR$/lib/document.dart" />
+        <option value="$PROJECT_DIR$/example/.gitignore" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -150,7 +170,7 @@
     <packageJsonPaths />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="98" />
+    <option name="x" value="97" />
     <option name="y" value="82" />
     <option name="width" value="1245" />
     <option name="height" value="877" />
@@ -177,22 +197,6 @@
             <path>
               <item name="fluttercouch" type="b2602c69:ProjectViewProjectNode" />
               <item name="fluttercouch" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="fluttercouch" type="b2602c69:ProjectViewProjectNode" />
-              <item name="fluttercouch" type="462c0819:PsiDirectoryNode" />
-              <item name="example" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="fluttercouch" type="b2602c69:ProjectViewProjectNode" />
-              <item name="fluttercouch" type="462c0819:PsiDirectoryNode" />
-              <item name="example" type="462c0819:PsiDirectoryNode" />
-              <item name="lib" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="fluttercouch" type="b2602c69:ProjectViewProjectNode" />
-              <item name="fluttercouch" type="462c0819:PsiDirectoryNode" />
-              <item name="lib" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="fluttercouch" type="b2602c69:ProjectViewProjectNode" />
@@ -473,7 +477,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="98" y="82" width="1245" height="877" extended-state="0" />
+    <frame x="97" y="82" width="1245" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -564,7 +568,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/lib/query/query_options.txt" />
     <entry file="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/test-0.12.40/lib/src/frontend/expect.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
@@ -808,13 +811,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/database.dart" />
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ios/Classes/FluttercouchPlugin.m">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
@@ -892,8 +888,24 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/document.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="668">
+        <state relative-caret-position="432">
           <caret line="91" column="18" lean-forward="false" selection-start-line="91" selection-start-column="18" selection-end-line="91" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="11" lean-forward="false" selection-start-line="1" selection-start-column="11" selection-end-line="1" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="19" lean-forward="true" selection-start-line="9" selection-start-column="19" selection-end-line="9" selection-end-column="19" />
           <folding />
         </state>
       </provider>
