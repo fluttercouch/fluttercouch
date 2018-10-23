@@ -20,9 +20,9 @@ abstract class Fluttercouch {
     }
   }
 
-  Future<String> saveDocument(Map<String, dynamic> _map) async {
+  Future<String> saveDocument(Document _doc) async {
     try {
-      final String result = await _methodChannel.invokeMethod('saveDocument', _map);
+      final String result = await _methodChannel.invokeMethod('saveDocument', _doc.toMap());
       return result;
     } on PlatformException {
       throw 'unable to save the document';
@@ -32,7 +32,7 @@ abstract class Fluttercouch {
   Future<String> saveDocumentWithId(String _id, Document _doc) async {
     try {
       final String result = await _methodChannel.invokeMethod(
-          'saveDocument', <String, dynamic>{'id': _id, 'map': _doc.toMap()});
+          'saveDocumentWithId', <String, dynamic>{'id': _id, 'map': _doc.toMap()});
       return result;
     } on PlatformException {
       throw 'unable to save the document with set id $_id';

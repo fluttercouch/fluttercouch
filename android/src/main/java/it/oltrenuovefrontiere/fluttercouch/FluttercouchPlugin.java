@@ -141,6 +141,7 @@ public class FluttercouchPlugin implements MethodCallHandler {
                     e.printStackTrace();
                     result.error("errContinuous", "unable to set replication to continuous", null);
                 }
+                break;
             case ("initReplicator"):
                 mCbManager.initReplicator();
                 result.success("");

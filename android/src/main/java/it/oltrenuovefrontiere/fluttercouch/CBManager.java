@@ -6,6 +6,8 @@ import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.Endpoint;
+import com.couchbase.lite.LogDomain;
+import com.couchbase.lite.LogLevel;
 import com.couchbase.lite.MutableDocument;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.ReplicatorConfiguration;
@@ -77,6 +79,7 @@ public class CBManager {
         DatabaseConfiguration config = new DatabaseConfiguration(FluttercouchPlugin.context);
         if (!mDatabase.containsKey(_name)) {
             defaultDatabase = _name;
+            Database.setLogLevel(LogDomain.REPLICATOR, LogLevel.VERBOSE);
             mDatabase.put(_name, new Database(_name, config));
         }
     }
