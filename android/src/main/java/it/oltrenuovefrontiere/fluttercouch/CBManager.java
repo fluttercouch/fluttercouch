@@ -48,15 +48,13 @@ public class CBManager {
     public String saveDocument(Map<String, Object> _map) throws CouchbaseLiteException {
         MutableDocument mutableDoc = new MutableDocument(_map);
         mDatabase.get(defaultDatabase).save(mutableDoc);
-        String returnedId = mutableDoc.getId();
-        return returnedId;
+        return mutableDoc.getId();
     }
 
     public String saveDocumentWithId(String _id, Map<String, Object> _map) throws CouchbaseLiteException {
         MutableDocument mutableDoc = new MutableDocument(_id, _map);
         mDatabase.get(defaultDatabase).save(mutableDoc);
-        String returnedId = mutableDoc.getId();
-        return returnedId;
+        return mutableDoc.getId();
     }
 
     public Map<String, Object> getDocumentWithId(String _id) throws CouchbaseLiteException {
@@ -65,7 +63,10 @@ public class CBManager {
             try {
                 Document document = defaultDb.getDocument(_id);
                 if (document != null) {
-                    return document.toMap();
+                    HashMap<String, Object> resultMap = new HashMap<String, Object>();
+                    resultMap.put("doc", document.toMap());
+                    resultMap.put("id", _id);
+                    return resultMap;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -79,7 +80,7 @@ public class CBManager {
         DatabaseConfiguration config = new DatabaseConfiguration(FluttercouchPlugin.context);
         if (!mDatabase.containsKey(_name)) {
             defaultDatabase = _name;
-            Database.setLogLevel(LogDomain.REPLICATOR, LogLevel.VERBOSE);
+            // Database.setLogLevel(LogDomain.REPLICATOR, LogLevel.VERBOSE);
             mDatabase.put(_name, new Database(_name, config));
         }
     }

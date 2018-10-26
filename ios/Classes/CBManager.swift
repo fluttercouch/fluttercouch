@@ -46,29 +46,33 @@ class CBManager {
         return mutableDocument.id
     }
     
-    func getDocumentWithId(id : String) -> Dictionary<String, Any>? {
+    func getDocumentWithId(id : String) -> NSDictionary? {
         if let defaultDb: Database = getDatabase() {
             if let document: Document = defaultDb.document(withID: id) {
-                return document.toDictionary()
+                let retrievedDocument: NSDictionary = NSDictionary.init(dictionary: document.toDictionary())
+                let resultMap: NSMutableDictionary = NSMutableDictionary.init()
+                // It is a repetition due to implementation of Document Dart Class
+                resultMap["id"] = id
+                resultMap["doc"] = retrievedDocument
+                return NSDictionary.init(dictionary: resultMap)
             }
         }
         return nil;
     }
     
-    func initDatabaseWithName(name: String) -> Database? {
-        if let returnedDatabase = mDatabase[name] {
-            return returnedDatabase
+    func initDatabaseWithName(name: String){
+        if mDatabase.keys.contains(name) {
+            defaultDatabase = name
         } else {
             do {
                 let newDatabase = try Database(name: name)
+                // Database.setLogLevel(level: LogLevel.verbose, domain: LogDomain.replicator)
                 mDatabase[name] = newDatabase
                 defaultDatabase = name
-                return newDatabase
             } catch {
                 print("Error initializing new database")
             }
         }
-        return nil
     }
     
     func setReplicatorEndpoint(endpoint: String) {
@@ -77,14 +81,25 @@ class CBManager {
     }
     
     func setReplicatorType(type: String) -> String {
+        var settedType: ReplicatorType = ReplicatorType.pull
         if (type == "PUSH") {
-            mReplConfig?.replicatorType = .push
+            settedType = .push
         } else if (type == "PULL") {
-            mReplConfig?.replicatorType = .pull
+            settedType = .pull
         } else if (type == "PUSH_AND_PULL") {
-            mReplConfig?.replicatorType = .pushAndPull
+            settedType = .pushAndPull
         }
-        return type
+        mReplConfig?.replicatorType = settedType
+        switch(mReplConfig?.replicatorType.rawValue) {
+        case (0):
+            return "PUSH_AND_PULL"
+        case (1):
+            return "PUSH"
+        case(2):
+            return "PULL"
+        default:
+            return ""
+        }
     }
     
     func setReplicatorAuthentication(auth: [String:String]) -> String {
@@ -94,13 +109,40 @@ class CBManager {
         return mReplConfig.authenticator.debugDescription
     }
     
-    func startReplication() {
+    func setReplicatorSessionAuthentication(sessionID: String?) {
+        if ((sessionID) != nil) {
+            if ((mReplConfig) != nil) {
+            mReplConfig.authenticator = SessionAuthenticator(sessionID: sessionID!)
+            }
+        }
+    }
+    
+    func setReplicatorContinuous(isContinuous: Bool) -> Bool {
+        if ((mReplConfig) != nil) {
+            mReplConfig?.continuous = isContinuous
+            return mReplConfig!.continuous
+        }
+        return false
+    }
+    
+    func initReplicator() {
         mReplicator = Replicator(config: mReplConfig)
-        mReplicator.start()
+    }
+    
+    func startReplication() {
+        if ((mReplicator) != nil) {
+            mReplicator.start()
+        }
     }
     
     func stopReplication() {
-        mReplicator.stop()
+        if ((mReplicator) != nil) {
+            mReplicator.stop()
+            mReplicator = nil
+        }
     }
     
+    func getReplicator() -> Replicator {
+        return mReplicator
+    }
 }
