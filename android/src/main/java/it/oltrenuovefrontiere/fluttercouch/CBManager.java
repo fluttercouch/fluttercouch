@@ -59,21 +59,22 @@ public class CBManager {
 
     public Map<String, Object> getDocumentWithId(String _id) throws CouchbaseLiteException {
         Database defaultDb = getDatabase();
+        HashMap<String, Object> resultMap = new HashMap<String, Object>();
         if (defaultDatabase != null) {
             try {
                 Document document = defaultDb.getDocument(_id);
                 if (document != null) {
-                    HashMap<String, Object> resultMap = new HashMap<String, Object>();
                     resultMap.put("doc", document.toMap());
                     resultMap.put("id", _id);
-                    return resultMap;
+                } else {
+                    resultMap.put("doc", null);
+                    resultMap.put("id", _id);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-
-        return null;
+        return resultMap;
     }
 
     public void initDatabaseWithName(String _name) throws CouchbaseLiteException {

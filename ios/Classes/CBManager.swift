@@ -47,17 +47,19 @@ class CBManager {
     }
     
     func getDocumentWithId(id : String) -> NSDictionary? {
+        let resultMap: NSMutableDictionary = NSMutableDictionary.init()
         if let defaultDb: Database = getDatabase() {
             if let document: Document = defaultDb.document(withID: id) {
                 let retrievedDocument: NSDictionary = NSDictionary.init(dictionary: document.toDictionary())
-                let resultMap: NSMutableDictionary = NSMutableDictionary.init()
                 // It is a repetition due to implementation of Document Dart Class
                 resultMap["id"] = id
                 resultMap["doc"] = retrievedDocument
-                return NSDictionary.init(dictionary: resultMap)
+            } else {
+                resultMap["id"] = id
+                resultMap["doc"] = NSDictionary.init()
             }
         }
-        return nil;
+        return NSDictionary.init(dictionary: resultMap)
     }
     
     func initDatabaseWithName(name: String){
