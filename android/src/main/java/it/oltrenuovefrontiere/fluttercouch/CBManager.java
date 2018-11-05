@@ -48,38 +48,40 @@ public class CBManager {
     public String saveDocument(Map<String, Object> _map) throws CouchbaseLiteException {
         MutableDocument mutableDoc = new MutableDocument(_map);
         mDatabase.get(defaultDatabase).save(mutableDoc);
-        String returnedId = mutableDoc.getId();
-        return returnedId;
+        return mutableDoc.getId();
     }
 
     public String saveDocumentWithId(String _id, Map<String, Object> _map) throws CouchbaseLiteException {
         MutableDocument mutableDoc = new MutableDocument(_id, _map);
         mDatabase.get(defaultDatabase).save(mutableDoc);
-        String returnedId = mutableDoc.getId();
-        return returnedId;
+        return mutableDoc.getId();
     }
 
     public Map<String, Object> getDocumentWithId(String _id) throws CouchbaseLiteException {
         Database defaultDb = getDatabase();
+        HashMap<String, Object> resultMap = new HashMap<String, Object>();
         if (defaultDatabase != null) {
             try {
                 Document document = defaultDb.getDocument(_id);
                 if (document != null) {
-                    return document.toMap();
+                    resultMap.put("doc", document.toMap());
+                    resultMap.put("id", _id);
+                } else {
+                    resultMap.put("doc", null);
+                    resultMap.put("id", _id);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-
-        return null;
+        return resultMap;
     }
 
     public void initDatabaseWithName(String _name) throws CouchbaseLiteException {
         DatabaseConfiguration config = new DatabaseConfiguration(FluttercouchPlugin.context);
         if (!mDatabase.containsKey(_name)) {
             defaultDatabase = _name;
-            Database.setLogLevel(LogDomain.REPLICATOR, LogLevel.VERBOSE);
+            // Database.setLogLevel(LogDomain.REPLICATOR, LogLevel.VERBOSE);
             mDatabase.put(_name, new Database(_name, config));
         }
     }

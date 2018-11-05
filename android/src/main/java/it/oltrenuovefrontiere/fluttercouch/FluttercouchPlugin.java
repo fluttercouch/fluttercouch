@@ -87,10 +87,7 @@ public class FluttercouchPlugin implements MethodCallHandler {
             case ("getDocumentWithId"):
                 String _id = call.arguments();
                 try {
-                    HashMap<String, Object> _map = new HashMap<>();
-                    _map.put("doc", mCbManager.getDocumentWithId(_id));
-                    _map.put("id", _id); // Is a bit redundant, but is necessary for standard return data in dart implementation
-                    result.success(_map);
+                    result.success(mCbManager.getDocumentWithId(_id));
                 } catch (CouchbaseLiteException e) {
                     e.printStackTrace();
                     result.error("errGet", "error getting the document with id: " + _id, e.toString());
