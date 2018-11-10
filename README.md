@@ -63,7 +63,7 @@ setReplicatorBasicAuthentication(<String, String>{
 });
 
 // Sets a SessionAuthenticator for the replication. SessionID is retrieved querying the public REST API of your Sync Gateway
-setReplicatorSessionAuthentication(sessionID)
+setReplicatorSessionAuthentication(sessionID);
 
 // Before starting the replication, you must init the replicator object
 initReplicator();
