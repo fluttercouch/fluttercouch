@@ -1,3 +1,6 @@
-## [0.0.1] - TODO: Add release date.
+## [0.5.0] - November 10th, 2018
 
-* TODO: Describe initial release.
+* Support of CRUD operations on Android and iOs Platforms
+* Document and MutableDocument support
+* Replication Support
+* ReplicationEventListener implementation
