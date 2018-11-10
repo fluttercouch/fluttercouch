@@ -40,7 +40,9 @@ The database is now available in any part of your class mixed with Fluttercouch.
 ### Replication Configuration
 You can configure a replicator with the following methods:
 ```dart
-// Supplies the address of the database replicated by the Sync Gateway server. In case you want to enable SSL encryption, use wss:// insted of ws://. To connect to a local Sync Gateway instance, use localhost as hostname for iOs simulator, and 10.0.2.2 for Android simulator.
+// Supplies the address of the database replicated by the Sync Gateway server. 
+// In case you want to enable SSL encryption, use wss:// insted of ws://. 
+// To connect to a local Sync Gateway instance, use localhost as hostname for iOs simulator, and 10.0.2.2 for Android simulator.
 setReplicatorEndpoint("ws://your-server-address:4984/yourReplicationDatabaseName");
 
 // Sets the replication type as PULL, PUSH or PUSH_AND_PULL
@@ -49,7 +51,8 @@ setReplicatorType("PUSH_AND_PULL");
 // Sets the replication as continuous
 setReplicatorContinuous(true);
 
-// Sets a BasicAuthenticator for the replication. The methods accept a parameter of type Map<String, String> with two keys named "username" and "password"
+// Sets a BasicAuthenticator for the replication. The methods accept a parameter of type Map<String, String> 
+// with two keys named "username" and "password".
 setReplicatorBasicAuthentication(<String, String>{
   "username": "yourUsername",
   "password": "yourPassword"
