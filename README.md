@@ -14,6 +14,10 @@ In order to use Fluttercouch, add this code to pubspec.yaml in your project dire
 ```
 The standard installation mode through pub.dartlang.org will be available in further releases.
 
+NOTES:
+- The current version uses the Couchbase Lite SDK 2.1 for Android and iOs.
+- Due to Couchbase Lite SDK restrictions, the minSdkVersion for Android is 19 (Android KitKat 4.4) and minimum platform for iOs is 9.0
+
 ## Code Reference
 
 ### Initialization
