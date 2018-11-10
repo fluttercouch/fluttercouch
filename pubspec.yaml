@@ -1,8 +1,8 @@
 name: fluttercouch
-description: With Fluttercouch is possible to use Couchbase Mobile Native SDK in Flutter Projects.
-version: 0.5.0
-author: Luca Christille
-homepage: https://github.com/oltrenuovefrontiere/fluttercouch
+description: A new flutter plugin project.
+version: 0.0.1
+author:
+homepage:
 
 dependencies:
   flutter:
