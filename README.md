@@ -98,14 +98,14 @@ listenReplicationEvents((dynamic event) {
 As in Couchbase Lite native implementations, documents are managed through Document and MutableDocument objects.
 To retrieve a document by ID, you wait for the the result of the getDocumentWithId method.
 ```dart
-document = await getDocumentWithId("document::ID");
+Document document = await getDocumentWithId("document::ID");
 ```
-To save a document to the database, you can use any of the following methods.
+To save a document to the database, you can use any of the following methods. Because MutableDocument is a subclass of Document, you can pass either types to saveDocument().
 ```dart
 saveDocument(document);
 saveDocumentWithId("aDocument::ID", document);
 ```
-Document and MutableDocument object expose getter methods to get values for a key
+Document and MutableDocument object expose getter methods to get values for a key.
 ```dart
 // retrieves the value related to the "key" as Boolean
 aBoolean = document.getBoolean("key");
@@ -120,7 +120,7 @@ aList = document.getList<T>("key");
 // retrieves the value related to the "key" as Map of type K, V
 aMap = document.getMap<K, V>("key");
 ```
-Document and MutableDocument have also methods that help to handle document values.
+Document and MutableDocument have also methods that help to handle various aspect of documents.
 ```dart
 const document = new Document(); // initializes a new empty document
 document.contains("key");        // returns true if the document contains the specified key
@@ -135,7 +135,7 @@ document.isEmpty();              // returns true if the document doesn't have an
 ```
 Because SubDocument operations are not currently supported, Fluttercouch supply a convenience method to get a List of Map that handles the conversion from dynamic type automatically. The method returns a List of type Map<K, V> (List<Map<K,V>>)
 ```dart
-document.getListOfMap<K, V>("key");
+List<Map<K,V>> aListOfMap = document.getListOfMap<K, V>("key");
 ```
 The MutableDocument class exposes setter methods to set document key/value pairs
 ```dart
@@ -161,7 +161,7 @@ The Fluttercouch plugin is still under development and any contribution is welco
 
 ## Current development
 
-By now, the library can create (in an Android device and iOs device) a database locally and replicate a couchbase server by connecting to a sync gateway. It can retrieve a Document by id and extract any “usual” field (no blob) and save it back to the Database.
+By now, the library can create (in Android device and iOs devices) a database locally and replicate a couchbase server by connecting to a sync gateway. It can retrieve a Document by id and extract any “usual” field (no blob) and save it back to the Database.
 Queries are still missing, but are under development.
 The iOs native code will be implemented after Android implementation is confirmed as a good approach for queries too, so that middleware code would not be written twice.
 
