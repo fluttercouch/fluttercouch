@@ -166,10 +166,3 @@ Queries are still missing, but are under development.
 The iOs native code will be implemented after Android implementation is confirmed as a good approach for queries too, so that middleware code would not be written twice.
 
 Any suggestion or feedback is appreciated.
-
-## Getting Started
-
-For help getting started with Flutter, view our online
-[documentation](https://flutter.io/).
-
-For help on editing plugin code, view the [documentation](https://flutter.io/platform-plugins/#edit-code).
