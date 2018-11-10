@@ -7,12 +7,11 @@ None of the Dart object holds the actual state (which is hold in the native code
 
 ## Installation
 
-In order to use Fluttercouch, add this code to pubspec.yaml in your project directory. (Thanks to DhudumVishal)
-```  fluttercouch: 
-    git: 
-      url: git://github.com/oltrenuovefrontiere/fluttercouch.git
+In order to use Fluttercouch, add this code to pubspec.yaml in your project directory.
+```dart
+dependencies:
+  fluttercouch: ^0.5.0
 ```
-The standard installation mode through pub.dartlang.org will be available in further releases.
 
 NOTES:
 - The current version uses the Couchbase Lite SDK 2.1 for Android and iOs.
