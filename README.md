@@ -1,3 +1,5 @@
+[![Gitter](https://badges.gitter.im/fluttercouch/Lobby.svg)](https://gitter.im/fluttercouch/Lobby)
+
 # Fluttercouch
 With Fluttercouch is possible to use Couchbase Mobile Native SDK in Flutter Projects.
 
