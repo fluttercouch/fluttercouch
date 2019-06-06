@@ -15,16 +15,27 @@ enum CBManagerError: Error {
     case CertificatePinning
 }
 
+protocol CBManagerDelegate : class {
+    func lookupKey(forAsset assetKey: String) -> String?
+}
+
 class CBManager {
-    static let instance = CBManager();
     private var mDatabase : Dictionary<String, Database> = Dictionary();
     private var mQueries : Dictionary<String,Query> = Dictionary();
+    private var mQueryListenerTokens : Dictionary<String,ListenerToken> = Dictionary();
     private var mReplConfig : ReplicatorConfiguration?;
     private var mReplicator : Replicator?;
     private var defaultDatabase = "defaultDatabase";
     private var mDBConfig = DatabaseConfiguration();
+    private weak var mDelegate: CBManagerDelegate?
     
-    private init() {
+    init(delegate: CBManagerDelegate, enableLogging: Bool) {
+        mDelegate = delegate
+        
+        guard enableLogging else {
+            return
+        }
+        
         let tempFolder = NSTemporaryDirectory().appending("cbllog")
         Database.log.file.config = LogFileConfiguration(directory: tempFolder)
         Database.log.file.level = .info
@@ -94,8 +105,9 @@ class CBManager {
         }
     }
     
-    func addQuery(queryId: String, query: Query) {
+    func addQuery(queryId: String, query: Query, listenerToken: ListenerToken) {
         mQueries[queryId] = query;
+        mQueryListenerTokens[queryId] = listenerToken;
     }
     
     func getQuery(queryId: String) -> Query? {
@@ -103,7 +115,15 @@ class CBManager {
     }
     
     func removeQuery(queryId: String) -> Query? {
-        return mQueries.removeValue(forKey: queryId)
+        guard let query = mQueries.removeValue(forKey: queryId) else {
+            return nil
+        }
+        
+        if let token = mQueryListenerTokens.removeValue(forKey: queryId) {
+            query.removeChangeListener(withToken: token)
+        }
+        
+        return query
     }
     
     func buildQuery(options: Dictionary<String,Any>) -> Query? {
@@ -302,12 +322,11 @@ class CBManager {
     }
     
     func setReplicatorPinnedServerCertificate(assetKey: String) throws {
-        guard let registrar = SwiftFluttercouchPlugin.registrar, let _mReplConfig = mReplConfig else {
+        guard let delegate = mDelegate, let _mReplConfig = mReplConfig else {
             return
         }
         
-        let key = registrar.lookupKey(forAsset: assetKey)
-        
+        let key = delegate.lookupKey(forAsset: assetKey)
         
         if let path = Bundle.main.path(forResource: key, ofType: nil), let data = NSData(contentsOfFile: path) {
             _mReplConfig.pinnedServerCertificate = SecCertificateCreateWithData(nil,data)

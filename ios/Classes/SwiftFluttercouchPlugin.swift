@@ -1,21 +1,40 @@
 import Flutter
 import UIKit
 
-public class SwiftFluttercouchPlugin: NSObject, FlutterPlugin {
-    let mCbManager = CBManager.instance
-    static var registrar: FlutterPluginRegistrar?
+public class SwiftFluttercouchPlugin: NSObject, FlutterPlugin, CBManagerDelegate {
+    weak var mRegistrar: FlutterPluginRegistrar?
+    let mQueryEventListener = QueryEventListener();
+    
+    #if DEBUG
+    lazy var mCBManager = CBManager(delegate: self, enableLogging: true)
+    #else
+    lazy var mCBManager = CBManager(delegate: self, enableLogging: false)
+    #endif
     
     public static func register(with registrar: FlutterPluginRegistrar) {
-        SwiftFluttercouchPlugin.registrar = registrar
-        let channel = FlutterMethodChannel(name: "it.oltrenuovefrontiere.fluttercouch", binaryMessenger: registrar.messenger())
-        let instance = SwiftFluttercouchPlugin()
-        channel.setMethodCallHandler(instance.handle(_:result:))
+        let instance = SwiftFluttercouchPlugin(registrar: registrar)
         
-        let replicatorEventChannel = FlutterEventChannel(name: "it.oltrenuovefrontiere.fluttercouch/replicationEventChannel", binaryMessenger: registrar.messenger())
-        replicatorEventChannel.setStreamHandler(ReplicatorEventListener() as? FlutterStreamHandler & NSObjectProtocol)
+        let channel = FlutterMethodChannel(name: "it.oltrenuovefrontiere.fluttercouch", binaryMessenger: registrar.messenger())
+        channel.setMethodCallHandler(instance.handle(_:result:))
         
         let jsonMethodChannel = FlutterMethodChannel(name: "it.oltrenuovefrontiere.fluttercouchJson", binaryMessenger: registrar.messenger(), codec: FlutterJSONMethodCodec.sharedInstance())
         jsonMethodChannel.setMethodCallHandler(instance.handleJson(_:result:))
+        
+        let replicatorEventChannel = FlutterEventChannel(name: "it.oltrenuovefrontiere.fluttercouch/replicationEventChannel", binaryMessenger: registrar.messenger())
+        replicatorEventChannel.setStreamHandler(ReplicatorEventListener(manager: instance.mCBManager) as? FlutterStreamHandler & NSObjectProtocol)
+        
+        let queryEventChannel = FlutterEventChannel(name: "it.oltrenuovefrontiere.fluttercouch/queryEventChannel", binaryMessenger: registrar.messenger(), codec: FlutterJSONMethodCodec.sharedInstance())
+        queryEventChannel.setStreamHandler(instance.mQueryEventListener as? FlutterStreamHandler & NSObjectProtocol)
+    }
+    
+    init(registrar: FlutterPluginRegistrar) {
+        super.init()
+        
+        mRegistrar = registrar
+    }
+    
+    func lookupKey(forAsset assetKey: String) -> String? {
+        return mRegistrar?.lookupKey(forAsset: assetKey)
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -23,7 +42,7 @@ public class SwiftFluttercouchPlugin: NSObject, FlutterPlugin {
         case "initDatabaseWithName":
             let _name : String = call.arguments! as! String
             do {
-                try self.mCbManager.initDatabaseWithName(name: _name)
+                try mCBManager.initDatabaseWithName(name: _name)
                 result(String(_name))
             } catch {
                 result(FlutterError.init(code: "errInit", message: "Error initializing database with name \(_name)", details: error.localizedDescription))
@@ -31,7 +50,7 @@ public class SwiftFluttercouchPlugin: NSObject, FlutterPlugin {
         case "closeDatabaseWithName":
             let _name : String = call.arguments! as! String
             do {
-                try self.mCbManager.closeDatabaseWithName(name: _name)
+                try mCBManager.closeDatabaseWithName(name: _name)
                 result(nil)
             } catch {
                 result(FlutterError.init(code: "errClose", message: "Error closing database with name \(_name)", details: error.localizedDescription))
@@ -39,7 +58,7 @@ public class SwiftFluttercouchPlugin: NSObject, FlutterPlugin {
         case "deleteDatabaseWithName":
             let _name : String = call.arguments! as! String
             do {
-                try self.mCbManager.deleteDatabaseWithName(name: _name)
+                try mCBManager.deleteDatabaseWithName(name: _name)
                 result(nil)
             } catch {
                 result(FlutterError.init(code: "errDelete", message: "Error deleting database with name \(_name)", details: error.localizedDescription))
@@ -51,7 +70,7 @@ public class SwiftFluttercouchPlugin: NSObject, FlutterPlugin {
             }
             
             do {
-                let returnedId = try self.mCbManager.saveDocument(map: document)
+                let returnedId = try mCBManager.saveDocument(map: document)
                 result(returnedId!)
             } catch {
                 result(FlutterError.init(code: "errSave", message: "Error saving document", details: error.localizedDescription))
@@ -63,7 +82,7 @@ public class SwiftFluttercouchPlugin: NSObject, FlutterPlugin {
             
             if (id != nil && map != nil){
                 do {
-                    let returnedId = try self.mCbManager.saveDocumentWithId(id: id!, map: map!)
+                    let returnedId = try mCBManager.saveDocumentWithId(id: id!, map: map!)
                     result(returnedId!)
                 } catch {
                     result(FlutterError.init(code: "errSave", message: "Error saving document with id \(id!)", details: error.localizedDescription))
@@ -73,45 +92,45 @@ public class SwiftFluttercouchPlugin: NSObject, FlutterPlugin {
             }
         case "getDocumentWithId":
             let id = call.arguments! as! String
-            if let returnMap = self.mCbManager.getDocumentWithId(id: id) {
+            if let returnMap = mCBManager.getDocumentWithId(id: id) {
                 result(NSDictionary(dictionary: returnMap))
             }
         case "setReplicatorEndpoint":
             let endpoint = call.arguments! as! String
-            self.mCbManager.setReplicatorEndpoint(endpoint: endpoint)
+            mCBManager.setReplicatorEndpoint(endpoint: endpoint)
             result(String(endpoint))
         case "setReplicatorType":
             let type = call.arguments! as! String
-            result(String(self.mCbManager.setReplicatorType(type: type)))
+            result(String(mCBManager.setReplicatorType(type: type)))
         case "setReplicatorBasicAuthentication":
             let auth = call.arguments! as! [String:String]
-            result(String(self.mCbManager.setReplicatorAuthentication(auth: auth)))
+            result(String(mCBManager.setReplicatorAuthentication(auth: auth)))
         case "setReplicatorSessionAuthentication":
             let sessionID = call.arguments! as! String
-            self.mCbManager.setReplicatorSessionAuthentication(sessionID: sessionID)
+            mCBManager.setReplicatorSessionAuthentication(sessionID: sessionID)
             result(String(sessionID))
         case "setReplicatorPinnedServerCertificate":
             let assetKey = call.arguments! as! String
             do {
-                try self.mCbManager.setReplicatorPinnedServerCertificate(assetKey: assetKey)
+                try mCBManager.setReplicatorPinnedServerCertificate(assetKey: assetKey)
                 result(String(assetKey))
             } catch {
                 result(FlutterError(code: "errCert",message: "Certificate Pinning Failed",details: error.localizedDescription))
             }
         case "setReplicatorContinuous":
             let isContinuous = call.arguments! as! Bool
-            result(Bool(self.mCbManager.setReplicatorContinuous(isContinuous: isContinuous)))
+            result(Bool(mCBManager.setReplicatorContinuous(isContinuous: isContinuous)))
         case "initReplicator":
-            self.mCbManager.initReplicator()
+            mCBManager.initReplicator()
             result(String(""))
         case "startReplicator":
-            self.mCbManager.startReplication()
+            mCBManager.startReplication()
             result(String(""))
         case "stopReplicator":
-            self.mCbManager.stopReplication()
+            mCBManager.stopReplication()
             result(String(""))
         case "closeDatabase":
-            if let database = self.mCbManager.getDatabase() {
+            if let database = mCBManager.getDatabase() {
                 do {
                     try database.close()
                     result(database.name)
@@ -122,7 +141,7 @@ public class SwiftFluttercouchPlugin: NSObject, FlutterPlugin {
                 result(String(""))
             }
         case "getDocumentCount":
-            if let count = self.mCbManager.getDatabase()?.count {
+            if let count = mCBManager.getDatabase()?.count {
                 result(count)
             } else {
                 result(0)
@@ -144,10 +163,7 @@ public class SwiftFluttercouchPlugin: NSObject, FlutterPlugin {
         
         switch (call.method) {
         case "execute":
-            var query = mCbManager.getQuery(queryId: queryId)
-            if query == nil {
-                query = QueryJson(json: options).toCouchbaseQuery()
-            }
+            let query = mCBManager.getQuery(queryId: queryId) ?? QueryJson(json: options, manager: mCBManager).toCouchbaseQuery()
             
             do {
                 if let results = try query?.execute() {
@@ -160,21 +176,34 @@ public class SwiftFluttercouchPlugin: NSObject, FlutterPlugin {
                 result(FlutterError(code: "errQuery", message: "Error executing query", details: error.localizedDescription))
             }
         case "store":
-            if let _ = mCbManager.getQuery(queryId: queryId) {
+            if let _ = mCBManager.getQuery(queryId: queryId) {
                 // DO NOTHING QUERY IS ALREADY STORED
                 result(true)
-            } else if let query = QueryJson(json: options).toCouchbaseQuery() {
-                let queryEventChannel = FlutterEventChannel(name: "it.oltrenuovefrontiere.fluttercouch/queryEventChannel/\(queryId)", binaryMessenger: SwiftFluttercouchPlugin.registrar!.messenger(), codec: FlutterJSONMethodCodec.sharedInstance())
-                queryEventChannel.setStreamHandler(QueryEventListener() as? FlutterStreamHandler & NSObjectProtocol)
-                
+            } else if let query = QueryJson(json: options, manager: mCBManager).toCouchbaseQuery() {
                 // Store Query for later use
-                mCbManager.addQuery(queryId: queryId, query: query)
+                let token = query.addChangeListener({ [weak self] change in
+                    var json = Dictionary<String,Any?>()
+                    json["query"] = queryId
+                    
+                    if let results = change.results {
+                        json["results"] = QueryJson.resultSetToJson(results: results)
+                    }
+                    
+                    if let error = change.error {
+                        json["error"] = error.localizedDescription
+                    }
+                    
+                    // Will only send events when there is something listening
+                    self?.mQueryEventListener.mEvents?(NSDictionary(dictionary: json as [AnyHashable : Any]))
+                })
+                
+                mCBManager.addQuery(queryId: queryId, query: query, listenerToken: token)
                 result(true)
             } else {
                 result(false)
             }
         case "remove":
-            let _ = mCbManager.removeQuery(queryId: queryId)
+            let _ = mCBManager.removeQuery(queryId: queryId)
             result(true)
         default:
             result(FlutterMethodNotImplemented)

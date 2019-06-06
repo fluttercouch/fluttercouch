@@ -11,8 +11,10 @@ import CouchbaseLiteSwift
 public class QueryJson {
     private let queryMap: QueryMap
     private var query: Query? = nil
+    weak private var mCBManager: CBManager?
     
-    init(json: Any) {
+    init(json: Any, manager: CBManager) {
+        self.mCBManager = manager
         self.queryMap = QueryMap(jsonObject: json)
     }
     
@@ -227,7 +229,7 @@ public class QueryJson {
     }
     
     private func getDatasourceFromString(name: String) -> DataSourceProtocol? {
-        guard let database = CBManager.instance.getDatabase(name: name) else {
+        guard let database = mCBManager?.getDatabase(name: name) else {
             return nil
         }
         
@@ -235,7 +237,7 @@ public class QueryJson {
     }
     
     private func getDatasourceFromString(name: String, alias: String) -> DataSourceProtocol? {
-        guard let database = CBManager.instance.getDatabase(name: name) else {
+        guard let database = mCBManager?.getDatabase(name: name) else {
             return nil
         }
         

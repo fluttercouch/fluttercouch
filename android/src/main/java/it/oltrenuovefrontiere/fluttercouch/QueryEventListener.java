@@ -13,7 +13,7 @@ import java.util.HashMap;
 import io.flutter.plugin.common.EventChannel;
 
 public class QueryEventListener implements EventChannel.StreamHandler {
-    private ListenerToken mListenerToken;
+    public EventChannel.EventSink mEventSink;
 
     /*
      * IMPLEMENTATION OF EVENTCHANNEL.STREAMHANDLER
@@ -21,8 +21,8 @@ public class QueryEventListener implements EventChannel.StreamHandler {
 
     @Override
     public void onListen(Object args, final EventChannel.EventSink eventSink) {
-
-        if (args instanceof JSONObject) {
+        mEventSink = eventSink;
+        /*if (args instanceof JSONObject) {
             JSONObject json = (JSONObject) args;
 
             final String queryId;
@@ -33,9 +33,9 @@ public class QueryEventListener implements EventChannel.StreamHandler {
                 return;
             }
 
-            Query query = CBManager.instance.getQuery(queryId);
-            if (query != null) {
-                mListenerToken = query.addChangeListener(new QueryChangeListener() {
+            mQuery = CBManager.instance.getQuery(queryId);
+            if (mQuery != null) {
+                mListenerToken = mQuery.addChangeListener(new QueryChangeListener() {
                     @Override
                     public void changed(QueryChange change) {
                         HashMap<String,Object> json = new HashMap<String,Object>();
@@ -55,27 +55,18 @@ public class QueryEventListener implements EventChannel.StreamHandler {
             }
         } else {
             eventSink.error("errArg", "Missing Arguments", args);
-        }
+        }*/
     }
 
     @Override
     public void onCancel(Object args) {
-        if (args instanceof JSONObject) {
-            JSONObject json = (JSONObject) args;
-
-            final String queryId;
-            try {
-                queryId = json.getString("query");
-            } catch (JSONException e) {
-                return;
-            }
-
-            Query query = CBManager.instance.getQuery(queryId);
-            if (query != null && mListenerToken != null) {
-                query.removeChangeListener(mListenerToken);
-            }
+        /*if (mQuery != null && mListenerToken != null) {
+            mQuery.removeChangeListener(mListenerToken);
         }
 
         mListenerToken = null;
+        mQuery = null;*/
+
+        mEventSink = null;
     }
 }

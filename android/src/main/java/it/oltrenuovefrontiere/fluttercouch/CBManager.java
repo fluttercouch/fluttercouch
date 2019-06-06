@@ -9,6 +9,7 @@ import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.EncryptionKey;
 import com.couchbase.lite.Endpoint;
+import com.couchbase.lite.ListenerToken;
 import com.couchbase.lite.LogFileConfiguration;
 import com.couchbase.lite.LogLevel;
 import com.couchbase.lite.MutableDocument;
@@ -27,18 +28,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 class CBManager {
-    public static final CBManager instance = new CBManager();
     private HashMap<String, Database> mDatabase = new HashMap<>();
     private HashMap<String, Query> mQueries = new HashMap<>();
+    private HashMap<String, ListenerToken> mQueryListenerTokens = new HashMap<>();
     private ReplicatorConfiguration mReplConfig;
     private Replicator mReplicator;
     private String defaultDatabase = "defaultDatabase";
-    private DatabaseConfiguration mDBConfig = new DatabaseConfiguration(FluttercouchPlugin.registrar.context());
+    private DatabaseConfiguration mDBConfig;
+    private CBManagerDelegate mDelegate;
 
-    private CBManager() {
-        final File path = FluttercouchPlugin.registrar.context().getCacheDir();
-        Database.log.getFile().setConfig(new LogFileConfiguration(path.toString()));
-        Database.log.getFile().setLevel(LogLevel.INFO);
+    public CBManager(CBManagerDelegate delegate, boolean enableLogging) {
+        mDelegate = delegate;
+        mDBConfig = new DatabaseConfiguration(mDelegate.getContext());
+
+        if (enableLogging) {
+            final File path = mDelegate.getContext().getCacheDir();
+            Database.log.getFile().setConfig(new LogFileConfiguration(path.toString()));
+            Database.log.getFile().setLevel(LogLevel.INFO);
+        }
     }
 
     public Database getDatabase() {
@@ -147,8 +154,8 @@ class CBManager {
 
     public void setReplicatorPinnedServerCertificate(String assetKey) throws Exception {
         if (assetKey != null) {
-            AssetManager assetManager = FluttercouchPlugin.registrar.context().getAssets();
-            String fileKey = FluttercouchPlugin.registrar.lookupKeyForAsset(assetKey);
+            AssetManager assetManager = mDelegate.getAssets();
+            String fileKey = mDelegate.lookupKeyForAsset(assetKey);
 
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             try (InputStream is = assetManager.open(fileKey)) {
@@ -198,8 +205,9 @@ class CBManager {
         return mReplicator;
     }
 
-    public void addQuery(String queryId, Query query) {
+    public void addQuery(String queryId, Query query, ListenerToken token) {
         mQueries.put(queryId,query);
+        mQueryListenerTokens.put(queryId,token);
     }
 
     public Query getQuery(String queryId) {
@@ -207,6 +215,12 @@ class CBManager {
     }
 
     public Query removeQuery(String queryId) {
-        return mQueries.remove(queryId);
+        Query query = mQueries.remove(queryId);
+        ListenerToken token = mQueryListenerTokens.remove(queryId);
+        if (query != null && token != null) {
+            query.removeChangeListener(token);
+        }
+
+        return query;
     }
 }

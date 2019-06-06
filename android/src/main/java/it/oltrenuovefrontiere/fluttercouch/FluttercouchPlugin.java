@@ -1,14 +1,21 @@
 package it.oltrenuovefrontiere.fluttercouch;
 
+import android.content.Context;
+import android.content.res.AssetManager;
+
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
+import com.couchbase.lite.ListenerToken;
 import com.couchbase.lite.Query;
+import com.couchbase.lite.QueryChange;
+import com.couchbase.lite.QueryChangeListener;
 import com.couchbase.lite.ResultSet;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,30 +27,63 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
-import static android.content.ContentValues.TAG;
-
 /**
  * FluttercouchPlugin
  */
-public class FluttercouchPlugin {
-    protected static Registrar registrar;
+public class FluttercouchPlugin implements CBManagerDelegate {
+    private final Registrar mRegistrar;
+    private final QueryEventListener mQueryEventListener = new QueryEventListener();
+    private final CBManager mCBManager;
+    private CallHander callHander = new CallHander();
+    private JSONCallHandler jsonCallHandler = new JSONCallHandler();
 
     /**
      * Plugin registration.
      */
     public static void registerWith(Registrar registrar) {
-        FluttercouchPlugin.registrar = registrar;
+        FluttercouchPlugin instance = new FluttercouchPlugin(registrar);
+
         final MethodChannel channel = new MethodChannel(registrar.messenger(), "it.oltrenuovefrontiere.fluttercouch");
-        channel.setMethodCallHandler(new CallHander());
+        channel.setMethodCallHandler(instance.callHander);
 
         final MethodChannel jsonChannel = new MethodChannel(registrar.messenger(), "it.oltrenuovefrontiere.fluttercouchJson", JSONMethodCodec.INSTANCE);
-        jsonChannel.setMethodCallHandler(new JSONCallHander());
+        jsonChannel.setMethodCallHandler(instance.jsonCallHandler);
 
         final EventChannel replicationEventChannel = new EventChannel(registrar.messenger(), "it.oltrenuovefrontiere.fluttercouch/replicationEventChannel");
-        replicationEventChannel.setStreamHandler(new ReplicationEventListener());
+        replicationEventChannel.setStreamHandler(new ReplicationEventListener(instance.mCBManager));
+
+        final EventChannel queryEventChannel = new EventChannel(registrar.messenger(), "it.oltrenuovefrontiere.fluttercouch/queryEventChannel", JSONMethodCodec.INSTANCE);
+        queryEventChannel.setStreamHandler(instance.mQueryEventListener);
     }
 
-    private static class CallHander implements MethodCallHandler {
+    public FluttercouchPlugin(Registrar registrar) {
+        super();
+
+        mRegistrar = registrar;
+
+        if (BuildConfig.DEBUG) {
+            mCBManager = new CBManager(this,true);
+        } else {
+            mCBManager = new CBManager(this,false);
+        }
+    }
+
+    @Override
+    public String lookupKeyForAsset(String asset) {
+        return mRegistrar.lookupKeyForAsset(asset);
+    }
+
+    @Override
+    public AssetManager getAssets() {
+        return mRegistrar.context().getAssets();
+    }
+
+    @Override
+    public Context getContext() {
+        return mRegistrar.context();
+    }
+
+    private class CallHander implements MethodCallHandler {
         @Override
         public void onMethodCall(MethodCall call, Result result) {
             String _name;
@@ -51,7 +91,7 @@ public class FluttercouchPlugin {
                 case ("initDatabaseWithName"):
                     _name = call.arguments();
                     try {
-                        CBManager.instance.initDatabaseWithName(_name);
+                        mCBManager.initDatabaseWithName(_name);
                         result.success(_name);
                     } catch (Exception e) {
                         result.error("errInit", "error initializing database with name " + _name, e.toString());
@@ -60,7 +100,7 @@ public class FluttercouchPlugin {
                 case ("closeDatabaseWithName"):
                     _name = call.arguments();
                     try {
-                        CBManager.instance.closeDatabaseWithName(_name);
+                        mCBManager.closeDatabaseWithName(_name);
                         result.success(null);
                     } catch (Exception e) {
                         result.error("errClose", "error closing database with name " + _name, e.toString());
@@ -69,7 +109,7 @@ public class FluttercouchPlugin {
                 case ("deleteDatabaseWithName"):
                     _name = call.arguments();
                     try {
-                        CBManager.instance.deleteDatabaseWithName(_name);
+                        mCBManager.deleteDatabaseWithName(_name);
                         result.success(null);
                     } catch (Exception e) {
                         result.error("errDelete", "error deleting database with name " + _name, e.toString());
@@ -78,7 +118,7 @@ public class FluttercouchPlugin {
                 case ("saveDocument"):
                     Map<String, Object> _document = call.arguments();
                     try {
-                        String returnedId = CBManager.instance.saveDocument(_document);
+                        String returnedId = mCBManager.saveDocument(_document);
                         result.success(returnedId);
                     } catch (CouchbaseLiteException e) {
                         result.error("errSave", "error saving document", e.toString());
@@ -89,7 +129,7 @@ public class FluttercouchPlugin {
                         String _id = call.argument("id");
                         Map<String, Object> _map = call.argument("map");
                         try {
-                            String returnedId = CBManager.instance.saveDocumentWithId(_id, _map);
+                            String returnedId = mCBManager.saveDocumentWithId(_id, _map);
                             result.success(returnedId);
                         } catch (CouchbaseLiteException e) {
                             result.error("errSave", "error saving document with id " + _id, e.toString());
@@ -101,7 +141,7 @@ public class FluttercouchPlugin {
                 case ("getDocumentWithId"):
                     String _id = call.arguments();
                     try {
-                        result.success(CBManager.instance.getDocumentWithId(_id));
+                        result.success(mCBManager.getDocumentWithId(_id));
                     } catch (CouchbaseLiteException e) {
                         result.error("errGet", "error getting the document with id: " + _id, e.toString());
                     }
@@ -109,7 +149,7 @@ public class FluttercouchPlugin {
                 case ("setReplicatorEndpoint"):
                     String _endpoint = call.arguments();
                     try {
-                        String _result = CBManager.instance.setReplicatorEndpoint(_endpoint);
+                        String _result = mCBManager.setReplicatorEndpoint(_endpoint);
                         result.success(_result);
                     } catch (URISyntaxException e) {
                         result.error("errURI", "error setting the replicator endpoint uri to " + _endpoint, e.toString());
@@ -118,7 +158,7 @@ public class FluttercouchPlugin {
                 case ("setReplicatorType"):
                     String _type = call.arguments();
                     try {
-                        result.success(CBManager.instance.setReplicatorType(_type));
+                        result.success(mCBManager.setReplicatorType(_type));
                     } catch (CouchbaseLiteException e) {
                         result.error("errReplType", "error setting replication type to " + _type, e.toString());
                     }
@@ -126,7 +166,7 @@ public class FluttercouchPlugin {
                 case ("setReplicatorBasicAuthentication"):
                     Map<String, String> _auth = call.arguments();
                     try {
-                        result.success(CBManager.instance.setReplicatorBasicAuthentication(_auth));
+                        result.success(mCBManager.setReplicatorBasicAuthentication(_auth));
                     } catch (Exception e) {
                         result.error("errAuth", "error setting authentication for replicator", e.toString());
                     }
@@ -134,7 +174,7 @@ public class FluttercouchPlugin {
                 case ("setReplicatorSessionAuthentication"):
                     String _sessionID = call.arguments();
                     try {
-                        result.success(CBManager.instance.setReplicatorSessionAuthentication(_sessionID));
+                        result.success(mCBManager.setReplicatorSessionAuthentication(_sessionID));
                     } catch (Exception e) {
                         result.error("errAuth", "invalid session ID", e.toString());
                     }
@@ -142,7 +182,7 @@ public class FluttercouchPlugin {
                 case ("setReplicatorPinnedServerCertificate"):
                     String assetKey = call.arguments();
                     try {
-                        CBManager.instance.setReplicatorPinnedServerCertificate(assetKey);
+                        mCBManager.setReplicatorPinnedServerCertificate(assetKey);
                         result.success(assetKey);
                     } catch (Exception e) {
                         result.error("errCert", "certificate pinning failed", e.toString());
@@ -151,26 +191,26 @@ public class FluttercouchPlugin {
                 case ("setReplicatorContinuous"):
                     Boolean _continuous = call.arguments();
                     try {
-                        result.success(CBManager.instance.setReplicatorContinuous(_continuous));
+                        result.success(mCBManager.setReplicatorContinuous(_continuous));
                     } catch (Exception e) {
                         result.error("errContinuous", "unable to set replication to continuous", e.toString());
                     }
                     break;
                 case ("initReplicator"):
-                    CBManager.instance.initReplicator();
+                    mCBManager.initReplicator();
                     result.success("");
                     break;
                 case ("startReplicator"):
-                    CBManager.instance.startReplicator();
+                    mCBManager.startReplicator();
                     result.success("");
                     break;
                 case ("stopReplicator"):
-                    CBManager.instance.stopReplicator();
+                    mCBManager.stopReplicator();
                     result.success("");
                     break;
                 case ("closeDatabase"):
                     try {
-                        Database database = CBManager.instance.getDatabase();
+                        Database database = mCBManager.getDatabase();
                         database.close();
                         result.success(database.getName());
                     } catch (Exception e) {
@@ -179,7 +219,7 @@ public class FluttercouchPlugin {
                     break;
                 case ("getDocumentCount"):
                     try {
-                        result.success(CBManager.instance.getDocumentCount());
+                        result.success(mCBManager.getDocumentCount());
                     } catch (Exception e) {
                         result.error("errGet", "error getting the document count.", e.toString());
                     }
@@ -190,12 +230,12 @@ public class FluttercouchPlugin {
         }
     }
 
-    private static class JSONCallHander implements MethodCallHandler {
+    private class JSONCallHandler implements MethodCallHandler {
         @Override
         public void onMethodCall(MethodCall call, Result result) {
             JSONObject queryJson = call.arguments();
 
-            String queryId = "";
+            final String queryId;
             try {
                 queryId = queryJson.getString("queryId");
             } catch (JSONException e) {
@@ -206,9 +246,9 @@ public class FluttercouchPlugin {
             Query queryFromJson;
             switch (call.method) {
                 case ("execute"):
-                    queryFromJson = CBManager.instance.getQuery(queryId);
+                    queryFromJson = mCBManager.getQuery(queryId);
                     if (queryFromJson == null) {
-                        queryFromJson = new QueryJson(queryJson).toCouchbaseQuery();
+                        queryFromJson = new QueryJson(queryJson,mCBManager).toCouchbaseQuery();
                     }
 
                     try {
@@ -220,19 +260,41 @@ public class FluttercouchPlugin {
                     }
                     break;
                 case ("store"):
-                    queryFromJson = CBManager.instance.getQuery(queryId);
+                    queryFromJson = mCBManager.getQuery(queryId);
                     if (queryFromJson == null) {
-                        queryFromJson = new QueryJson(queryJson).toCouchbaseQuery();
-                        CBManager.instance.addQuery(queryId, queryFromJson);
-                        result.success(queryFromJson != null);
+                        queryFromJson = new QueryJson(queryJson,mCBManager).toCouchbaseQuery();
+
+                        if (queryFromJson != null) {
+                            ListenerToken mListenerToken = queryFromJson.addChangeListener(new QueryChangeListener() {
+                                @Override
+                                public void changed(QueryChange change) {
+                                    HashMap<String,Object> json = new HashMap<String,Object>();
+                                    json.put("query",queryId);
+
+                                    if (change.getResults() != null) {
+                                        json.put("results",QueryJson.resultsToJson(change.getResults()));
+                                    }
+
+                                    if (change.getError() != null) {
+                                        json.put("error",change.getError().getLocalizedMessage());
+                                    }
+
+                                    final EventChannel.EventSink eventSink = mQueryEventListener.mEventSink;
+                                    if (eventSink != null) {
+                                        eventSink.success(json);
+                                    }
+                                }
+                            });
+
+                            mCBManager.addQuery(queryId, queryFromJson, mListenerToken);
+                        }
                     }
 
-                    final EventChannel queryEventChannel = new EventChannel(registrar.messenger(), "it.oltrenuovefrontiere.fluttercouch/queryEventChannel/"+queryId, JSONMethodCodec.INSTANCE);
-                    queryEventChannel.setStreamHandler(new QueryEventListener());
+                    result.success(queryFromJson != null);
 
                     break;
                 case ("remove"):
-                    CBManager.instance.removeQuery(queryId);
+                    mCBManager.removeQuery(queryId);
                     result.success(true);
                     break;
                 default:

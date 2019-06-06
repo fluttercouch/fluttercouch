@@ -31,8 +31,10 @@ import io.flutter.plugin.common.JSONUtil;
 class QueryJson {
     private QueryMap queryMap;
     private Query query = null;
+    private CBManager mCBManager;
 
-    QueryJson(JSONObject json) {
+    QueryJson(JSONObject json, CBManager manager) {
+        this.mCBManager = manager;
         this.queryMap = new QueryMap(json);
     }
 
@@ -235,11 +237,11 @@ class QueryJson {
     }
 
     private DataSource getDatasourceFromString(String name) {
-        return DataSource.database(CBManager.instance.getDatabase(name));
+        return DataSource.database(mCBManager.getDatabase(name));
     }
 
     private DataSource getDatasourceFromString(String name, String as) {
-        return DataSource.database(CBManager.instance.getDatabase(name)).as(as);
+        return DataSource.database(mCBManager.getDatabase(name)).as(as);
     }
 
     private SelectResult[] inflateSelectResultArray() {
