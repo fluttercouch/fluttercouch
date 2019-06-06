@@ -34,6 +34,11 @@ class Document {
 
   bool getBoolean(String key) {
     Object _result = getValue(key);
+
+    if (_result == 0 || _result == 1) {
+      return _result == 1;
+    }
+
     return _result is bool ? _result : null;
   }
 

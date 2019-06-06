@@ -1,37 +1,44 @@
 package it.oltrenuovefrontiere.fluttercouch;
 
+import android.content.res.AssetManager;
+
 import com.couchbase.lite.BasicAuthenticator;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.Document;
+import com.couchbase.lite.EncryptionKey;
 import com.couchbase.lite.Endpoint;
-import com.couchbase.lite.LogDomain;
+import com.couchbase.lite.LogFileConfiguration;
 import com.couchbase.lite.LogLevel;
 import com.couchbase.lite.MutableDocument;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.ReplicatorConfiguration;
 import com.couchbase.lite.SessionAuthenticator;
 import com.couchbase.lite.URLEndpoint;
-import com.couchbase.litecore.C4Replicator;
+import com.couchbase.lite.Query;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CBManager {
-    private static final CBManager mInstance = new CBManager();
+class CBManager {
+    public static final CBManager instance = new CBManager();
     private HashMap<String, Database> mDatabase = new HashMap<>();
+    private HashMap<String, Query> mQueries = new HashMap<>();
     private ReplicatorConfiguration mReplConfig;
     private Replicator mReplicator;
     private String defaultDatabase = "defaultDatabase";
+    private DatabaseConfiguration mDBConfig = new DatabaseConfiguration(FluttercouchPlugin.registrar.context());
 
     private CBManager() {
-    }
-
-    public static CBManager getInstance() {
-        return mInstance;
+        final File path = FluttercouchPlugin.registrar.context().getCacheDir();
+        Database.log.getFile().setConfig(new LogFileConfiguration(path.toString()));
+        Database.log.getFile().setLevel(LogLevel.INFO);
     }
 
     public Database getDatabase() {
@@ -77,12 +84,27 @@ public class CBManager {
         return resultMap;
     }
 
+    // ENCRYPTION IS ONLY COMPATIBLE WITH ENTERPRISE EDITION - NOT SUPPORTING //
+    private void setEncryptionKey(String password) {
+        EncryptionKey key = new EncryptionKey(password);
+        mDBConfig.setEncryptionKey(key);
+    }
+
     public void initDatabaseWithName(String _name) throws CouchbaseLiteException {
-        DatabaseConfiguration config = new DatabaseConfiguration(FluttercouchPlugin.context);
         if (!mDatabase.containsKey(_name)) {
             defaultDatabase = _name;
-            // Database.setLogLevel(LogDomain.REPLICATOR, LogLevel.VERBOSE);
-            mDatabase.put(_name, new Database(_name, config));
+            mDatabase.put(_name, new Database(_name, mDBConfig));
+        }
+    }
+
+    public void deleteDatabaseWithName(String _name) throws CouchbaseLiteException {
+        Database.delete(_name,new File(mDBConfig.getDirectory()));
+    }
+
+    public void closeDatabaseWithName(String _name) throws CouchbaseLiteException {
+        Database _db = mDatabase.remove(_name);
+        if (_db != null) {
+            _db.close();
         }
     }
 
@@ -123,6 +145,28 @@ public class CBManager {
         return mReplConfig.getAuthenticator().toString();
     }
 
+    public void setReplicatorPinnedServerCertificate(String assetKey) throws Exception {
+        if (assetKey != null) {
+            AssetManager assetManager = FluttercouchPlugin.registrar.context().getAssets();
+            String fileKey = FluttercouchPlugin.registrar.lookupKeyForAsset(assetKey);
+
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            try (InputStream is = assetManager.open(fileKey)) {
+                int nRead;
+                byte[] data = new byte[1024];
+                while ((nRead = is.read(data, 0, data.length)) != -1) {
+                    buffer.write(data, 0, nRead);
+                }
+
+                buffer.flush();
+            }
+
+            mReplConfig.setPinnedServerCertificate(buffer.toByteArray());
+        } else {
+            throw new Exception();
+        }
+    }
+
     public boolean setReplicatorContinuous(boolean _continuous) {
         mReplConfig.setContinuous(_continuous);
         return mReplConfig.isContinuous();
@@ -141,7 +185,28 @@ public class CBManager {
         mReplicator = null;
     }
 
+    public long getDocumentCount() throws Exception {
+        Database defaultDb = getDatabase();
+        if (defaultDb != null) {
+            return defaultDb.getCount();
+        } else {
+            throw new Exception();
+        }
+    }
+
     public Replicator getReplicator() {
         return mReplicator;
+    }
+
+    public void addQuery(String queryId, Query query) {
+        mQueries.put(queryId,query);
+    }
+
+    public Query getQuery(String queryId) {
+        return mQueries.get(queryId);
+    }
+
+    public Query removeQuery(String queryId) {
+        return mQueries.remove(queryId);
     }
 }

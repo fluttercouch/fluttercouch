@@ -10,6 +10,8 @@ abstract class Fluttercouch {
   static const EventChannel _replicationEventChannel =
     const EventChannel("it.oltrenuovefrontiere.fluttercouch/replicationEventChannel");
 
+  Stream _replicationStream = _replicationEventChannel.receiveBroadcastStream();
+
   Future<String> initDatabaseWithName(String _name) async {
     try {
       final String result =
@@ -94,6 +96,15 @@ abstract class Fluttercouch {
     }
   }
 
+  Future<String> setReplicatorPinnedServerCertificate(String _assetKey) async {
+    try {
+      final String result = await _methodChannel.invokeMethod('setReplicatorPinnedServerCertificate', _assetKey);
+      return result;
+    } on PlatformException {
+      throw 'unable to pin the certificate';
+    }
+  }
+
   Future<Null> initReplicator() async {
     try {
       await _methodChannel.invokeMethod("initReplicator");
@@ -118,6 +129,39 @@ abstract class Fluttercouch {
     }
   }
 
+  Future<Null> closeDatabaseWithName(String _name) async {
+    try {
+      await _methodChannel.invokeMethod('closeDatabaseWithName',_name);
+    } on PlatformException {
+      throw 'unable to close database with name $_name';
+    }
+  }
+
+  Future<Null> closeDatabase() async {
+    try {
+      await _methodChannel.invokeMethod('closeDatabase');
+    } on PlatformException {
+      throw 'unable to close database';
+    }
+  }
+
+  Future<Null> deleteDatabaseWithName(String _name) async {
+    try {
+      await _methodChannel.invokeMethod('deleteDatabaseWithName',_name);
+    } on PlatformException {
+      throw 'unable to delete database with name $_name';
+    }
+  }
+
+  Future<int> getDocumentCount() async {
+    try {
+      final int result = await _methodChannel.invokeMethod('getDocumentCount');
+      return result;
+    } on PlatformException {
+      throw 'unable to get document count';
+    }
+  }
+
   Future<Map<dynamic, dynamic>> _getDocumentWithId(String _id) async {
     try {
       final Map<dynamic, dynamic> result =
@@ -128,7 +172,7 @@ abstract class Fluttercouch {
     }
   }
 
-  void listenReplicationEvents(Function(dynamic) function) {
-    _replicationEventChannel.receiveBroadcastStream().listen(function);
+  StreamSubscription listenReplicationEvents(Function(String) function) {
+    return _replicationStream.listen(function);
   }
 }

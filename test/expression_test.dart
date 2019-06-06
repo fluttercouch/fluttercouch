@@ -80,7 +80,7 @@ void main() {
         Expression expression = Expression.property("SDK").equalTo(
             Expression.string("SDK"));
         expect(jsonEncode(expression),
-            '"[{\\"property\\":\\"SDK\\"},{\\"equalTo\\":[{\\"string\\":\\"SDK\\"}]}]"');
+            '[{"property":"SDK"},{"equalTo":[{"string":"SDK"}]}]');
       });
     });
   });

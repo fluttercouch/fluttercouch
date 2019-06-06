@@ -26,7 +26,15 @@ void main() {
     test("SelectFrom", () {
       Query query = QueryBuilder.select([SelectResult.all()]).from("database");
       expect(json.encode(query),
-          '{"selectDistinct":false,"selectResult":[[{"string":"all"}]],"from":"database"}');
+          '{"selectDistinct":false,"selectResult":[[{"property":null}]],"from":{"database":"database"}}');
+    });
+
+    test("SelectFromAs", () {
+      Query query = QueryBuilder
+          .select([SelectResult.expression(Meta.id.from("myAlias"))])
+          .from("database", as: "myAlias");
+      expect(json.encode(query),
+          '{"selectDistinct":false,"selectResult":[[{"meta":"id"},{"from":"myAlias"}]],"from":{"database":"database","as":"myAlias"}}');
     });
 
     test("SelectFromWhere", () {
@@ -36,7 +44,7 @@ void main() {
           .where(
           Expression.property("type").equalTo(Expression.string("hotel")));
       expect(json.encode(query),
-          '{"selectDistinct":false,"selectResult":[[{"string":"all"}]],"from":"database","where":[{"property":"type"},{"equalTo":[{"string":"hotel"}]}]}');
+          '{"selectDistinct":false,"selectResult":[[{"property":null}]],"from":{"database":"database"},"where":[{"property":"type"},{"equalTo":[{"string":"hotel"}]}]}');
     });
 
     test("SelectFromWhereOrderBy", () {
@@ -47,7 +55,7 @@ void main() {
           Expression.property("type").equalTo(Expression.string("hotel")))
           .orderBy([Ordering.expression(Meta.id)]);
       expect(json.encode(query),
-          '{"selectDistinct":false,"selectResult":[[{"string":"all"}]],"from":"database","where":[{"property":"type"},{"equalTo":[{"string":"hotel"}]}],"orderBy":[{"meta":"id"}]}');
+          '{"selectDistinct":false,"selectResult":[[{"property":null}]],"from":{"database":"database"},"where":[{"property":"type"},{"equalTo":[{"string":"hotel"}]}],"orderBy":[[{"meta":"id"}]]}');
     });
 
     test("SelectFromWhereLimit", () {
@@ -58,7 +66,7 @@ void main() {
           Expression.property("type").equalTo(Expression.string("hotel")))
           .limit(Expression.intValue(10));
       expect(json.encode(query),
-          '{"selectDistinct":false,"selectResult":[[{"string":"all"}]],"from":"database","where":[{"property":"type"},{"equalTo":[{"string":"hotel"}]}],"limit":[{"intValue":10}]}');
+          '{"selectDistinct":false,"selectResult":[[{"property":null}]],"from":{"database":"database"},"where":[{"property":"type"},{"equalTo":[{"string":"hotel"}]}],"limit":[{"intValue":10}]}');
     });
 
     test("ArrayFunction", () {
@@ -75,7 +83,7 @@ void main() {
           .and(ArrayFunction.contains(Expression.property("public_likes"),
           Expression.string("Armani Langworth"))));
       expect(json.encode(query),
-          '{"selectDistinct":false,"selectResult":[[{"meta":"id"}],[{"property":"name"}],[{"property":"public_linkes"}]],"from":"Database","where":[{"property":"type"},{"equalTo":[{"string":"hotel"}]},{"and":[]}]}');
+          '{"selectDistinct":false,"selectResult":[[{"meta":"id"}],[{"property":"name"}],[{"property":"public_linkes"}]],"from":{"database":"Database"},"where":[{"property":"type"},{"equalTo":[{"string":"hotel"}]},{"and":[]}]}');
     });
 
     test("In", () {
@@ -90,7 +98,7 @@ void main() {
               .equalTo(Expression.string("airport"))))
           .orderBy([Ordering.property("name")]);
       expect(json.encode(query),
-          '{"selectDistinct":false,"selectResult":[[{"property":"name"}]],"from":"database","where":[{"property":"country"},{"in":[[{"string":"Latvia"}],[{"string":"usa"}]]},{"and":[{"property":"type"},{"equalTo":[{"string":"airport"}]}]}],"orderBy":[{"property":"name"}]}');
+          '{"selectDistinct":false,"selectResult":[[{"property":"name"}]],"from":{"database":"database"},"where":[{"property":"country"},{"in":[[{"string":"Latvia"}],[{"string":"usa"}]]},{"and":[{"property":"type"},{"equalTo":[{"string":"airport"}]}]}],"orderBy":[[{"property":"name"}]]}');
     });
 
     test("like", () {
@@ -108,7 +116,7 @@ void main() {
           .property("type")
           .like(Expression.string("Royal Engineers Museum"))));
       expect(json.encode(query),
-          '{"selectDistinct":false,"selectResult":[[{"meta":"id"}],[{"property":"country"}],[{"property":"name"}]],"from":"database","where":[{"property":"type"},{"equalTo":[{"string":"landmark"}]},{"and":[{"property":"type"},{"like":[{"string":"Royal Engineers Museum"}]}]}]}');
+          '{"selectDistinct":false,"selectResult":[[{"meta":"id"}],[{"property":"country"}],[{"property":"name"}]],"from":{"database":"database"},"where":[{"property":"type"},{"equalTo":[{"string":"landmark"}]},{"and":[{"property":"type"},{"like":[{"string":"Royal Engineers Museum"}]}]}]}');
     });
 
     test("regex", () {
@@ -126,7 +134,7 @@ void main() {
           .property("name")
           .regex(Expression.string("\\bEng.*r\\b"))));
       expect(json.encode(query),
-          '{"selectDistinct":false,"selectResult":[[{"meta":"id"}],[{"property":"country"}],[{"property":"name"}]],"from":"database","where":[{"property":"type"},{"equalTo":[{"string":"landmark"}]},{"and":[{"property":"name"},{"regex":[{"string":"\\\\bEng.*r\\\\b"}]}]}]}');
+          '{"selectDistinct":false,"selectResult":[[{"meta":"id"}],[{"property":"country"}],[{"property":"name"}]],"from":{"database":"database"},"where":[{"property":"type"},{"equalTo":[{"string":"landmark"}]},{"and":[{"property":"name"},{"regex":[{"string":"\\\\bEng.*r\\\\b"}]}]}]}');
     });
 
     test("join", () {
@@ -159,7 +167,7 @@ void main() {
           .from("route")
           .equalTo(Expression.string("RIX"))));
       expect(json.encode(query),
-          '{"selectDistinct":false,"selectResult":[[{"property":"name"},{"from":"airline"}],[{"property":"callsign"},{"from":"airline"}],[{"property":"destinationairport"},{"from":"route"}],[{"property":"stops"},{"from":"route"}],[{"property":"airline"},{"from":"route"}]],"from":"airline","joins":[{"join":"database","as":"route"},{"on":[{"meta":"id"},{"from":"airline"},{"equalTo":[{"property":"airlineid"},{"from":"route"}]}]}],"where":[{"property":"type"},{"from":"route"},{"equalTo":[{"string":"route"}]},{"and":[{"property":"type"},{"from":"airline"},{"equalTo":[{"string":"airline"}]}]},{"and":[{"property":"sourceairport"},{"from":"route"},{"equalTo":[{"string":"RIX"}]}]}]}');
+          '{"selectDistinct":false,"selectResult":[[{"property":"name"},{"from":"airline"}],[{"property":"callsign"},{"from":"airline"}],[{"property":"destinationairport"},{"from":"route"}],[{"property":"stops"},{"from":"route"}],[{"property":"airline"},{"from":"route"}]],"from":{"database":"airline"},"joins":[{"join":"database","as":"route"},{"on":[{"meta":"id"},{"from":"airline"},{"equalTo":[{"property":"airlineid"},{"from":"route"}]}]}],"where":[{"property":"type"},{"from":"route"},{"equalTo":[{"string":"route"}]},{"and":[{"property":"type"},{"from":"airline"},{"equalTo":[{"string":"airline"}]}]},{"and":[{"property":"sourceairport"},{"from":"route"},{"equalTo":[{"string":"RIX"}]}]}]}');
     });
 
     test("groupBy", () {
@@ -183,7 +191,7 @@ void main() {
             .descending()
       ]);
       expect(json.encode(query),
-          '{"selectDistinct":false,"selectResult":[[{"count":[{"string":"*"}]}],[{"property":"country"}],[{"property":"tz"}]],"from":"database","where":[{"property":"type"},{"equalTo":[{"string":"airport"}]},{"and":[{"property":"geo.alt"},{"greaterThanOrEqualTo":[{"intValue":300}]}]}],"groupBy":[[{"property":"country"}],[{"property":"tz"}]],"orderBy":[{"count":[{"string":"*"}]},{"orderingSortOrder":"descending"}]}');
+          '{"selectDistinct":false,"selectResult":[[{"count":[{"string":"*"}]}],[{"property":"country"}],[{"property":"tz"}]],"from":{"database":"database"},"where":[{"property":"type"},{"equalTo":[{"string":"airport"}]},{"and":[{"property":"geo.alt"},{"greaterThanOrEqualTo":[{"intValue":300}]}]}],"groupBy":[[{"property":"country"}],[{"property":"tz"}]],"orderBy":[[{"count":[{"string":"*"}]},{"orderingSortOrder":"descending"}]]}');
     });
 
     test("orderBy", () {
@@ -196,7 +204,7 @@ void main() {
           .orderBy([Ordering.property("name").ascending()])
           .limit(Expression.intValue(10));
       expect(json.encode(query),
-          '{"selectDistinct":false,"selectResult":[[{"meta":"id"},{"from":"airline"},{"equalTo":[{"property":"airlineid"},{"from":"route"}]}],[{"property":"name"}]],"from":"database","where":[{"property":"type"},{"equalTo":[{"string":"hotel"}]}],"orderBy":[{"property":"name"},{"orderingSortOrder":"ascending"}],"limit":[{"intValue":10}]}');
+          '{"selectDistinct":false,"selectResult":[[{"meta":"id"}],[{"property":"name"}]],"from":{"database":"database"},"where":[{"property":"type"},{"equalTo":[{"string":"hotel"}]}],"orderBy":[[{"property":"name"},{"orderingSortOrder":"ascending"}]],"limit":[{"intValue":10}]}');
     });
   });
 }

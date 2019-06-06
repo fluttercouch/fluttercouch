@@ -8,14 +8,8 @@ import com.couchbase.lite.ReplicatorChangeListener;
 import io.flutter.plugin.common.EventChannel;
 
 public class ReplicationEventListener implements EventChannel.StreamHandler, ReplicatorChangeListener {
-
-    private CBManager mCBmanager;
     private ListenerToken mListenerToken;
     private EventChannel.EventSink mEventSink;
-
-    ReplicationEventListener(CBManager _cbManager) {
-        this.mCBmanager = _cbManager;
-    }
 
     /*
      * IMPLEMENTATION OF EVENTCHANNEL.STREAMHANDLER
@@ -24,13 +18,17 @@ public class ReplicationEventListener implements EventChannel.StreamHandler, Rep
     @Override
     public void onListen(Object o, final EventChannel.EventSink eventSink) {
         mEventSink = eventSink;
-        mListenerToken = mCBmanager.getReplicator().addChangeListener(this);
+        mListenerToken = CBManager.instance.getReplicator().addChangeListener(this);
     }
 
     @Override
     public void onCancel(Object o) {
-        mCBmanager.getReplicator().removeChangeListener(mListenerToken);
+        if (mListenerToken != null) {
+            CBManager.instance.getReplicator().removeChangeListener(mListenerToken);
+        }
+
         mEventSink = null;
+        mListenerToken = null;
     }
 
     /*
