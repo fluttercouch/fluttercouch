@@ -51,7 +51,7 @@ public class SwiftFluttercouchPlugin: NSObject, FlutterPlugin, CBManagerDelegate
             let _name : String = call.arguments! as! String
             do {
                 try mCBManager.closeDatabaseWithName(name: _name)
-                result(nil)
+                result(_name)
             } catch {
                 result(FlutterError.init(code: "errClose", message: "Error closing database with name \(_name)", details: error.localizedDescription))
             }
@@ -98,37 +98,40 @@ public class SwiftFluttercouchPlugin: NSObject, FlutterPlugin, CBManagerDelegate
         case "setReplicatorEndpoint":
             let endpoint = call.arguments! as! String
             mCBManager.setReplicatorEndpoint(endpoint: endpoint)
-            result(String(endpoint))
+            result(nil)
         case "setReplicatorType":
             let type = call.arguments! as! String
-            result(String(mCBManager.setReplicatorType(type: type)))
+            mCBManager.setReplicatorType(type: type)
+            result(nil)
         case "setReplicatorBasicAuthentication":
             let auth = call.arguments! as! [String:String]
-            result(String(mCBManager.setReplicatorAuthentication(auth: auth)))
+            mCBManager.setReplicatorAuthentication(auth: auth)
+            result(nil)
         case "setReplicatorSessionAuthentication":
             let sessionID = call.arguments! as! String
             mCBManager.setReplicatorSessionAuthentication(sessionID: sessionID)
-            result(String(sessionID))
+            result(nil)
         case "setReplicatorPinnedServerCertificate":
             let assetKey = call.arguments! as! String
             do {
                 try mCBManager.setReplicatorPinnedServerCertificate(assetKey: assetKey)
-                result(String(assetKey))
+                result(nil)
             } catch {
                 result(FlutterError(code: "errCert",message: "Certificate Pinning Failed",details: error.localizedDescription))
             }
         case "setReplicatorContinuous":
             let isContinuous = call.arguments! as! Bool
-            result(Bool(mCBManager.setReplicatorContinuous(isContinuous: isContinuous)))
+            mCBManager.setReplicatorContinuous(isContinuous: isContinuous)
+            result(nil)
         case "initReplicator":
             mCBManager.initReplicator()
-            result(String(""))
+            result(nil)
         case "startReplicator":
             mCBManager.startReplication()
-            result(String(""))
+            result(nil)
         case "stopReplicator":
             mCBManager.stopReplication()
-            result(String(""))
+            result(nil)
         case "closeDatabase":
             if let database = mCBManager.getDatabase() {
                 do {

@@ -126,159 +126,6 @@ class CBManager {
         return query
     }
     
-    func buildQuery(options: Dictionary<String,Any>) -> Query? {
-        let select : Select
-        if let expressionStack = options["selectResult"] as? Array<ExpressionJson> {
-            let selectResult = _buildSelect(expressionStack: expressionStack)
-            if let selectDistinct = options["selectDisinct"] as? Bool, selectDistinct == true {
-                select = QueryBuilder.selectDistinct(selectResult)
-            } else {
-                select = QueryBuilder.select(selectResult)
-            }
-        } else {
-            return nil
-        }
-        
-        let from: From
-        if let dbname = options["from"] as? String, let db = getDatabase(name: dbname) {
-            from = select.from(DataSource.database(db))
-        } else if let db = getDatabase() {
-            from = select.from(DataSource.database(db))
-        } else {
-            return nil
-        }
-        
-        let whereClause: Where?
-        if let whereJson = options["where"] as? ExpressionJson, let whereExpression = _buildExpressionProtocol(expression: whereJson) {
-            whereClause = from.where(whereExpression)
-        } else {
-            whereClause = nil
-        }
-        
-        if let limit = options["limit"] as? ExpressionJson, let limitExpression = _buildExpressionProtocol(expression: limit) {
-            if let query = whereClause {
-                return query.limit(limitExpression)
-            } else {
-                return from.limit(limitExpression)
-            }
-        }
-
-        if let query = whereClause {
-            return query
-        } else {
-            return from
-        }
-    }
-    
-    func _buildSelect(expressionStack: Array<ExpressionJson>) -> Array<SelectResultProtocol> {
-        var selectResults : Array<SelectResultProtocol> = []
-        
-        for expression in expressionStack {
-            if let result = _buildExpressionProtocol(expression: expression) {
-                if (expression.first?.keys.first == "string" && expression.first?.values.first as? String == "all") {
-                    selectResults.append(SelectResult.all())
-                } else {
-                    selectResults.append(SelectResult.expression(result))
-                }
-            }
-        }
-        
-        return selectResults
-    }
-    
-    func _buildExpressionProtocol(expression: ExpressionJson) -> ExpressionProtocol? {
-        var stack : Array<ExpressionProtocol> = []
-        
-        for jsonObject in expression {
-            guard let objectType = jsonObject.keys.first else {
-                return nil
-            }
-            
-            switch objectType {
-            case "meta":
-                if let value = _buildMetaExpressionProtocol(expression: jsonObject) {
-                    stack.insert(value, at: 0)
-                }
-            case "booleanValue":
-                if let value = jsonObject[objectType] as? Bool {
-                    stack.insert(Expression.boolean(value),at: 0)
-                }
-            case "doubleValue":
-                if let value = jsonObject[objectType] as? Double {
-                    stack.insert(Expression.double(value),at: 0)
-                }
-            case "intValue":
-                if let value = jsonObject[objectType] as? Int {
-                    stack.insert(Expression.int(value), at: 0)
-                }
-            case "value":
-                stack.insert(Expression.value(jsonObject[objectType]), at: 0)
-            case "string":
-                stack.insert(Expression.string(jsonObject[objectType] as? String), at: 0)
-            case "property":
-                if let value = jsonObject[objectType] as? String {
-                    stack.insert(Expression.property(value), at: 0)
-                }
-            case "negated":
-                let head = stack.removeFirst()
-                stack.insert(Expression.negated(head), at: 0)
-            case "not":
-                let head = stack.removeFirst()
-                stack.insert(Expression.not(head), at: 0)
-            case "add":
-                let head = stack.removeFirst()
-                if let value = jsonObject[objectType] as? ExpressionJson, let otherExpression = _buildExpressionProtocol(expression: value) {
-                    stack.insert(head.add(otherExpression), at: 0)
-                }
-            case "and":
-                let head = stack.removeFirst()
-                if let value = jsonObject[objectType] as? ExpressionJson, let otherExpression = _buildExpressionProtocol(expression: value) {
-                    stack.insert(head.and(otherExpression), at: 0)
-                }
-            case "from":
-                if let value = jsonObject[objectType] as? String {
-                    if let head = stack.removeFirst() as? PropertyExpressionProtocol {
-                        stack.insert(head.from(value), at: 0)
-                    } else if let head = stack.removeFirst() as? MetaExpressionProtocol {
-                        stack.insert(head.from(value), at: 0)
-                    }
-                }
-            default:
-                return nil
-            }
-        }
-        
-        return stack.first
-    }
-    
-    func _buildMetaExpressionProtocol(expression: Dictionary<String, Any>) -> MetaExpressionProtocol? {
-        guard let expressionType = expression.keys.first else {
-            return nil
-        }
-        
-        switch expressionType {
-        case "meta":
-            if let value = expression[expressionType] as? String {
-                switch value {
-                case "id":
-                    return Meta.id
-                case "isDeleted":
-                    return Meta.isDeleted
-                case "expiration":
-                    return Meta.expiration
-                case "sequence":
-                    return Meta.sequence
-                default:
-                    return nil
-                }
-            } else {
-                return nil
-            }
-        default:
-            return nil
-        }
-    }
-    
     func setReplicatorEndpoint(endpoint: String) {
         let targetEndpoint = URLEndpoint(url: URL(string: endpoint)!)
         mReplConfig = ReplicatorConfiguration(database: getDatabase()!, target: targetEndpoint)
@@ -306,11 +153,10 @@ class CBManager {
         }
     }
     
-    func setReplicatorAuthentication(auth: [String:String]) -> String {
+    func setReplicatorAuthentication(auth: [String:String]) {
         if let username = auth["username"], let password = auth["password"] {
             mReplConfig?.authenticator = BasicAuthenticator(username: username, password: password)
         }
-        return mReplConfig?.authenticator.debugDescription ?? "Undefined Config"
     }
     
     func setReplicatorSessionAuthentication(sessionID: String?) {
@@ -335,12 +181,10 @@ class CBManager {
         }
     }
     
-    func setReplicatorContinuous(isContinuous: Bool) -> Bool {
+    func setReplicatorContinuous(isContinuous: Bool) {
         if ((mReplConfig) != nil) {
             mReplConfig?.continuous = isContinuous
-            return mReplConfig!.continuous
         }
-        return false
     }
     
     func initReplicator() {

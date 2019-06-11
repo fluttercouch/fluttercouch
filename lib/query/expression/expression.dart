@@ -6,7 +6,7 @@ abstract class Expression {
   final List<Map<String, dynamic>> internalExpressionStack = new List();
 
   factory Expression.all() {
-    return PropertyExpression({"property":null});
+    return PropertyExpression({"property": null});
   }
 
   factory Expression.booleanValue(bool value) {

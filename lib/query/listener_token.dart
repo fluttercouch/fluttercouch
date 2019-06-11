@@ -5,7 +5,7 @@ class ListenerToken {
 
   ListenerToken();
 
-  Map<String, dynamic> toJson() => {"token":tokenId};
+  Map<String, dynamic> toJson() => {"token": tokenId};
 
   @override
   bool operator ==(other) {

@@ -115,13 +115,12 @@ class CBManager {
         }
     }
 
-    public String setReplicatorEndpoint(String _endpoint) throws URISyntaxException {
+    public void setReplicatorEndpoint(String _endpoint) throws URISyntaxException {
         Endpoint targetEndpoint = new URLEndpoint(new URI(_endpoint));
         mReplConfig = new ReplicatorConfiguration(mDatabase.get(defaultDatabase), targetEndpoint);
-        return mReplConfig.getTarget().toString();
     }
 
-    public String setReplicatorType(String _type) throws CouchbaseLiteException {
+    public void setReplicatorType(String _type) throws CouchbaseLiteException {
         ReplicatorConfiguration.ReplicatorType settedType = ReplicatorConfiguration.ReplicatorType.PULL;
         if (_type.equals("PUSH")) {
             settedType = ReplicatorConfiguration.ReplicatorType.PUSH;
@@ -131,25 +130,22 @@ class CBManager {
             settedType = ReplicatorConfiguration.ReplicatorType.PUSH_AND_PULL;
         }
         mReplConfig.setReplicatorType(settedType);
-        return settedType.toString();
     }
 
-    public String setReplicatorBasicAuthentication(Map<String, String> _auth) throws Exception {
+    public void setReplicatorBasicAuthentication(Map<String, String> _auth) throws Exception {
         if (_auth.containsKey("username") && _auth.containsKey("password")) {
             mReplConfig.setAuthenticator(new BasicAuthenticator(_auth.get("username"), _auth.get("password")));
         } else {
             throw new Exception();
         }
-        return mReplConfig.getAuthenticator().toString();
     }
 
-    public String setReplicatorSessionAuthentication(String sessionID) throws Exception {
+    public void setReplicatorSessionAuthentication(String sessionID) throws Exception {
         if (sessionID != null) {
             mReplConfig.setAuthenticator(new SessionAuthenticator(sessionID));
         } else {
             throw new Exception();
         }
-        return mReplConfig.getAuthenticator().toString();
     }
 
     public void setReplicatorPinnedServerCertificate(String assetKey) throws Exception {
@@ -174,9 +170,8 @@ class CBManager {
         }
     }
 
-    public boolean setReplicatorContinuous(boolean _continuous) {
+    public void setReplicatorContinuous(boolean _continuous) {
         mReplConfig.setContinuous(_continuous);
-        return mReplConfig.isContinuous();
     }
 
     public void initReplicator() {

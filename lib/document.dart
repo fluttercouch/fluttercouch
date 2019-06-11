@@ -102,7 +102,7 @@ class Document {
           .map((item) => item.cast<K, V>())
           .toList();
     } else {
-      return List<Map<K,V>>();
+      return List<Map<K, V>>();
     }
   }
 

@@ -101,7 +101,7 @@ public class FluttercouchPlugin implements CBManagerDelegate {
                     _name = call.arguments();
                     try {
                         mCBManager.closeDatabaseWithName(_name);
-                        result.success(null);
+                        result.success(_name);
                     } catch (Exception e) {
                         result.error("errClose", "error closing database with name " + _name, e.toString());
                     }
@@ -149,8 +149,8 @@ public class FluttercouchPlugin implements CBManagerDelegate {
                 case ("setReplicatorEndpoint"):
                     String _endpoint = call.arguments();
                     try {
-                        String _result = mCBManager.setReplicatorEndpoint(_endpoint);
-                        result.success(_result);
+                        mCBManager.setReplicatorEndpoint(_endpoint);
+                        result.success(null);
                     } catch (URISyntaxException e) {
                         result.error("errURI", "error setting the replicator endpoint uri to " + _endpoint, e.toString());
                     }
@@ -158,7 +158,8 @@ public class FluttercouchPlugin implements CBManagerDelegate {
                 case ("setReplicatorType"):
                     String _type = call.arguments();
                     try {
-                        result.success(mCBManager.setReplicatorType(_type));
+                        mCBManager.setReplicatorType(_type);
+                        result.success(null);
                     } catch (CouchbaseLiteException e) {
                         result.error("errReplType", "error setting replication type to " + _type, e.toString());
                     }
@@ -166,7 +167,8 @@ public class FluttercouchPlugin implements CBManagerDelegate {
                 case ("setReplicatorBasicAuthentication"):
                     Map<String, String> _auth = call.arguments();
                     try {
-                        result.success(mCBManager.setReplicatorBasicAuthentication(_auth));
+                        mCBManager.setReplicatorBasicAuthentication(_auth);
+                        result.success(null);
                     } catch (Exception e) {
                         result.error("errAuth", "error setting authentication for replicator", e.toString());
                     }
@@ -174,7 +176,8 @@ public class FluttercouchPlugin implements CBManagerDelegate {
                 case ("setReplicatorSessionAuthentication"):
                     String _sessionID = call.arguments();
                     try {
-                        result.success(mCBManager.setReplicatorSessionAuthentication(_sessionID));
+                        mCBManager.setReplicatorSessionAuthentication(_sessionID);
+                        result.success(null);
                     } catch (Exception e) {
                         result.error("errAuth", "invalid session ID", e.toString());
                     }
@@ -183,7 +186,7 @@ public class FluttercouchPlugin implements CBManagerDelegate {
                     String assetKey = call.arguments();
                     try {
                         mCBManager.setReplicatorPinnedServerCertificate(assetKey);
-                        result.success(assetKey);
+                        result.success(null);
                     } catch (Exception e) {
                         result.error("errCert", "certificate pinning failed", e.toString());
                     }
@@ -191,22 +194,23 @@ public class FluttercouchPlugin implements CBManagerDelegate {
                 case ("setReplicatorContinuous"):
                     Boolean _continuous = call.arguments();
                     try {
-                        result.success(mCBManager.setReplicatorContinuous(_continuous));
+                        mCBManager.setReplicatorContinuous(_continuous);
+                        result.success(null);
                     } catch (Exception e) {
                         result.error("errContinuous", "unable to set replication to continuous", e.toString());
                     }
                     break;
                 case ("initReplicator"):
                     mCBManager.initReplicator();
-                    result.success("");
+                    result.success(null);
                     break;
                 case ("startReplicator"):
                     mCBManager.startReplicator();
-                    result.success("");
+                    result.success(null);
                     break;
                 case ("stopReplicator"):
                     mCBManager.stopReplicator();
-                    result.success("");
+                    result.success(null);
                     break;
                 case ("closeDatabase"):
                     try {

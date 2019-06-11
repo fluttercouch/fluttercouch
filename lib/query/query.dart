@@ -14,13 +14,15 @@ class Query {
   bool _stored = false;
   Map<String, dynamic> options;
   Parameters param;
-  Map<ListenerToken,StreamSubscription> tokens = {};
+  Map<ListenerToken, StreamSubscription> tokens = {};
 
   static const JSONMethodCodec _jsonMethod = const JSONMethodCodec();
 
-  static const MethodChannel _channel = const MethodChannel('it.oltrenuovefrontiere.fluttercouchJson', _jsonMethod);
+  static const MethodChannel _channel = const MethodChannel(
+      'it.oltrenuovefrontiere.fluttercouchJson', _jsonMethod);
 
-  static const EventChannel _queryEventChannel = const EventChannel("it.oltrenuovefrontiere.fluttercouch/queryEventChannel", _jsonMethod);
+  static const EventChannel _queryEventChannel = const EventChannel(
+      "it.oltrenuovefrontiere.fluttercouch/queryEventChannel", _jsonMethod);
 
   static final Stream _stream = _queryEventChannel.receiveBroadcastStream();
 
@@ -36,10 +38,11 @@ class Query {
     }
 
     try {
-      final List<dynamic> resultSet = await _channel.invokeMethod('execute', this);
+      final List<dynamic> resultSet =
+          await _channel.invokeMethod('execute', this);
 
       List<Result> results = List<Result>();
-      for(dynamic result in resultSet) {
+      for (dynamic result in resultSet) {
         Result newResult = Result();
         newResult.setMap(result["map"]);
         newResult.setList(result["list"]);
@@ -53,7 +56,7 @@ class Query {
         removeChangeListener(token);
       });
 
-      throw 'unable to execute the query: ${this.toJson()}\n ${e.message}';
+      rethrow;
     }
   }
 
@@ -71,7 +74,8 @@ class Query {
 
   Future<ListenerToken> addChangeListener(ListenerCallback callback) async {
     var token = ListenerToken();
-    tokens[token] = _stream.where((data) => data["query"] == queryId).listen((data) {
+    tokens[token] =
+        _stream.where((data) => data["query"] == queryId).listen((data) {
       Map<String, dynamic> qcJson = data;
       final List<dynamic> resultList = qcJson["results"];
 
@@ -123,5 +127,5 @@ class QueryChange {
   final ResultSet results;
   final String error;
 
-  QueryChange({this.query,this.results,this.error}) : assert(query != null);
+  QueryChange({this.query, this.results, this.error}) : assert(query != null);
 }
