@@ -1,10 +1,12 @@
 name: fluttercouch
 description: A new flutter plugin project.
-version: 0.0.1
+version: 0.5.1
 author:
 homepage:
 
 dependencies:
+  uuid: ^2.0.0
+
   flutter:
     sdk: flutter
 

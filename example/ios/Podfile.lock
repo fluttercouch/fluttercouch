@@ -1,12 +1,12 @@
 PODS:
-  - CouchbaseLite-Swift (2.1.1)
+  - CouchbaseLite-Swift (2.5.1)
   - Flutter (1.0.0)
   - fluttercouch (0.0.1):
-    - CouchbaseLite-Swift (~> 2.1.0)
+    - CouchbaseLite-Swift (~> 2.5.1)
     - Flutter
 
 DEPENDENCIES:
-  - Flutter (from `Pods/.symlinks/flutter/ios-release`)
+  - Flutter (from `Pods/.symlinks/flutter/ios`)
   - fluttercouch (from `Pods/.symlinks/plugins/fluttercouch/ios`)
 
 SPEC REPOS:
@@ -15,15 +15,15 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   Flutter:
-    :path: Pods/.symlinks/flutter/ios-release
+    :path: Pods/.symlinks/flutter/ios
   fluttercouch:
     :path: Pods/.symlinks/plugins/fluttercouch/ios
 
 SPEC CHECKSUMS:
-  CouchbaseLite-Swift: cfb9343dfea7aeb116db82941ba8189fc24cb119
+  CouchbaseLite-Swift: 89876f4656ef16945aea554127755ee40855af12
   Flutter: 9d0fac939486c9aba2809b7982dfdbb47a7b0296
-  fluttercouch: cd549f34c50ebfaeb5cafb0db9ff22967ed75fe7
+  fluttercouch: d534d7e932645dd3138f2e8bafb370cf63c32730
 
 PODFILE CHECKSUM: 053181c8a81f9b75918d2db7970ec1688a41211a
 
-COCOAPODS: 1.5.2
+COCOAPODS: 1.5.3

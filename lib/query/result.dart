@@ -69,7 +69,7 @@ class Result {
 
   List<String> getKeys() {
     if (null != _internalMap && _internalMap.isNotEmpty) {
-      return _internalMap.keys;
+      return List.unmodifiable(_internalMap.keys);
     } else {
       return null;
     }
@@ -107,5 +107,15 @@ class Result {
 
   Map<String, dynamic> toMap() {
     return _internalMap;
+  }
+
+  setMap(Map<String, dynamic> map) {
+    _internalMap.clear();
+    _internalMap.addAll(map);
+  }
+
+  setList(List<dynamic> list) {
+    _internalList.clear();
+    _internalList.addAll(list);
   }
 }

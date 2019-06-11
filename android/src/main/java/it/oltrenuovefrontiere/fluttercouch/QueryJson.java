@@ -13,6 +13,7 @@ import com.couchbase.lite.Ordering;
 import com.couchbase.lite.PropertyExpression;
 import com.couchbase.lite.Query;
 import com.couchbase.lite.QueryBuilder;
+import com.couchbase.lite.ResultSet;
 import com.couchbase.lite.Select;
 import com.couchbase.lite.SelectResult;
 import com.couchbase.lite.Where;
@@ -27,13 +28,26 @@ import java.util.Map;
 
 import io.flutter.plugin.common.JSONUtil;
 
-public class QueryJson {
-
+class QueryJson {
     private QueryMap queryMap;
     private Query query = null;
+    private CBManager mCBManager;
 
-    QueryJson(JSONObject json) {
+    QueryJson(JSONObject json, CBManager manager) {
+        this.mCBManager = manager;
         this.queryMap = new QueryMap(json);
+    }
+
+    static List<Map<String,Object>> resultsToJson(ResultSet results) {
+        List<Map<String,Object>> rtnList = new ArrayList<>();
+        for (final com.couchbase.lite.Result rslt:results) {
+            HashMap<String, Object> value = new HashMap<>();
+            value.put("map",rslt.toMap());
+            value.put("list",rslt.toList());
+            rtnList.add(value);
+        }
+
+        return rtnList;
     }
 
     Query toCouchbaseQuery() {
@@ -129,41 +143,19 @@ public class QueryJson {
     private Ordering[] inflateOrdering(List<List<Map<String, Object>>> orderByArray) {
         List<Ordering> resultOrdering = new ArrayList<>();
         for (List<Map<String, Object>> currentOrderByArgument : orderByArray) {
-            if (currentOrderByArgument.size() == 1) {
-                Map<String, Object> orderingArgument = currentOrderByArgument.get(0);
-                if (orderingArgument.containsKey("meta")) {
-                    MetaExpression meta = null;
-                    if (orderingArgument.get("meta").equals("id")) {
-                        meta = Meta.id;
-                    } else if (orderingArgument.get("meta").equals("sequence")) {
-                        meta = Meta.sequence;
-                    }
-                    resultOrdering.add(Ordering.expression(meta));
-                } else if (orderingArgument.containsKey("property")) {
-                    resultOrdering.add(Ordering.property((String) orderingArgument.get("property")));
+            Map<String,Object> last = currentOrderByArgument.get(currentOrderByArgument.size() -1);
+            Expression orderingExpression = inflateExpressionFromArray(currentOrderByArgument);
+            Ordering.SortOrder ordering = Ordering.expression(orderingExpression);
+
+            if (last.containsKey("orderingSortOrder")) {
+                String orderingSortOrder = (String) last.get("orderingSortOrder");
+                if (orderingSortOrder.equals("ascending")) {
+                    resultOrdering.add(ordering.ascending());
+                } else if (orderingSortOrder.equals("descending")) {
+                    resultOrdering.add(ordering.descending());
                 }
-            } else if (currentOrderByArgument.size() == 2) {
-                Map<String, Object> orderingArgument = currentOrderByArgument.get(0);
-                String orderingSortOrder = (String) currentOrderByArgument.get(1).get("orderingSortOrder");
-                if (orderingArgument.containsKey("meta")) {
-                    MetaExpression meta = null;
-                    if (orderingArgument.get("meta").equals("id")) {
-                        meta = Meta.id;
-                    } else if (orderingArgument.get("meta").equals("sequence")) {
-                        meta = Meta.sequence;
-                    }
-                    if (orderingSortOrder.equals("ascending")) {
-                        resultOrdering.add(Ordering.expression(meta).ascending());
-                    } else if (orderingSortOrder.equals("descending")) {
-                        resultOrdering.add(Ordering.expression(meta).descending());
-                    }
-                } else if (orderingArgument.containsKey("property")) {
-                    if (orderingSortOrder.equals("ascending")) {
-                        resultOrdering.add(Ordering.property((String) orderingArgument.get("property")).ascending());
-                    } else if (orderingSortOrder.equals("descending")) {
-                        resultOrdering.add(Ordering.property((String) orderingArgument.get("property")).descending());
-                    }
-                }
+            } else {
+                resultOrdering.add(ordering);
             }
         }
         return resultOrdering.toArray(new Ordering[0]);
@@ -171,27 +163,72 @@ public class QueryJson {
 
     private void inflateJoins() {
         List<Map<String, Object>> joinsArray = queryMap.joins;
-        if (joinsArray.size() == 1) {
-            Map<String, Object> joinArguments = joinsArray.get(0);
-            DataSource dataSource = getDatasourceFromString(((String) joinArguments.get("join")), ((String) joinArguments.get("as")));
-            query = ((From) query).join(Join.join(dataSource));
+        Map<String, Object> joinArguments = joinsArray.get(0);
+        String alias = (String) joinArguments.get("as");
+
+        String databaseName;
+        Join join;
+        if (joinArguments.containsKey("join")) {
+            databaseName = (String) joinArguments.get("join");
+            if (alias != null) {
+                join = Join.join(getDatasourceFromString(databaseName,alias));
+            } else {
+                join = Join.join(getDatasourceFromString(databaseName));
+            }
+        } else if (joinArguments.containsKey("crossJoin")) {
+            databaseName = (String) joinArguments.get("crossJoin");
+            if (alias != null) {
+                join = Join.crossJoin(getDatasourceFromString(databaseName,alias));
+            } else {
+                join = Join.crossJoin(getDatasourceFromString(databaseName));
+            }
+        } else if (joinArguments.containsKey("innerJoin")) {
+            databaseName = (String) joinArguments.get("innerJoin");
+            if (alias != null) {
+                join = Join.innerJoin(getDatasourceFromString(databaseName,alias));
+            } else {
+                join = Join.innerJoin(getDatasourceFromString(databaseName));
+            }
+        } else if (joinArguments.containsKey("leftJoin")) {
+            databaseName = (String) joinArguments.get("leftJoin");
+            if (alias != null) {
+                join = Join.leftJoin(getDatasourceFromString(databaseName,alias));
+            } else {
+                join = Join.leftJoin(getDatasourceFromString(databaseName));
+            }
+        } else if (joinArguments.containsKey("leftOuterJoin")) {
+            databaseName = (String) joinArguments.get("leftOuterJoin");
+            if (alias != null) {
+                join = Join.leftOuterJoin(getDatasourceFromString(databaseName,alias));
+            } else {
+                join = Join.leftOuterJoin(getDatasourceFromString(databaseName));
+            }
+        } else {
+            return;
         }
-        if (joinsArray.size() == 2) {
-            Map<String, Object> joinArguments = joinsArray.get(0);
+
+        if (joinsArray.size() == 1) {
+            query = ((From) query).join(join);
+        } else if (joinsArray.size() == 2) {
             Map<String, Object> joinOnArguments = joinsArray.get(1);
-            DataSource dataSource = getDatasourceFromString(((String) joinArguments.get("join")), ((String) joinArguments.get("as")));
-            Expression onExpression = inflateExpressionFromArray((QueryMap.getListOfMapFromGenericList(joinOnArguments.get("on"))));
-            query = ((From) query).join(Join.join(dataSource).on(onExpression));
+            Expression onExpression = inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(joinOnArguments.get("on")));
+            query = ((From) query).join(((Join.On) join).on(onExpression));
         }
     }
 
     private void inflateFrom() {
-        String databaseName = queryMap.from;
-        query = ((Select) query).from(getDatasourceFromString(databaseName));
+        String databaseName = (String) queryMap.from.get("database");
+        String alias = (String) queryMap.from.get("as");
+
+        if (alias != null) {
+            query = ((Select) query).from(getDatasourceFromString(databaseName,alias));
+        } else {
+            query = ((Select) query).from(getDatasourceFromString(databaseName));
+        }
     }
 
     private void inflateSelect() {
-        Boolean selectDistinct = queryMap.selectDistinct;
+        boolean selectDistinct = queryMap.selectDistinct;
         if (selectDistinct) {
             query = QueryBuilder.selectDistinct(inflateSelectResultArray());
         } else {
@@ -200,11 +237,11 @@ public class QueryJson {
     }
 
     private DataSource getDatasourceFromString(String name) {
-        return DataSource.database(CBManager.getInstance().getDatabase(name));
+        return DataSource.database(mCBManager.getDatabase(name));
     }
 
     private DataSource getDatasourceFromString(String name, String as) {
-        return DataSource.database(CBManager.getInstance().getDatabase(name)).as(as);
+        return DataSource.database(mCBManager.getDatabase(name)).as(as);
     }
 
     private SelectResult[] inflateSelectResultArray() {
@@ -217,38 +254,23 @@ public class QueryJson {
     }
 
     private SelectResult inflateSelectResult(List<Map<String, Object>> selectResultParametersArray) {
-        switch (selectResultParametersArray.size()) {
-            case (0):
-                return null;
-            case (1):
-                Map<String, Object> selectResultParameter = selectResultParametersArray.get(0);
-                if (selectResultParameter.containsKey("string")) {
-                    return SelectResult.all();
-                } else if (selectResultParameter.containsKey("meta")) {
-                    if (selectResultParameter.get("meta").equals("id")) {
-                        return SelectResult.expression(Meta.id);
-                    } else if (selectResultParameter.get("meta").equals("sequence")) {
-                        return SelectResult.expression(Meta.sequence);
-                    }
-                } else if (selectResultParameter.containsKey("property")) {
-                    return SelectResult.property(((String) selectResultParameter.get("property")));
-                }
-                break;
-            case (2):
-                if (selectResultParametersArray.get(0).containsKey("property")) {
-                    return SelectResult.expression(inflateExpressionFromArray(selectResultParametersArray));
-                }
+        SelectResult.As result = SelectResult.expression(inflateExpressionFromArray(selectResultParametersArray));
+
+        String alias = (String) selectResultParametersArray.get(selectResultParametersArray.size()-1).get("as");
+        if (alias != null) {
+            return result.as(alias);
         }
-        return null;
+
+        return result;
     }
 
     private void inflateWhere() {
         List<Map<String, Object>> whereObject = queryMap.where;
-            if (query instanceof From) {
-                query = ((From) query).where(inflateExpressionFromArray(whereObject));
-            } else if (query instanceof Joins) {
-                query = ((Joins) query).where(inflateExpressionFromArray(whereObject));
-            }
+        if (query instanceof From) {
+            query = ((From) query).where(inflateExpressionFromArray(whereObject));
+        } else if (query instanceof Joins) {
+            query = ((Joins) query).where(inflateExpressionFromArray(whereObject));
+        }
     }
 
     private Expression inflateExpressionFromArray(List<Map<String, Object>> expressionParametersArray) {
@@ -258,7 +280,12 @@ public class QueryJson {
             if (returnExpression == null) {
                 switch (currentExpression.keySet().iterator().next()) {
                     case ("property"):
-                        returnExpression = Expression.property(((String) currentExpression.get("property")));
+                        Object value = currentExpression.get("property");
+                        if (value == null) {
+                            returnExpression = Expression.all();
+                        } else {
+                            returnExpression = Expression.property(((String) value));
+                        }
                         break;
                     case ("meta"):
                         if (currentExpression.get("meta").equals("id")) {
@@ -274,7 +301,7 @@ public class QueryJson {
                         returnExpression = Expression.date((Date) currentExpression.get("date"));
                         break;
                     case ("doubleValue"):
-                        returnExpression = Expression.doubleValue((double) currentExpression.get("double"));
+                        returnExpression = Expression.doubleValue((double) currentExpression.get("doubleValue"));
                         break;
                     case ("floatValue"):
                         returnExpression = Expression.floatValue((float) currentExpression.get("floatValue"));
@@ -302,61 +329,61 @@ public class QueryJson {
                         }
                         break;
                     case ("add"):
-                        returnExpression.add(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("add"))));
+                        returnExpression = returnExpression.add(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("add"))));
                         break;
                     case ("and"):
-                        returnExpression.and(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("and"))));
+                        returnExpression = returnExpression.and(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("and"))));
                         break;
                     case ("divide"):
-                        returnExpression.divide(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("divide"))));
+                        returnExpression = returnExpression.divide(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("divide"))));
                         break;
                     case ("equalTo"):
-                        returnExpression.equalTo(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("equalTo"))));
+                        returnExpression = returnExpression.equalTo(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("equalTo"))));
                         break;
                     case ("greaterThan"):
-                        returnExpression.greaterThan(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("greaterThan"))));
+                        returnExpression = returnExpression.greaterThan(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("greaterThan"))));
                         break;
                     case ("greaterThanOrEqualTo"):
-                        returnExpression.greaterThanOrEqualTo(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("greaterThanOrEqualTo"))));
+                        returnExpression = returnExpression.greaterThanOrEqualTo(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("greaterThanOrEqualTo"))));
                         break;
                     case ("is"):
-                        returnExpression.is(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("is"))));
+                        returnExpression = returnExpression.is(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("is"))));
                         break;
                     case ("isNot"):
-                        returnExpression.isNot(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("isNot"))));
+                        returnExpression = returnExpression.isNot(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("isNot"))));
                         break;
                     case ("isNullOrMissing"):
-                        returnExpression.isNullOrMissing();
+                        returnExpression = returnExpression.isNullOrMissing();
                         break;
                     case ("lessThan"):
-                        returnExpression.lessThan(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("lessThan"))));
+                        returnExpression = returnExpression.lessThan(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("lessThan"))));
                         break;
                     case ("lessThanOrEqualTo"):
-                        returnExpression.lessThanOrEqualTo(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("lessThanOrEqualTo"))));
+                        returnExpression = returnExpression.lessThanOrEqualTo(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("lessThanOrEqualTo"))));
                         break;
                     case ("like"):
-                        returnExpression.like(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("like"))));
+                        returnExpression = returnExpression.like(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("like"))));
                         break;
                     case ("modulo"):
-                        returnExpression.modulo(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("modulo"))));
+                        returnExpression = returnExpression.modulo(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("modulo"))));
                         break;
                     case ("multiply"):
-                        returnExpression.multiply(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("multiply"))));
+                        returnExpression = returnExpression.multiply(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("multiply"))));
                         break;
                     case ("notEqualTo"):
-                        returnExpression.notEqualTo(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("notEqualTo"))));
+                        returnExpression = returnExpression.notEqualTo(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("notEqualTo"))));
                         break;
                     case ("notNullOrMissing"):
-                        returnExpression.notNullOrMissing();
+                        returnExpression = returnExpression.notNullOrMissing();
                         break;
                     case ("or"):
-                        returnExpression.or(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("or"))));
+                        returnExpression = returnExpression.or(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("or"))));
                         break;
                     case ("regex"):
-                        returnExpression.regex(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("regex"))));
+                        returnExpression = returnExpression.regex(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("regex"))));
                         break;
                     case ("subtract"):
-                        returnExpression.subtract(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("subtract"))));
+                        returnExpression = returnExpression.subtract(inflateExpressionFromArray(QueryMap.getListOfMapFromGenericList(currentExpression.get("subtract"))));
                         break;
                 }
             }
@@ -371,7 +398,7 @@ class QueryMap {
     boolean hasSelectResult = false;
     List<List<Map<String, Object>>> selectResult = new ArrayList<>();
     boolean hasFrom = false;
-    String from = "";
+    Map<String, Object> from;
     boolean hasJoins = false;
     List<Map<String, Object>> joins = new ArrayList<>();
     boolean hasWhere = false;
@@ -397,8 +424,7 @@ class QueryMap {
         }
         if (queryMap.containsKey("from")) {
             this.hasFrom = true;
-            this.from = getString("from");
-
+            this.from = getMap("from");
         }
         if (queryMap.containsKey("joins")) {
             this.hasJoins = true;
@@ -456,6 +482,15 @@ class QueryMap {
             }
         }
         return resultList;
+    }
+
+    private Map<String, Object> getMap(String key) {
+        Object mapObject = queryMap.get(key);
+        if (mapObject instanceof Map<?, ?>) {
+            return getMapFromGenericMap(mapObject);
+        }
+
+        return new HashMap<>();
     }
 
     private List<List<Map<String, Object>>> getListofList(String key) {

@@ -5,6 +5,10 @@ import 'package:fluttercouch/query/expression/variable_expression.dart';
 abstract class Expression {
   final List<Map<String, dynamic>> internalExpressionStack = new List();
 
+  factory Expression.all() {
+    return PropertyExpression({"property": null});
+  }
+
   factory Expression.booleanValue(bool value) {
     return VariableExpression({"booleanValue": value});
   }
@@ -80,8 +84,9 @@ abstract class Expression {
     return _addExpression("isNot", expression);
   }
 
-  Expression isNullOrMissing(Expression expression) {
-    return _addExpression("isNullOrMissing", expression);
+  Expression isNullOrMissing() {
+    internalExpressionStack.add({"isNullOrMissing": null});
+    return this;
   }
 
   Expression lessThan(Expression expression) {
@@ -108,8 +113,9 @@ abstract class Expression {
     return _addExpression("notEqualTo", expression);
   }
 
-  Expression notNullOrMissing(Expression expression) {
-    return _addExpression("notNullOrMissing", expression);
+  Expression notNullOrMissing() {
+    internalExpressionStack.add({"notNullOrMissing": null});
+    return this;
   }
 
   Expression or(Expression expression) {

@@ -8,13 +8,12 @@ import com.couchbase.lite.ReplicatorChangeListener;
 import io.flutter.plugin.common.EventChannel;
 
 public class ReplicationEventListener implements EventChannel.StreamHandler, ReplicatorChangeListener {
-
-    private CBManager mCBmanager;
+    private CBManager mCBManager;
     private ListenerToken mListenerToken;
     private EventChannel.EventSink mEventSink;
 
-    ReplicationEventListener(CBManager _cbManager) {
-        this.mCBmanager = _cbManager;
+    public ReplicationEventListener(CBManager manager) {
+        mCBManager = manager;
     }
 
     /*
@@ -24,12 +23,16 @@ public class ReplicationEventListener implements EventChannel.StreamHandler, Rep
     @Override
     public void onListen(Object o, final EventChannel.EventSink eventSink) {
         mEventSink = eventSink;
-        mListenerToken = mCBmanager.getReplicator().addChangeListener(this);
+        mListenerToken = mCBManager.getReplicator().addChangeListener(this);
     }
 
     @Override
     public void onCancel(Object o) {
-        mCBmanager.getReplicator().removeChangeListener(mListenerToken);
+        if (mListenerToken != null) {
+            mCBManager.getReplicator().removeChangeListener(mListenerToken);
+        }
+
+        mListenerToken = null;
         mEventSink = null;
     }
 
@@ -39,6 +42,10 @@ public class ReplicationEventListener implements EventChannel.StreamHandler, Rep
 
     @Override
     public void changed(ReplicatorChange change) {
+        if (mEventSink == null) {
+            return;
+        }
+
         CouchbaseLiteException error = change.getStatus().getError();
         if (error != null) {
             mEventSink.error("CouchbaseLiteException", "Error during replication", error.getCode());

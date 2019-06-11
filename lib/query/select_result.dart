@@ -1,35 +1,50 @@
 import 'package:fluttercouch/query/expression/expression.dart';
 
 class SelectResult {
-  Expression _internalExpression;
+  static SelectResultFrom all() => SelectResultFrom(Expression.all(), null);
 
-  SelectResult._internal(Expression _expression) {
-    this._internalExpression = _expression;
-  }
+  static SelectResultAs property(String _property) =>
+      expression(Expression.property(_property));
 
-  factory SelectResult.all() {
-    return SelectResult._internal(Expression.string("all"));
-  }
+  static SelectResultAs expression(Expression _expression) =>
+      SelectResultAs(_expression, null);
+}
 
-  factory SelectResult.property(String _property) {
-    return SelectResult._internal((Expression.property(_property)));
-  }
+class SelectResultProtocol {
+  Expression expression;
+  String alias;
 
-  factory SelectResult.expression(Expression _expression) {
-    return SelectResult._internal(_expression);
-  }
-
-  SelectResult from(String _alias) {
-    _internalExpression.internalExpressionStack.add({"from": _alias});
-    return this;
-  }
-
-  SelectResult As(String _alias) {
-    _internalExpression.internalExpressionStack.add({"as": _alias});
-    return this;
+  SelectResultProtocol(Expression expression, {String alias}) {
+    this.expression = expression;
+    this.alias = alias;
   }
 
   toJson() {
-    return _internalExpression.internalExpressionStack;
+    if (alias != null) {
+      return expression.internalExpressionStack +
+          [
+            {"as": alias}
+          ];
+    } else {
+      return expression.internalExpressionStack;
+    }
+  }
+}
+
+class SelectResultAs extends SelectResultProtocol {
+  SelectResultAs(Expression expression, String alias)
+      : super(expression, alias: alias);
+
+  SelectResultProtocol As(String _alias) {
+    return SelectResultProtocol(this.expression, alias: _alias);
+  }
+}
+
+class SelectResultFrom extends SelectResultProtocol {
+  SelectResultFrom(Expression expression, String alias)
+      : super(expression, alias: alias);
+
+  SelectResultProtocol from(String _alias) {
+    return SelectResultProtocol(Expression.all().from(_alias));
   }
 }

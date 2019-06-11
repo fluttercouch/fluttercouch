@@ -1,7 +1,6 @@
 import 'package:fluttercouch/document.dart';
 
 class MutableDocument extends Document {
-
   MutableDocument({Map<dynamic, dynamic> map, String id}) {
     if (map != null) {
       super.internalState = super.stringMapFromDynamic(map);

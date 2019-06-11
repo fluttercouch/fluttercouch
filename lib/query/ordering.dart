@@ -20,14 +20,18 @@ class Ordering {
   }
 
   Ordering ascending() {
-    this._internalExpression.internalExpressionStack.add(
-        {"orderingSortOrder": "ascending"});
+    this
+        ._internalExpression
+        .internalExpressionStack
+        .add({"orderingSortOrder": "ascending"});
     return this;
   }
 
   Ordering descending() {
-    this._internalExpression.internalExpressionStack.add(
-        {"orderingSortOrder": "descending"});
+    this
+        ._internalExpression
+        .internalExpressionStack
+        .add({"orderingSortOrder": "descending"});
     return this;
   }
 }

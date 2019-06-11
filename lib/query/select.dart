@@ -8,10 +8,14 @@ class Select extends Query {
     super.param = new Parameters();
   }
 
-  From from(String databaseName) {
+  From from(String databaseName, {String as}) {
     var resultQuery = new From();
     resultQuery.options = this.options;
-    options["from"] = databaseName;
+    if (as != null) {
+      options["from"] = {"database": databaseName, "as": as};
+    } else {
+      options["from"] = {"database": databaseName};
+    }
     return resultQuery;
   }
 

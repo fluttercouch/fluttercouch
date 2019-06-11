@@ -9,14 +9,37 @@
 import Foundation
 import CouchbaseLiteSwift
 
+typealias ExpressionJson = Array<Dictionary<String,Any>>
+
+enum CBManagerError: Error {
+    case CertificatePinning
+}
+
+protocol CBManagerDelegate : class {
+    func lookupKey(forAsset assetKey: String) -> String?
+}
+
 class CBManager {
-    static let instance = CBManager();
     private var mDatabase : Dictionary<String, Database> = Dictionary();
-    private var mReplConfig : ReplicatorConfiguration! = nil;
-    private var mReplicator : Replicator! = nil;
+    private var mQueries : Dictionary<String,Query> = Dictionary();
+    private var mQueryListenerTokens : Dictionary<String,ListenerToken> = Dictionary();
+    private var mReplConfig : ReplicatorConfiguration?;
+    private var mReplicator : Replicator?;
     private var defaultDatabase = "defaultDatabase";
+    private var mDBConfig = DatabaseConfiguration();
+    private weak var mDelegate: CBManagerDelegate?
     
-    private init() {}
+    init(delegate: CBManagerDelegate, enableLogging: Bool) {
+        mDelegate = delegate
+        
+        guard enableLogging else {
+            return
+        }
+        
+        let tempFolder = NSTemporaryDirectory().appending("cbllog")
+        Database.log.file.config = LogFileConfiguration(directory: tempFolder)
+        Database.log.file.level = .info
+    }
     
     func getDatabase() -> Database? {
         if let result = mDatabase[defaultDatabase] {
@@ -62,19 +85,45 @@ class CBManager {
         return NSDictionary.init(dictionary: resultMap)
     }
     
-    func initDatabaseWithName(name: String){
+    func initDatabaseWithName(name: String) throws {
         if mDatabase.keys.contains(name) {
             defaultDatabase = name
         } else {
-            do {
-                let newDatabase = try Database(name: name)
-                // Database.setLogLevel(level: LogLevel.verbose, domain: LogDomain.replicator)
-                mDatabase[name] = newDatabase
-                defaultDatabase = name
-            } catch {
-                print("Error initializing new database")
-            }
+            let newDatabase = try Database(name: name,config: mDBConfig)
+            mDatabase[name] = newDatabase
+            defaultDatabase = name
         }
+    }
+    
+    func deleteDatabaseWithName(name: String) throws {
+        try Database.delete(withName: name)
+    }
+    
+    func closeDatabaseWithName(name: String) throws {
+        if let _db = mDatabase.removeValue(forKey: name) {
+            try _db.close()
+        }
+    }
+    
+    func addQuery(queryId: String, query: Query, listenerToken: ListenerToken) {
+        mQueries[queryId] = query;
+        mQueryListenerTokens[queryId] = listenerToken;
+    }
+    
+    func getQuery(queryId: String) -> Query? {
+        return mQueries[queryId]
+    }
+    
+    func removeQuery(queryId: String) -> Query? {
+        guard let query = mQueries.removeValue(forKey: queryId) else {
+            return nil
+        }
+        
+        if let token = mQueryListenerTokens.removeValue(forKey: queryId) {
+            query.removeChangeListener(withToken: token)
+        }
+        
+        return query
     }
     
     func setReplicatorEndpoint(endpoint: String) {
@@ -104,47 +153,65 @@ class CBManager {
         }
     }
     
-    func setReplicatorAuthentication(auth: [String:String]) -> String {
+    func setReplicatorAuthentication(auth: [String:String]) {
         if let username = auth["username"], let password = auth["password"] {
             mReplConfig?.authenticator = BasicAuthenticator(username: username, password: password)
         }
-        return mReplConfig.authenticator.debugDescription
     }
     
     func setReplicatorSessionAuthentication(sessionID: String?) {
-        if ((sessionID) != nil) {
-            if ((mReplConfig) != nil) {
-            mReplConfig.authenticator = SessionAuthenticator(sessionID: sessionID!)
-            }
+        guard let _sessionID = sessionID, let _mReplConfig = mReplConfig else {
+            return;
+        }
+        
+        _mReplConfig.authenticator = SessionAuthenticator(sessionID: _sessionID)
+    }
+    
+    func setReplicatorPinnedServerCertificate(assetKey: String) throws {
+        guard let delegate = mDelegate, let _mReplConfig = mReplConfig else {
+            return
+        }
+        
+        let key = delegate.lookupKey(forAsset: assetKey)
+        
+        if let path = Bundle.main.path(forResource: key, ofType: nil), let data = NSData(contentsOfFile: path) {
+            _mReplConfig.pinnedServerCertificate = SecCertificateCreateWithData(nil,data)
+        } else {
+            throw CBManagerError.CertificatePinning
         }
     }
     
-    func setReplicatorContinuous(isContinuous: Bool) -> Bool {
+    func setReplicatorContinuous(isContinuous: Bool) {
         if ((mReplConfig) != nil) {
             mReplConfig?.continuous = isContinuous
-            return mReplConfig!.continuous
         }
-        return false
     }
     
     func initReplicator() {
-        mReplicator = Replicator(config: mReplConfig)
+        guard let _mReplConfig = mReplConfig else {
+            return;
+        }
+        
+        mReplicator = Replicator(config: _mReplConfig)
     }
     
     func startReplication() {
-        if ((mReplicator) != nil) {
-            mReplicator.start()
+        guard let _mReplicator = mReplicator else {
+            return;
         }
+        
+        _mReplicator.start()
     }
     
     func stopReplication() {
-        if ((mReplicator) != nil) {
-            mReplicator.stop()
-            mReplicator = nil
+        guard let _mReplicator = mReplicator else {
+            return;
         }
+        
+        _mReplicator.stop()
     }
     
-    func getReplicator() -> Replicator {
+    func getReplicator() -> Replicator? {
         return mReplicator
     }
 }

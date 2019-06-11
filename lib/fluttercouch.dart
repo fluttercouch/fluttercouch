@@ -7,128 +7,69 @@ abstract class Fluttercouch {
   static const MethodChannel _methodChannel =
       const MethodChannel('it.oltrenuovefrontiere.fluttercouch');
 
-  static const EventChannel _replicationEventChannel =
-    const EventChannel("it.oltrenuovefrontiere.fluttercouch/replicationEventChannel");
+  static const EventChannel _replicationEventChannel = const EventChannel(
+      "it.oltrenuovefrontiere.fluttercouch/replicationEventChannel");
 
-  Future<String> initDatabaseWithName(String _name) async {
-    try {
-      final String result =
-          await _methodChannel.invokeMethod('initDatabaseWithName', _name);
-      return result;
-    } on PlatformException catch (e) {
-      throw 'unable to init database $_name: ${e.message}';
-    }
-  }
+  Stream _replicationStream = _replicationEventChannel.receiveBroadcastStream();
 
-  Future<String> saveDocument(Document _doc) async {
-    try {
-      final String result = await _methodChannel.invokeMethod('saveDocument', _doc.toMap());
-      return result;
-    } on PlatformException {
-      throw 'unable to save the document';
-    }
-  }
+  Future<String> initDatabaseWithName(String _name) =>
+      _methodChannel.invokeMethod('initDatabaseWithName', _name);
 
-  Future<String> saveDocumentWithId(String _id, Document _doc) async {
-    try {
-      final String result = await _methodChannel.invokeMethod(
-          'saveDocumentWithId', <String, dynamic>{'id': _id, 'map': _doc.toMap()});
-      return result;
-    } on PlatformException {
-      throw 'unable to save the document with set id $_id';
-    }
-  }
+  Future<String> saveDocument(Document _doc) =>
+      _methodChannel.invokeMethod('saveDocument', _doc.toMap());
+
+  Future<String> saveDocumentWithId(String _id, Document _doc) =>
+      _methodChannel.invokeMethod('saveDocumentWithId',
+          <String, dynamic>{'id': _id, 'map': _doc.toMap()});
 
   Future<Document> getDocumentWithId(String _id) async {
     Map<dynamic, dynamic> _docResult;
-    _docResult = await _getDocumentWithId(_id);
+    _docResult = await _methodChannel.invokeMethod('getDocumentWithId', _id);
     return Document(_docResult["doc"], _docResult["id"]);
   }
 
-  Future<String> setReplicatorEndpoint(String _endpoint) async {
-    try {
-      final String result =
-          await _methodChannel.invokeMethod('setReplicatorEndpoint', _endpoint);
-      return result;
-    } on PlatformException {
-      throw 'unable to set target endpoint to $_endpoint';
-    }
-  }
+  Future<Null> setReplicatorEndpoint(String _endpoint) =>
+      _methodChannel.invokeMethod('setReplicatorEndpoint', _endpoint);
 
-  Future<String> setReplicatorType(String _type) async {
-    try {
-      final String result =
-          await _methodChannel.invokeMethod('setReplicatorType', _type);
-      return result;
-    } on PlatformException {
-      throw 'unable to set replicator type to $_type';
-    }
-  }
+  Future<Null> setReplicatorType(String _type) =>
+      _methodChannel.invokeMethod('setReplicatorType', _type);
 
-  Future<bool> setReplicatorContinuous(bool _continuous) async {
-    try {
-      final bool result = await _methodChannel.invokeMethod('setReplicatorContinuous', _continuous);
-      return result;
-    } on PlatformException {
-      throw 'unable to set replicator continuous setting to $_continuous';
-    }
-  }
+  Future<Null> setReplicatorContinuous(bool _continuous) =>
+      _methodChannel.invokeMethod('setReplicatorContinuous', _continuous);
 
-  Future<String> setReplicatorBasicAuthentication(
-      Map<String, String> _auth) async {
-    try {
-      final String result = await _methodChannel.invokeMethod(
-          'setReplicatorBasicAuthentication', _auth);
-      return result;
-    } on PlatformException {
-      throw 'unable to set replicator basic authentication';
-    }
-  }
+  Future<Null> setReplicatorBasicAuthentication(Map<String, String> _auth) =>
+      _methodChannel.invokeMethod('setReplicatorBasicAuthentication', _auth);
 
-  Future<String> setReplicatorSessionAuthentication(String _sessionID) async {
-    try {
-      final String result = await _methodChannel.invokeMethod('setReplicatorSessionAuthentication', _sessionID);
-      return result;
-    } on PlatformException {
-      throw 'unable to set replicator basic authentication';
-    }
-  }
+  Future<Null> setReplicatorSessionAuthentication(String _sessionID) =>
+      _methodChannel.invokeMethod(
+          'setReplicatorSessionAuthentication', _sessionID);
 
-  Future<Null> initReplicator() async {
-    try {
-      await _methodChannel.invokeMethod("initReplicator");
-    } on PlatformException {
-      throw 'unable to init replicator';
-    }
-  }
+  Future<Null> setReplicatorPinnedServerCertificate(String _assetKey) =>
+      _methodChannel.invokeMethod(
+          'setReplicatorPinnedServerCertificate', _assetKey);
 
-  Future<Null> startReplicator() async {
-    try {
-      await _methodChannel.invokeMethod('startReplicator');
-    } on PlatformException {
-      throw 'unable to start replication';
-    }
-  }
+  Future<Null> initReplicator() =>
+      _methodChannel.invokeMethod("initReplicator");
 
-  Future<Null> stopReplicator() async {
-    try {
-      await _methodChannel.invokeMethod('stopReplicator');
-    } on PlatformException {
-      throw 'unable to stop replication';
-    }
-  }
+  Future<Null> startReplicator() =>
+      _methodChannel.invokeMethod('startReplicator');
 
-  Future<Map<dynamic, dynamic>> _getDocumentWithId(String _id) async {
-    try {
-      final Map<dynamic, dynamic> result =
-      await _methodChannel.invokeMethod('getDocumentWithId', _id);
-      return result;
-    } on PlatformException {
-      throw 'unable to get the document with id $_id';
-    }
-  }
+  Future<Null> stopReplicator() =>
+      _methodChannel.invokeMethod('stopReplicator');
 
-  void listenReplicationEvents(Function(dynamic) function) {
-    _replicationEventChannel.receiveBroadcastStream().listen(function);
+  Future<String> closeDatabaseWithName(String _name) =>
+      _methodChannel.invokeMethod('closeDatabaseWithName', _name);
+
+  Future<String> closeDatabase() =>
+      _methodChannel.invokeMethod('closeDatabase');
+
+  Future<Null> deleteDatabaseWithName(String _name) =>
+      _methodChannel.invokeMethod('deleteDatabaseWithName', _name);
+
+  Future<int> getDocumentCount() =>
+      _methodChannel.invokeMethod('getDocumentCount');
+
+  StreamSubscription listenReplicationEvents(Function(String) function) {
+    return _replicationStream.listen(function);
   }
 }
