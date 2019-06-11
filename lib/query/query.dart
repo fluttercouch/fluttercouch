@@ -50,7 +50,7 @@ class Query {
       }
 
       return ResultSet(results);
-    } on PlatformException catch (e) {
+    } on PlatformException {
       // Remove all listeners on error
       tokens.keys.forEach((token) {
         removeChangeListener(token);

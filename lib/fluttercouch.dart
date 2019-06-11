@@ -1,3 +1,31 @@
+export 'document.dart';
+export 'mutable_document.dart';
+export 'blob.dart';
+export 'query/array_function.dart';
+export 'query/from.dart';
+export 'query/functions.dart';
+export 'query/group_by.dart';
+export 'query/having.dart';
+export 'query/join.dart';
+export 'query/joins.dart';
+export 'query/limit.dart';
+export 'query/listener_token.dart';
+export 'query/order_by.dart';
+export 'query/ordering.dart';
+export 'query/parameters.dart';
+export 'query/query_builder.dart';
+export 'query/result_set.dart';
+export 'query/result.dart';
+export 'query/select_result.dart';
+export 'query/select.dart';
+export 'query/where.dart';
+export 'query/expression/expression.dart';
+export 'query/expression/meta.dart';
+export 'query/expression/meta_expression.dart';
+export 'query/expression/meta.dart';
+export 'query/expression/property_expression.dart';
+export 'query/expression/variable_expression.dart';
+
 import 'dart:async';
 
 import 'package:flutter/services.dart';
