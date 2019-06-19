@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 
 import '../listener_token.dart';
-
 import 'parameters.dart';
 import 'result.dart';
 import 'result_set.dart';

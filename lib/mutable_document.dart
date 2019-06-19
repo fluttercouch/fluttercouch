@@ -19,7 +19,7 @@ class MutableDocument extends Document {
   /// - Returns: The self object.
   void setValue(String key, Object value) {
     if (value != null) {
-      super.internalData[key] = value;
+      super.internalState[key] = value;
     }
   }
 
@@ -88,7 +88,7 @@ class MutableDocument extends Document {
   ///
   /// - Parameter key: The key.
   void remove(String key) {
-    super.internalData.remove(key);
+    super.internalState.remove(key);
   }
 
   /// Returns the same MutableDocument object.

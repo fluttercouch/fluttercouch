@@ -4,15 +4,15 @@ import 'mutable_document.dart';
 class Document {
   Document([Map<dynamic, dynamic> data, String id]) {
     if (data != null) {
-      internalData = _stringMapFromDynamic(data);
+      internalState = _stringMapFromDynamic(data);
     } else {
-      internalData = Map<String, dynamic>();
+      internalState = Map<String, dynamic>();
     }
 
     _id = id;
   }
 
-  Map<dynamic, dynamic> internalData;
+  Map<dynamic, dynamic> internalState;
   String _id;
 
   /// The document's ID.
@@ -29,9 +29,9 @@ class Document {
   /// - Parameter key: The key.
   /// - Returns: True of the property exists, otherwise false.
   bool contains(String key) {
-    if (internalData != null &&
-        internalData.isNotEmpty &&
-        internalData.containsKey(key)) {
+    if (internalState != null &&
+        internalState.isNotEmpty &&
+        internalState.containsKey(key)) {
       return true;
     } else {
       return false;
@@ -40,7 +40,7 @@ class Document {
 
   /// The number of properties in the document.
   int count() {
-    return internalData.length;
+    return internalState.length;
   }
 
   /// Gets a property's value as a boolean value.
@@ -94,8 +94,8 @@ class Document {
 
   /// An array containing all keys, or an empty array if the document has no properties.
   List<String> getKeys() {
-    if (internalData != null) {
-      return internalData.keys.toList();
+    if (internalState != null) {
+      return internalState.keys.toList();
     } else {
       return List<String>();
     }
@@ -119,7 +119,7 @@ class Document {
   /// - Returns: The value or null.
   Object getValue(String key) {
     if (contains(key)) {
-      return internalData[key] as Object;
+      return internalState[key] as Object;
     } else {
       return null;
     }
@@ -165,13 +165,13 @@ class Document {
   ///
   /// - Returns: The Dictionary representing the content of the current object.
   Map<String, dynamic> toMap() {
-    return Map.from(internalData);
+    return Map.from(internalState);
   }
 
   /// Returns a mutable copy of the document.
   ///
   /// - Returns: The MutableDocument object.
   MutableDocument toMutable() {
-    return MutableDocument(internalData, id);
+    return MutableDocument(internalState, id);
   }
 }

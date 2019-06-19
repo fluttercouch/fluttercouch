@@ -1,10 +1,9 @@
-import 'query.dart';
+import 'expression/expression.dart';
 import 'group_by.dart';
 import 'limit.dart';
 import 'order_by.dart';
 import 'ordering.dart';
-
-import 'expression/expression.dart';
+import 'query.dart';
 
 class Where extends Query {
   Limit limit(Expression expression, {Expression offset}) {
