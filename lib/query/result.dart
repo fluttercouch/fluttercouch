@@ -1,11 +1,6 @@
 class Result {
-  Map<String, dynamic> _internalMap;
-  List<dynamic> _internalList;
-
-  Result() {
-    this._internalMap = new Map<String, dynamic>();
-    this._internalList = new List<dynamic>();
-  }
+  Map<String, dynamic> _internalMap = {};
+  List<dynamic> _internalList = [];
 
   bool contains(String key) {
     if (_internalMap != null) {
@@ -109,12 +104,12 @@ class Result {
     return _internalMap;
   }
 
-  setMap(Map<String, dynamic> map) {
+  void setMap(Map<String, dynamic> map) {
     _internalMap.clear();
     _internalMap.addAll(map);
   }
 
-  setList(List<dynamic> list) {
+  void setList(List<dynamic> list) {
     _internalList.clear();
     _internalList.addAll(list);
   }

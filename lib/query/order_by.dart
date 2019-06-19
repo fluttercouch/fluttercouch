@@ -1,23 +1,16 @@
-import 'package:fluttercouch/query/expression/expression.dart';
-import 'package:fluttercouch/query/limit.dart';
-import 'package:fluttercouch/query/parameters.dart';
-import 'package:fluttercouch/query/query.dart';
+import 'expression/expression.dart';
+import 'limit.dart';
+import 'query.dart';
 
 class OrderBy extends Query {
-  OrderBy() {
-    this.options = new Map<String, dynamic>();
-    this.param = new Parameters();
-  }
-
   Limit limit(Expression expression, {Expression offset}) {
     var resultQuery = new Limit();
-    resultQuery.options = this.options;
-    resultQuery.options["limit"] = expression;
+    resultQuery.internalOptions = this.options;
     if (offset != null) {
-      resultQuery.options["offset"] = offset;
+      resultQuery.internalOptions["limit"] = [expression, offset];
+    } else {
+      resultQuery.internalOptions["limit"] = [expression];
     }
     return resultQuery;
   }
-
-  Map<String, dynamic> toJson() => options;
 }

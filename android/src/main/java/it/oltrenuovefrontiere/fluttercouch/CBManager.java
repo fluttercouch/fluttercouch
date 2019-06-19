@@ -200,16 +200,16 @@ class CBManager {
         return mReplicator;
     }
 
-    public void addQuery(String queryId, Query query, ListenerToken token) {
+    void addQuery(String queryId, Query query, ListenerToken token) {
         mQueries.put(queryId,query);
         mQueryListenerTokens.put(queryId,token);
     }
 
-    public Query getQuery(String queryId) {
+    Query getQuery(String queryId) {
         return mQueries.get(queryId);
     }
 
-    public Query removeQuery(String queryId) {
+    Query removeQuery(String queryId) {
         Query query = mQueries.remove(queryId);
         ListenerToken token = mQueryListenerTokens.remove(queryId);
         if (query != null && token != null) {

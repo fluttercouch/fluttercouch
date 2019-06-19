@@ -1,4 +1,4 @@
-import 'package:fluttercouch/query/expression/meta_expression.dart';
+import 'meta_expression.dart';
 
 class Meta {
   static MetaExpression get id => MetaExpression({"meta": "id"});

@@ -1,6 +1,7 @@
 package it.oltrenuovefrontiere.fluttercouch;
 
 import com.couchbase.lite.DataSource;
+import com.couchbase.lite.Database;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.Query;
 import com.couchbase.lite.QueryBuilder;
@@ -98,11 +99,11 @@ public class QueryManager {
         }
 
         private void setFrom() {
-            if (_cbManager.getDatabase().getName() == _internalMap.get("databaseName")) {
-                Select _selectQuery = (Select) this._query;
-                _selectQuery.from(DataSource.database(_cbManager.getDatabase()));
-                this._query = _selectQuery;
-            }
+            Database database = _cbManager.getDatabase(_internalMap.get("databaseName"));
+
+            Select _selectQuery = (Select) this._query;
+            _selectQuery.from(DataSource.database(database));
+            this._query = _selectQuery;
         }
 
         private void setWhere() {

@@ -76,9 +76,9 @@ class QueryJson {
     }
 
     private void inflateLimit() {
-        List<Map<String, Object>> limitArray = queryMap.limit;
+        List<List<Map<String, Object>>> limitArray = queryMap.limit;
         if (limitArray.size() == 1) {
-            Expression limitExpression = inflateExpressionFromArray(limitArray);
+            Expression limitExpression = inflateExpressionFromArray(limitArray.get(0));
             if (query instanceof From) {
                 query = ((From) query).limit(limitExpression);
             } else if (query instanceof Joins) {
@@ -91,8 +91,8 @@ class QueryJson {
                 query = ((GroupBy) query).limit(limitExpression);
             }
         } else if (limitArray.size() == 2) {
-            Expression limitExpression = inflateExpressionFromArray(limitArray.subList(0, 0));
-            Expression offsetExpression = inflateExpressionFromArray(limitArray.subList(1, 1));
+            Expression limitExpression = inflateExpressionFromArray(limitArray.get(0));
+            Expression offsetExpression = inflateExpressionFromArray(limitArray.get(1));
             if (query instanceof From) {
                 query = ((From) query).limit(limitExpression, offsetExpression);
             } else if (query instanceof Joins) {
@@ -245,11 +245,11 @@ class QueryJson {
     }
 
     private SelectResult[] inflateSelectResultArray() {
-            List<List<Map<String, Object>>> selectResultArray = queryMap.selectResult;
-            List<SelectResult> result = new ArrayList<>();
-            for (List<Map<String, Object>> SelectResultParametersArray : selectResultArray) {
-                result.add(inflateSelectResult(SelectResultParametersArray));
-            }
+        List<List<Map<String, Object>>> selectResultArray = queryMap.selectResult;
+        List<SelectResult> result = new ArrayList<>();
+        for (List<Map<String, Object>> SelectResultParametersArray : selectResultArray) {
+            result.add(inflateSelectResult(SelectResultParametersArray));
+        }
         return result.toArray(new SelectResult[0]);
     }
 
@@ -408,7 +408,7 @@ class QueryMap {
     boolean hasOrderBy = false;
     List<List<Map<String, Object>>> orderBy = new ArrayList<>();
     boolean hasLimit = false;
-    List<Map<String, Object>> limit = new ArrayList<>();
+    List<List<Map<String, Object>>> limit = new ArrayList<>();
 
     QueryMap(JSONObject jsonObject) {
         Object unwrappedJson = JSONUtil.unwrap(jsonObject);
@@ -444,7 +444,7 @@ class QueryMap {
         }
         if (queryMap.containsKey("limit")) {
             this.hasLimit = true;
-            this.limit = getList("limit");
+            this.limit = getListofList("limit");
         }
 
     }

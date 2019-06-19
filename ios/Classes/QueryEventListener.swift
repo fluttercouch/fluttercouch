@@ -9,16 +9,16 @@ import Foundation
 import CouchbaseLiteSwift
 
 class QueryEventListener: FlutterStreamHandler {
-    var mEvents: FlutterEventSink?
+    var mEventSink: FlutterEventSink?
     
     func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-        mEvents = events
+        mEventSink = events
         
         return nil
     }
     
     func onCancel(withArguments arguments: Any?) -> FlutterError? {
-        mEvents = nil
+        mEventSink = nil
         
         return nil
     }

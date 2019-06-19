@@ -1,4 +1,4 @@
-import 'package:fluttercouch/query/expression/expression.dart';
+import 'expression/expression.dart';
 
 class SelectResult {
   static SelectResultFrom all() => SelectResultFrom(Expression.all(), null);
@@ -11,22 +11,22 @@ class SelectResult {
 }
 
 class SelectResultProtocol {
-  Expression expression;
-  String alias;
-
   SelectResultProtocol(Expression expression, {String alias}) {
     this.expression = expression;
     this.alias = alias;
   }
 
-  toJson() {
+  Expression expression;
+  String alias;
+
+  List<Map<String, dynamic>> toJson() {
     if (alias != null) {
-      return expression.internalExpressionStack +
+      return expression.expressionStack +
           [
             {"as": alias}
           ];
     } else {
-      return expression.internalExpressionStack;
+      return expression.expressionStack;
     }
   }
 }
@@ -35,7 +35,7 @@ class SelectResultAs extends SelectResultProtocol {
   SelectResultAs(Expression expression, String alias)
       : super(expression, alias: alias);
 
-  SelectResultProtocol As(String _alias) {
+  SelectResultProtocol as(String _alias) {
     return SelectResultProtocol(this.expression, alias: _alias);
   }
 }
