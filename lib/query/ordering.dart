@@ -1,8 +1,6 @@
-import 'package:fluttercouch/query/expression/expression.dart';
+import 'expression/expression.dart';
 
 class Ordering {
-  Expression _internalExpression;
-
   Ordering._internal(Expression _expression) {
     this._internalExpression = _expression;
   }
@@ -15,23 +13,21 @@ class Ordering {
     return Ordering._internal(_expression);
   }
 
-  toJson() {
-    return _internalExpression.internalExpressionStack;
-  }
+  Expression _internalExpression;
 
   Ordering ascending() {
-    this
-        ._internalExpression
-        .internalExpressionStack
-        .add({"orderingSortOrder": "ascending"});
-    return this;
+    Expression clone = _internalExpression.clone();
+    clone.internalExpressionStack.add({"orderingSortOrder": "ascending"});
+    return Ordering._internal(clone);
   }
 
   Ordering descending() {
-    this
-        ._internalExpression
-        .internalExpressionStack
-        .add({"orderingSortOrder": "descending"});
-    return this;
+    Expression clone = _internalExpression.clone();
+    clone.internalExpressionStack.add({"orderingSortOrder": "descending"});
+    return Ordering._internal(clone);
+  }
+
+  List<Map<String, dynamic>> toJson() {
+    return _internalExpression.expressionStack;
   }
 }

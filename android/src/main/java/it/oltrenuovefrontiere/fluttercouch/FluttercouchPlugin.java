@@ -2,6 +2,7 @@ package it.oltrenuovefrontiere.fluttercouch;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.os.AsyncTask;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
@@ -236,44 +237,55 @@ public class FluttercouchPlugin implements CBManagerDelegate {
 
     private class JSONCallHandler implements MethodCallHandler {
         @Override
-        public void onMethodCall(MethodCall call, Result result) {
-            JSONObject queryJson = call.arguments();
+        public void onMethodCall(MethodCall call, final Result result) {
+            final JSONObject json = call.arguments();
 
-            final String queryId;
-            try {
-                queryId = queryJson.getString("queryId");
-            } catch (JSONException e) {
-                result.error("errArg", "Query Error: Invalid Arguments", e);
-                return;
-            }
-
-            Query queryFromJson;
+            final String id;
             switch (call.method) {
-                case ("execute"):
-                    queryFromJson = mCBManager.getQuery(queryId);
-                    if (queryFromJson == null) {
-                        queryFromJson = new QueryJson(queryJson,mCBManager).toCouchbaseQuery();
+                case ("executeQuery"):
+                    try {
+                        id = json.getString("queryId");
+                    } catch (JSONException e) {
+                        result.error("errArg", "Query Error: Invalid Arguments", e);
+                        return;
                     }
 
-                    try {
-                        ResultSet results = queryFromJson.execute();
-                        List<Map<String,Object>> resultsList = QueryJson.resultsToJson(results);
-                        result.success(resultsList);
-                    } catch (CouchbaseLiteException e) {
-                        result.error("errExecutingQuery", "error executing query ", e.toString());
-                    }
+                    AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            Query queryFromJson = mCBManager.getQuery(id);
+                            if (queryFromJson == null) {
+                                queryFromJson = new QueryJson(json,mCBManager).toCouchbaseQuery();
+                            }
+
+                            try {
+                                ResultSet results = queryFromJson.execute();
+                                List<Map<String,Object>> resultsList = QueryJson.resultsToJson(results);
+                                result.success(resultsList);
+                            } catch (CouchbaseLiteException e) {
+                                result.error("errExecutingQuery", "error executing query ", e.toString());
+                            }
+                        }
+                    });
                     break;
-                case ("store"):
-                    queryFromJson = mCBManager.getQuery(queryId);
+                case ("storeQuery"):
+                    try {
+                        id = json.getString("queryId");
+                    } catch (JSONException e) {
+                        result.error("errArg", "Query Error: Invalid Arguments", e);
+                        return;
+                    }
+
+                    Query queryFromJson = mCBManager.getQuery(id);
                     if (queryFromJson == null) {
-                        queryFromJson = new QueryJson(queryJson,mCBManager).toCouchbaseQuery();
+                        queryFromJson = new QueryJson(json,mCBManager).toCouchbaseQuery();
 
                         if (queryFromJson != null) {
-                            ListenerToken mListenerToken = queryFromJson.addChangeListener(new QueryChangeListener() {
+                            ListenerToken mListenerToken = queryFromJson.addChangeListener(AsyncTask.THREAD_POOL_EXECUTOR, new QueryChangeListener() {
                                 @Override
                                 public void changed(QueryChange change) {
                                     HashMap<String,Object> json = new HashMap<String,Object>();
-                                    json.put("query",queryId);
+                                    json.put("query",id);
 
                                     if (change.getResults() != null) {
                                         json.put("results",QueryJson.resultsToJson(change.getResults()));
@@ -290,15 +302,22 @@ public class FluttercouchPlugin implements CBManagerDelegate {
                                 }
                             });
 
-                            mCBManager.addQuery(queryId, queryFromJson, mListenerToken);
+                            mCBManager.addQuery(id, queryFromJson, mListenerToken);
                         }
                     }
 
                     result.success(queryFromJson != null);
 
                     break;
-                case ("remove"):
-                    mCBManager.removeQuery(queryId);
+                case ("removeQuery"):
+                    try {
+                        id = json.getString("queryId");
+                    } catch (JSONException e) {
+                        result.error("errArg", "Query Error: Invalid Arguments", e);
+                        return;
+                    }
+
+                    mCBManager.removeQuery(id);
                     result.success(true);
                     break;
                 default:

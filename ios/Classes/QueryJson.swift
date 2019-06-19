@@ -58,7 +58,7 @@ public class QueryJson {
     private func inflateLimit() {
         let limitArray = queryMap.limit
         if (limitArray.count == 1) {
-            let limitExpression = inflateExpressionFromArray(expressionParametersArray: limitArray)
+            let limitExpression = inflateExpressionFromArray(expressionParametersArray: limitArray[0])
             switch query {
             case let _from as From:
                 query = _from.limit(limitExpression)
@@ -74,8 +74,8 @@ public class QueryJson {
                 break
             }
         } else if (limitArray.count == 2) {
-            let limitExpression = inflateExpressionFromArray(expressionParametersArray:[limitArray[0]])
-            let offsetExpression = inflateExpressionFromArray(expressionParametersArray:[limitArray[1]])
+            let limitExpression = inflateExpressionFromArray(expressionParametersArray:limitArray[0])
+            let offsetExpression = inflateExpressionFromArray(expressionParametersArray:limitArray[1])
             
             switch query {
             case let _from as From:
@@ -229,7 +229,7 @@ public class QueryJson {
     }
     
     private func getDatasourceFromString(name: String) -> DataSourceProtocol? {
-        guard let database = mCBManager?.getDatabase(name: name) else {
+        guard let database = mCBManager?.getDatabase(name: name) ?? mCBManager?.getDatabase() else {
             return nil
         }
         
@@ -299,91 +299,91 @@ public class QueryJson {
                     returnExpression = existingExpression
                         .add(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
-                        )
+                    )
                 case ("and", let value):
                     returnExpression = existingExpression
                         .and(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
-                        )
+                    )
                 case ("divide", let value):
                     returnExpression = existingExpression
                         .divide(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
-                        )
+                    )
                 case ("equalTo", let value):
                     returnExpression = existingExpression
                         .equalTo(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
-                        )
+                    )
                 case ("greaterThan", let value):
                     returnExpression = existingExpression
                         .greaterThan(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
-                        )
+                    )
                 case ("greaterThanOrEqualTo", let value):
                     returnExpression = existingExpression
                         .greaterThanOrEqualTo(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
-                        )
+                    )
                 case ("is", let value):
                     returnExpression = existingExpression
                         .is(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
-                        )
+                    )
                 case ("isNot", let value):
                     returnExpression = existingExpression
                         .isNot(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
-                        )
+                    )
                 case ("isNullOrMissing", _):
                     returnExpression = existingExpression.isNullOrMissing()
                 case ("lessThan", let value):
                     returnExpression = existingExpression
                         .lessThan(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
-                        )
+                    )
                 case ("lessThanOrEqualTo", let value):
                     returnExpression = existingExpression
                         .lessThanOrEqualTo(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
-                        )
+                    )
                 case ("like", let value):
                     returnExpression = existingExpression
                         .like(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
-                        )
+                    )
                 case ("modulo", let value):
                     returnExpression = existingExpression
                         .modulo(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
-                        )
+                    )
                 case ("multiply", let value):
                     returnExpression = existingExpression
                         .multiply(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
-                        )
+                    )
                 case ("notEqualTo", let value):
                     returnExpression = existingExpression
                         .notEqualTo(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
-                        )
+                    )
                 case ("notNullOrMissing", _):
                     returnExpression = existingExpression.notNullOrMissing()
                 case ("or", let value):
                     returnExpression = existingExpression
                         .or(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
-                        )
+                    )
                 case ("regex", let value):
                     returnExpression = existingExpression
                         .regex(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
-                        )
+                    )
                 case ("subtract", let value):
                     returnExpression = existingExpression
                         .subtract(inflateExpressionFromArray(expressionParametersArray:
                             QueryMap.getListOfMapFromGenericList(objectList: value))
-                        )
+                    )
                 default:
                     break
                 }
@@ -436,10 +436,12 @@ private class QueryMap {
     var mWhere: Array<Dictionary<String, Any>> = []
     var hasGroupBy = false
     var groupBy: Array<Dictionary<String, Any>> = []
+    var hasHaving = false
+    var having: Array<Dictionary<String, Any>> = []
     var hasOrderBy = false
     var orderBy: Array<Array<Dictionary<String, Any>>> = []
     var hasLimit = false
-    var limit: Array<Dictionary<String, Any>> = []
+    var limit: Array<Array<Dictionary<String, Any>>> = []
     
     init(jsonObject: Any) {
         switch jsonObject {
@@ -472,13 +474,17 @@ private class QueryMap {
             self.hasGroupBy = true
             self.groupBy = getList(key: "groupBy")
         }
+        if let _ = queryMap["having"] {
+            self.hasHaving = true
+            self.having = getList(key: "having")
+        }
         if let _ = queryMap["orderBy"] {
             self.hasOrderBy = true
             self.orderBy = getListofList(key: "orderBy")
         }
         if let _ = queryMap["limit"] {
             self.hasLimit = true
-            self.limit = getList(key: "limit")
+            self.limit = getListofList(key: "limit")
         }
     }
     

@@ -1,15 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fluttercouch/query/array_function.dart';
-import 'package:fluttercouch/query/expression/expression.dart';
-import 'package:fluttercouch/query/expression/meta.dart';
-import 'package:fluttercouch/query/functions.dart';
-import 'package:fluttercouch/query/join.dart';
-import 'package:fluttercouch/query/ordering.dart';
-import 'package:fluttercouch/query/query.dart';
-import 'package:fluttercouch/query/query_builder.dart';
-import 'package:fluttercouch/query/select_result.dart';
+import 'package:fluttercouch/fluttercouch.dart';
 
 void main() {
   group("Query creation", () {
@@ -23,18 +15,55 @@ void main() {
           '{"selectDistinct":false,"selectResult":[[{"meta":"id"}],[{"property":"name"}],[{"property":"type"}]]}');
     });
 
+    From baseQuery = QueryBuilder.select([SelectResult.all()]).from("database");
+
+    Map<String, dynamic> baseJson = {
+      "selectDistinct": false,
+      "selectResult": [
+        [
+          {"property": null}
+        ]
+      ],
+      "from": {"database": "database"}
+    };
+    Expression limitExpr = Expression.intValue(10);
+    Map<String, dynamic> limitJson = {
+      "limit": [
+        [
+          {"intValue": 10}
+        ]
+      ]
+    };
+    Expression offsetExpr = Expression.intValue(10);
+    Map<String, dynamic> limitOffsetJson = {
+      "limit": [
+        [
+          {"intValue": 10}
+        ],
+        [
+          {"intValue": 10}
+        ]
+      ]
+    };
+    List<Ordering> orderByExpr = [Ordering.property("country")];
+    Map<String, dynamic> orderByJson = {
+      "orderBy": [
+        [
+          {"property": "country"}
+        ]
+      ]
+    };
+
     test("SelectFrom", () {
-      Query query = QueryBuilder.select([SelectResult.all()]).from("database");
-      expect(json.encode(query),
-          '{"selectDistinct":false,"selectResult":[[{"property":null}]],"from":{"database":"database"}}');
+      expect(json.encode(baseQuery), json.encode(baseJson));
     });
 
     test("SelectFromAs", () {
-      Query query = QueryBuilder.select(
-              [SelectResult.expression(Meta.id.from("myAlias"))])
+      Query query = QueryBuilder.selectDistinct(
+              [SelectResult.expression(Meta.sequence.from("myAlias"))])
           .from("database", as: "myAlias");
       expect(json.encode(query),
-          '{"selectDistinct":false,"selectResult":[[{"meta":"id"},{"from":"myAlias"}]],"from":{"database":"database","as":"myAlias"}}');
+          '{"selectDistinct":true,"selectResult":[[{"meta":"sequence"},{"from":"myAlias"}]],"from":{"database":"database","as":"myAlias"}}');
     });
 
     test("SelectFromWhere", () {
@@ -63,27 +92,14 @@ void main() {
               Expression.property("type").equalTo(Expression.string("hotel")))
           .limit(Expression.intValue(10));
       expect(json.encode(query),
-          '{"selectDistinct":false,"selectResult":[[{"property":null}]],"from":{"database":"database"},"where":[{"property":"type"},{"equalTo":[{"string":"hotel"}]}],"limit":[{"intValue":10}]}');
-    });
-
-    test("ArrayFunction", () {
-      Query query = QueryBuilder.select([
-        SelectResult.expression(Meta.id),
-        SelectResult.property("name"),
-        SelectResult.property("public_linkes")
-      ]).from("Database").where(Expression.property("type")
-          .equalTo(Expression.string("hotel"))
-          .and(ArrayFunction.contains(Expression.property("public_likes"),
-              Expression.string("Armani Langworth"))));
-      expect(json.encode(query),
-          '{"selectDistinct":false,"selectResult":[[{"meta":"id"}],[{"property":"name"}],[{"property":"public_linkes"}]],"from":{"database":"Database"},"where":[{"property":"type"},{"equalTo":[{"string":"hotel"}]},{"and":[]}]}');
+          '{"selectDistinct":false,"selectResult":[[{"property":null}]],"from":{"database":"database"},"where":[{"property":"type"},{"equalTo":[{"string":"hotel"}]}],"limit":[[{"intValue":10}]]}');
     });
 
     test("In", () {
       Query query = QueryBuilder.select([SelectResult.property("name")])
           .from("database")
           .where(Expression.property("country")
-              .In([Expression.string("Latvia"), Expression.string("usa")]).and(
+              .iN([Expression.string("Latvia"), Expression.string("usa")]).and(
                   Expression.property("type")
                       .equalTo(Expression.string("airport"))))
           .orderBy([Ordering.property("name")]);
@@ -128,6 +144,33 @@ void main() {
         SelectResult.expression(Expression.property("airline").from("route"))
       ])
           .from("airline")
+          .join(Join.join("route").on(Meta.id
+              .from("airline")
+              .equalTo(Expression.property("airlineid").from("route"))))
+          .where(Expression.property("type")
+              .from("route")
+              .equalTo(Expression.string("route"))
+              .and(Expression.property("type")
+                  .from("airline")
+                  .equalTo(Expression.string("airline")))
+              .and(Expression.property("sourceairport")
+                  .from("route")
+                  .equalTo(Expression.string("RIX"))));
+      expect(json.encode(query),
+          '{"selectDistinct":false,"selectResult":[[{"property":"name"},{"from":"airline"}],[{"property":"callsign"},{"from":"airline"}],[{"property":"destinationairport"},{"from":"route"}],[{"property":"stops"},{"from":"route"}],[{"property":"airline"},{"from":"route"}]],"from":{"database":"airline"},"joins":[{"join":"route"},{"on":[{"meta":"id"},{"from":"airline"},{"equalTo":[{"property":"airlineid"},{"from":"route"}]}]}],"where":[{"property":"type"},{"from":"route"},{"equalTo":[{"string":"route"}]},{"and":[{"property":"type"},{"from":"airline"},{"equalTo":[{"string":"airline"}]}]},{"and":[{"property":"sourceairport"},{"from":"route"},{"equalTo":[{"string":"RIX"}]}]}]}');
+    });
+
+    test("joinAs", () {
+      Query query = QueryBuilder.select([
+        SelectResult.expression(Expression.property("name").from("airline")),
+        SelectResult.expression(
+            Expression.property("callsign").from("airline")),
+        SelectResult.expression(
+            Expression.property("destinationairport").from("route")),
+        SelectResult.expression(Expression.property("stops").from("route")),
+        SelectResult.expression(Expression.property("airline").from("route"))
+      ])
+          .from("airline")
           .join(Join.join("database", as: "route").on(Meta.id
               .from("airline")
               .equalTo(Expression.property("airlineid").from("route"))))
@@ -144,38 +187,343 @@ void main() {
           '{"selectDistinct":false,"selectResult":[[{"property":"name"},{"from":"airline"}],[{"property":"callsign"},{"from":"airline"}],[{"property":"destinationairport"},{"from":"route"}],[{"property":"stops"},{"from":"route"}],[{"property":"airline"},{"from":"route"}]],"from":{"database":"airline"},"joins":[{"join":"database","as":"route"},{"on":[{"meta":"id"},{"from":"airline"},{"equalTo":[{"property":"airlineid"},{"from":"route"}]}]}],"where":[{"property":"type"},{"from":"route"},{"equalTo":[{"string":"route"}]},{"and":[{"property":"type"},{"from":"airline"},{"equalTo":[{"string":"airline"}]}]},{"and":[{"property":"sourceairport"},{"from":"route"},{"equalTo":[{"string":"RIX"}]}]}]}');
     });
 
-    test("groupBy", () {
+    test("crossJoin", () {
       Query query = QueryBuilder.select([
-        SelectResult.expression(Functions.count(Expression.string("*"))),
-        SelectResult.property("country"),
-        SelectResult.property("tz")
+        SelectResult.expression(Expression.property("name").from("airline")),
+        SelectResult.expression(
+            Expression.property("callsign").from("airline")),
+        SelectResult.expression(
+            Expression.property("destinationairport").from("route")),
+        SelectResult.expression(Expression.property("stops").from("route")),
+        SelectResult.expression(Expression.property("airline").from("route"))
       ])
-          .from("database")
+          .from("airline")
+          .join(Join.crossJoin("route").on(Meta.id
+              .from("airline")
+              .equalTo(Expression.property("airlineid").from("route"))))
           .where(Expression.property("type")
-              .equalTo(Expression.string("airport"))
-              .and(Expression.property("geo.alt")
-                  .greaterThanOrEqualTo(Expression.intValue(300))))
-          .groupBy([
-        Expression.property("country"),
-        Expression.property("tz")
-      ]).orderBy([
-        Ordering.expression(Functions.count(Expression.string("*")))
-            .descending()
-      ]);
+              .from("route")
+              .equalTo(Expression.string("route"))
+              .and(Expression.property("type")
+                  .from("airline")
+                  .equalTo(Expression.string("airline")))
+              .and(Expression.property("sourceairport")
+                  .from("route")
+                  .equalTo(Expression.string("RIX"))));
       expect(json.encode(query),
-          '{"selectDistinct":false,"selectResult":[[{"count":[{"string":"*"}]}],[{"property":"country"}],[{"property":"tz"}]],"from":{"database":"database"},"where":[{"property":"type"},{"equalTo":[{"string":"airport"}]},{"and":[{"property":"geo.alt"},{"greaterThanOrEqualTo":[{"intValue":300}]}]}],"groupBy":[[{"property":"country"}],[{"property":"tz"}]],"orderBy":[[{"count":[{"string":"*"}]},{"orderingSortOrder":"descending"}]]}');
+          '{"selectDistinct":false,"selectResult":[[{"property":"name"},{"from":"airline"}],[{"property":"callsign"},{"from":"airline"}],[{"property":"destinationairport"},{"from":"route"}],[{"property":"stops"},{"from":"route"}],[{"property":"airline"},{"from":"route"}]],"from":{"database":"airline"},"joins":[{"crossJoin":"route"},{"on":[{"meta":"id"},{"from":"airline"},{"equalTo":[{"property":"airlineid"},{"from":"route"}]}]}],"where":[{"property":"type"},{"from":"route"},{"equalTo":[{"string":"route"}]},{"and":[{"property":"type"},{"from":"airline"},{"equalTo":[{"string":"airline"}]}]},{"and":[{"property":"sourceairport"},{"from":"route"},{"equalTo":[{"string":"RIX"}]}]}]}');
+    });
+
+    test("innerJoin", () {
+      Query query = QueryBuilder.select([
+        SelectResult.expression(Expression.property("name").from("airline")),
+        SelectResult.expression(
+            Expression.property("callsign").from("airline")),
+        SelectResult.expression(
+            Expression.property("destinationairport").from("route")),
+        SelectResult.expression(Expression.property("stops").from("route")),
+        SelectResult.expression(Expression.property("airline").from("route"))
+      ])
+          .from("airline")
+          .join(Join.innerJoin("route").on(Meta.id
+              .from("airline")
+              .equalTo(Expression.property("airlineid").from("route"))))
+          .limit(Expression.intValue(10), offset: Expression.intValue(10));
+      expect(json.encode(query),
+          '{"selectDistinct":false,"selectResult":[[{"property":"name"},{"from":"airline"}],[{"property":"callsign"},{"from":"airline"}],[{"property":"destinationairport"},{"from":"route"}],[{"property":"stops"},{"from":"route"}],[{"property":"airline"},{"from":"route"}]],"from":{"database":"airline"},"joins":[{"innerJoin":"route"},{"on":[{"meta":"id"},{"from":"airline"},{"equalTo":[{"property":"airlineid"},{"from":"route"}]}]}],"limit":[[{"intValue":10}],[{"intValue":10}]]}');
+    });
+
+    test("leftJoin", () {
+      Query query = QueryBuilder.select([
+        SelectResult.expression(Expression.property("name").from("airline")),
+        SelectResult.expression(
+            Expression.property("callsign").from("airline")),
+        SelectResult.expression(
+            Expression.property("destinationairport").from("route")),
+        SelectResult.expression(Expression.property("stops").from("route")),
+        SelectResult.expression(Expression.property("airline").from("route"))
+      ])
+          .from("airline")
+          .join(Join.leftJoin("route").on(Meta.id
+              .from("airline")
+              .equalTo(Expression.property("airlineid").from("route"))))
+          .limit(Expression.intValue(10));
+      expect(json.encode(query),
+          '{"selectDistinct":false,"selectResult":[[{"property":"name"},{"from":"airline"}],[{"property":"callsign"},{"from":"airline"}],[{"property":"destinationairport"},{"from":"route"}],[{"property":"stops"},{"from":"route"}],[{"property":"airline"},{"from":"route"}]],"from":{"database":"airline"},"joins":[{"leftJoin":"route"},{"on":[{"meta":"id"},{"from":"airline"},{"equalTo":[{"property":"airlineid"},{"from":"route"}]}]}],"limit":[[{"intValue":10}]]}');
+    });
+
+    test("leftOuterJoin", () {
+      Query query = QueryBuilder.select([
+        SelectResult.expression(Expression.property("name").from("airline")),
+        SelectResult.expression(
+            Expression.property("callsign").from("airline")),
+        SelectResult.expression(
+            Expression.property("destinationairport").from("route")),
+        SelectResult.expression(Expression.property("stops").from("route")),
+        SelectResult.expression(Expression.property("airline").from("route"))
+      ])
+          .from("airline")
+          .join(Join.leftOuterJoin("route").on(Meta.id
+              .from("airline")
+              .equalTo(Expression.property("airlineid").from("route"))))
+          .orderBy([Ordering.property("callsign")]);
+      expect(json.encode(query),
+          '{"selectDistinct":false,"selectResult":[[{"property":"name"},{"from":"airline"}],[{"property":"callsign"},{"from":"airline"}],[{"property":"destinationairport"},{"from":"route"}],[{"property":"stops"},{"from":"route"}],[{"property":"airline"},{"from":"route"}]],"from":{"database":"airline"},"joins":[{"leftOuterJoin":"route"},{"on":[{"meta":"id"},{"from":"airline"},{"equalTo":[{"property":"airlineid"},{"from":"route"}]}]}],"orderBy":[[{"property":"callsign"}]]}');
+    });
+
+    GroupBy groupBy = baseQuery.groupBy([Expression.property("country")]);
+    Map<String, dynamic> groupByJson = Map.from(baseJson);
+    groupByJson.addAll({
+      "groupBy": [
+        [
+          {"property": "country"}
+        ]
+      ]
+    });
+
+    test("groupBy", () {
+      expect(json.encode(groupBy), json.encode(groupByJson));
+    });
+
+    test("groupByLimit", () {
+      Map expected = Map.from(groupByJson);
+      expected.addAll(limitJson);
+      expect(json.encode(groupBy.limit(limitExpr)), json.encode(expected));
+    });
+
+    test("groupByLimitOffset", () {
+      Map expected = Map.from(groupByJson);
+      expected.addAll(limitOffsetJson);
+      expect(json.encode(groupBy.limit(limitExpr, offset: offsetExpr)),
+          json.encode(expected));
+    });
+
+    test("groupByOrderBy", () {
+      Map expected = Map.from(groupByJson);
+      expected.addAll(orderByJson);
+      expect(json.encode(groupBy.orderBy(orderByExpr)), json.encode(expected));
+    });
+
+    Having having = groupBy.having(
+        Expression.property("country").equalTo(Expression.string("US")));
+
+    Map<String, dynamic> havingJson = Map.from(groupByJson);
+    havingJson.addAll({
+      "having": [
+        {"property": "country"},
+        {
+          "equalTo": [
+            {"string": "US"}
+          ]
+        }
+      ]
+    });
+
+    test("having", () {
+      Map expected = Map.from(havingJson);
+      expect(json.encode(having), json.encode(expected));
+    });
+
+    test("havingLimit", () {
+      Map expected = Map.from(havingJson);
+      expected.addAll(limitJson);
+      expect(json.encode(having.limit(limitExpr)), json.encode(expected));
+    });
+
+    test("havingLimitOffset", () {
+      Map expected = Map.from(havingJson);
+      expected.addAll(limitOffsetJson);
+      expect(json.encode(having.limit(limitExpr, offset: offsetExpr)),
+          json.encode(expected));
+    });
+
+    test("havingOrderBy", () {
+      Map expected = Map.from(havingJson);
+      expected.addAll(orderByJson);
+      expect(json.encode(having.orderBy(orderByExpr)), json.encode(expected));
+    });
+
+    test("limit", () {
+      Map expected = Map.from(baseJson);
+      expected.addAll(limitJson);
+      expect(json.encode(baseQuery.limit(limitExpr)), json.encode(expected));
     });
 
     test("orderBy", () {
-      Query query = QueryBuilder.select(
-              [SelectResult.expression(Meta.id), SelectResult.property("name")])
-          .from("database")
-          .where(
-              Expression.property("type").equalTo(Expression.string("hotel")))
-          .orderBy([Ordering.property("name").ascending()]).limit(
-              Expression.intValue(10));
-      expect(json.encode(query),
-          '{"selectDistinct":false,"selectResult":[[{"meta":"id"}],[{"property":"name"}]],"from":{"database":"database"},"where":[{"property":"type"},{"equalTo":[{"string":"hotel"}]}],"orderBy":[[{"property":"name"},{"orderingSortOrder":"ascending"}]],"limit":[{"intValue":10}]}');
+      Map expected = Map.from(baseJson);
+      expected.addAll(orderByJson);
+      expect(
+          json.encode(baseQuery.orderBy(orderByExpr)), json.encode(expected));
+    });
+
+    test("orderByLimit", () {
+      Map expected = Map.from(baseJson);
+      expected.addAll(orderByJson);
+      expected.addAll(limitJson);
+      expect(json.encode(baseQuery.orderBy(orderByExpr).limit(limitExpr)),
+          json.encode(expected));
+    });
+
+    test("orderByLimitOffset", () {
+      Map expected = Map.from(baseJson);
+      expected.addAll(orderByJson);
+      expected.addAll(limitOffsetJson);
+      expect(
+          json.encode(baseQuery
+              .orderBy(orderByExpr)
+              .limit(limitExpr, offset: offsetExpr)),
+          json.encode(expected));
+    });
+
+    List<Ordering> orderByAscExpr = [Ordering.property("country").ascending()];
+    Map<String, dynamic> orderByAscJson = {
+      "orderBy": [
+        [
+          {"property": "country"},
+          {"orderingSortOrder": "ascending"}
+        ]
+      ]
+    };
+    test("orderAscending", () {
+      Map expected = Map.from(baseJson);
+      expected.addAll(orderByAscJson);
+      expect(json.encode(baseQuery.orderBy(orderByAscExpr)),
+          json.encode(expected));
+    });
+
+    List<Ordering> orderByDescExpr = [
+      Ordering.property("country").descending()
+    ];
+    Map<String, dynamic> orderByDescJson = {
+      "orderBy": [
+        [
+          {"property": "country"},
+          {"orderingSortOrder": "descending"}
+        ]
+      ]
+    };
+    test("orderDescending", () {
+      Map expected = Map.from(baseJson);
+      expected.addAll(orderByDescJson);
+      expect(json.encode(baseQuery.orderBy(orderByDescExpr)),
+          json.encode(expected));
+    });
+
+    Where whereExpr = baseQuery
+        .where(Expression.property("country").equalTo(Expression.string("US")));
+    Map<String, dynamic> whereJson = Map.from(baseJson);
+    whereJson.addAll({
+      "where": [
+        {"property": "country"},
+        {
+          "equalTo": [
+            {"string": "US"}
+          ]
+        }
+      ]
+    });
+
+    test("whereLimitOffset", () {
+      Map expected = Map.from(whereJson);
+      expected.addAll(limitOffsetJson);
+      expect(json.encode(whereExpr.limit(limitExpr, offset: offsetExpr)),
+          json.encode(expected));
+    });
+
+    test("whereGroupBy", () {
+      Map expected = Map.from(whereJson);
+      expected.addAll({
+        "groupBy": [
+          [
+            {"property": "country"}
+          ]
+        ]
+      });
+      expect(json.encode(whereExpr.groupBy([Expression.property("country")])),
+          json.encode(expected));
+    });
+  });
+
+  group("Results", () {
+    var map = {
+      "int": 1,
+      "bool": true,
+      "list": [],
+      "double": 1.2,
+      "string": "test",
+      "object": {}
+    };
+    Map<dynamic, dynamic> result = {
+      "map": map,
+      "list": [1]
+    };
+
+    var newResult = Result();
+    newResult.setMap(result["map"]);
+    newResult.setList(result["list"]);
+
+    test("contains()", () {
+      expect(newResult.contains("int"), true);
+    });
+
+    test("count()", () {
+      expect(newResult.count(), map.length);
+    });
+
+    test("getList()", () {
+      expect(newResult.getList(key: "list"), []);
+    });
+
+    test("getBoolean()", () {
+      expect(newResult.getBoolean(key: "bool"), true);
+    });
+
+    test("getDouble()", () {
+      expect(newResult.getDouble(key: "double"), 1.2);
+    });
+
+    test("getInt()", () {
+      expect(newResult.getInt(key: "int"), 1);
+    });
+
+    test("getKeys()", () {
+      expect(newResult.getKeys(), map.keys);
+    });
+
+    test("getString()", () {
+      expect(newResult.getString(key: "string"), "test");
+    });
+
+    test("getValue()", () {
+      expect(newResult.getValue(key: "int"), 1);
+    });
+
+    test("getValueIndex()", () {
+      expect(newResult.getValue(index: 0), 1);
+    });
+
+    test("toList()", () {
+      expect(newResult.toList(), [1]);
+    });
+
+    test("toMap()", () {
+      expect(newResult.toMap(), map);
+    });
+
+    var results = ResultSet([newResult]);
+
+    test("allResults()", () {
+      expect(results.allResults(), [newResult]);
+    });
+
+    test("allResults()", () {
+      expect(results.allResults(), [newResult]);
+    });
+
+    test("iterator", () {
+      var itr = results.iterator;
+      itr.moveNext();
+      expect(itr.current, newResult);
     });
   });
 }

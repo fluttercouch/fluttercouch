@@ -4,6 +4,7 @@ import UIKit
 public class SwiftFluttercouchPlugin: NSObject, FlutterPlugin, CBManagerDelegate {
     weak var mRegistrar: FlutterPluginRegistrar?
     let mQueryEventListener = QueryEventListener();
+    let databaseDispatchQueue = DispatchQueue(label: "DatabaseDispatchQueue", qos: .background)
     
     #if DEBUG
     lazy var mCBManager = CBManager(delegate: self, enableLogging: true)
@@ -159,32 +160,39 @@ public class SwiftFluttercouchPlugin: NSObject, FlutterPlugin, CBManagerDelegate
          * Supported messages are acyclic values of these forms: null, bools, nums,
          * Strings, Lists of supported values, Maps from strings to supported values
          **/
-        guard let options = call.arguments as? Dictionary<String, Any>, let queryId = options["queryId"] as? String else {
-            result(FlutterError(code: "errArgs", message: "Query Error: Invalid Arguments", details: call.arguments.debugDescription))
-            return
-        }
         
         switch (call.method) {
-        case "execute":
+        case "executeQuery":
+            guard let options = call.arguments as? [String:Any], let queryId = options["queryId"] as? String else {
+                result(FlutterError(code: "errArgs", message: "Query Error: Invalid Arguments", details: call.arguments.debugDescription))
+                return
+            }
             let query = mCBManager.getQuery(queryId: queryId) ?? QueryJson(json: options, manager: mCBManager).toCouchbaseQuery()
             
-            do {
-                if let results = try query?.execute() {
-                    let json = QueryJson.resultSetToJson(results: results)
-                    result(json)
-                } else {
-                    result(FlutterError(code: "errQuery", message: "Error executing query", details: "Something went wrong with the query"))
+            databaseDispatchQueue.async {
+                do {
+                    if let results = try query?.execute() {
+                        let json = QueryJson.resultSetToJson(results: results)
+                        result(json)
+                    } else {
+                        result(FlutterError(code: "errQuery", message: "Error executing query", details: "Something went wrong with the query"))
+                    }
+                } catch {
+                    result(FlutterError(code: "errQuery", message: "Error executing query", details: error.localizedDescription))
                 }
-            } catch {
-                result(FlutterError(code: "errQuery", message: "Error executing query", details: error.localizedDescription))
             }
-        case "store":
+        case "storeQuery":
+            guard let options = call.arguments as? [String:Any], let queryId = options["queryId"] as? String else {
+                result(FlutterError(code: "errArgs", message: "Query Error: Invalid Arguments", details: call.arguments.debugDescription))
+                return
+            }
+            
             if let _ = mCBManager.getQuery(queryId: queryId) {
                 // DO NOTHING QUERY IS ALREADY STORED
                 result(true)
             } else if let query = QueryJson(json: options, manager: mCBManager).toCouchbaseQuery() {
                 // Store Query for later use
-                let token = query.addChangeListener({ [weak self] change in
+                let token = query.addChangeListener(withQueue: databaseDispatchQueue) { [weak self] change in
                     var json = Dictionary<String,Any?>()
                     json["query"] = queryId
                     
@@ -197,15 +205,20 @@ public class SwiftFluttercouchPlugin: NSObject, FlutterPlugin, CBManagerDelegate
                     }
                     
                     // Will only send events when there is something listening
-                    self?.mQueryEventListener.mEvents?(NSDictionary(dictionary: json as [AnyHashable : Any]))
-                })
+                    self?.mQueryEventListener.mEventSink?(NSDictionary(dictionary: json as [AnyHashable : Any]))
+                }
                 
                 mCBManager.addQuery(queryId: queryId, query: query, listenerToken: token)
                 result(true)
             } else {
                 result(false)
             }
-        case "remove":
+        case "removeQuery":
+            guard let options = call.arguments as? [String:Any], let queryId = options["queryId"] as? String else {
+                result(FlutterError(code: "errArgs", message: "Query Error: Invalid Arguments", details: call.arguments.debugDescription))
+                return
+            }
+            
             let _ = mCBManager.removeQuery(queryId: queryId)
             result(true)
         default:

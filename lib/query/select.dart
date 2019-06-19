@@ -1,23 +1,47 @@
-import 'package:fluttercouch/query/from.dart';
-import 'package:fluttercouch/query/parameters.dart';
-import 'package:fluttercouch/query/query.dart';
+import 'dart:async';
+import 'dart:collection';
+
+import 'package:flutter/services.dart';
+import 'package:uuid/uuid.dart';
+
+import '../listener_token.dart';
+
+import 'query.dart';
+import 'from.dart';
+import 'functions.dart';
+import 'group_by.dart';
+import 'having.dart';
+import 'join.dart';
+import 'joins.dart';
+import 'limit.dart';
+import 'order_by.dart';
+import 'ordering.dart';
+import 'parameters.dart';
+import 'query_builder.dart';
+import 'result.dart';
+import 'result_set.dart';
+import 'select.dart';
+import 'select_result.dart';
+import 'where.dart';
+
+import 'expression/expression.dart';
+import 'expression/meta.dart';
+import 'expression/meta_expression.dart';
+import 'expression/property_expression.dart';
+import 'expression/variable_expression.dart';
 
 class Select extends Query {
-  Select() {
-    super.options = new Map<String, dynamic>();
-    super.param = new Parameters();
-  }
-
   From from(String databaseName, {String as}) {
     var resultQuery = new From();
-    resultQuery.options = this.options;
+    resultQuery.internalOptions = this.options;
     if (as != null) {
-      options["from"] = {"database": databaseName, "as": as};
+      resultQuery.internalOptions["from"] = {
+        "database": databaseName,
+        "as": as
+      };
     } else {
-      options["from"] = {"database": databaseName};
+      resultQuery.internalOptions["from"] = {"database": databaseName};
     }
     return resultQuery;
   }
-
-  Map<String, dynamic> toJson() => options;
 }

@@ -78,13 +78,13 @@ void main() {
 
     jsonChannel.setMockMethodCallHandler((MethodCall methodCall) async {
       switch (methodCall.method) {
-        case "execute":
+        case "executeQuery":
           return [];
           break;
-        case "store":
+        case "storeQuery":
           return true;
           break;
-        case "remove":
+        case "removeQuery":
           return true;
           break;
         default:

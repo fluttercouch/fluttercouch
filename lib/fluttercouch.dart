@@ -1,7 +1,7 @@
 export 'document.dart';
 export 'mutable_document.dart';
-export 'blob.dart';
-export 'query/array_function.dart';
+export 'listener_token.dart';
+export 'query/query.dart';
 export 'query/from.dart';
 export 'query/functions.dart';
 export 'query/group_by.dart';
@@ -9,7 +9,6 @@ export 'query/having.dart';
 export 'query/join.dart';
 export 'query/joins.dart';
 export 'query/limit.dart';
-export 'query/listener_token.dart';
 export 'query/order_by.dart';
 export 'query/ordering.dart';
 export 'query/parameters.dart';

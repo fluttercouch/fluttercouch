@@ -1,10 +1,8 @@
-import 'package:fluttercouch/query/expression/meta_expression.dart';
-import 'package:fluttercouch/query/expression/property_expression.dart';
-import 'package:fluttercouch/query/expression/variable_expression.dart';
+import 'meta_expression.dart';
+import 'property_expression.dart';
+import 'variable_expression.dart';
 
 abstract class Expression {
-  final List<Map<String, dynamic>> internalExpressionStack = new List();
-
   factory Expression.all() {
     return PropertyExpression({"property": null});
   }
@@ -44,6 +42,11 @@ abstract class Expression {
     return MetaExpression({"not": expression.internalExpressionStack});
   }
 
+  final List<Map<String, dynamic>> internalExpressionStack = new List();
+
+  List<Map<String, dynamic>> get expressionStack =>
+      List.from(internalExpressionStack);
+
   Expression add(Expression expression) {
     return _addExpression("add", expression);
   }
@@ -74,19 +77,22 @@ abstract class Expression {
   }
 
   // implement in(Expression... expressions) but lacking variable arguments number feature in Dart
-  Expression In(List<Expression> listExpression) {
+  Expression iN(List<Expression> listExpression) {
     return _addList("in", listExpression);
   }
 
-  // implement is(Expression expression) but "is" is a reserved keyword
+  Expression iS(Expression expression) {
+    return _addExpression("is", expression);
+  }
 
   Expression isNot(Expression expression) {
     return _addExpression("isNot", expression);
   }
 
   Expression isNullOrMissing() {
-    internalExpressionStack.add({"isNullOrMissing": null});
-    return this;
+    Expression clone = this.clone();
+    clone.internalExpressionStack.add({"isNullOrMissing": null});
+    return clone;
   }
 
   Expression lessThan(Expression expression) {
@@ -114,8 +120,9 @@ abstract class Expression {
   }
 
   Expression notNullOrMissing() {
-    internalExpressionStack.add({"notNullOrMissing": null});
-    return this;
+    Expression clone = this.clone();
+    clone.internalExpressionStack.add({"notNullOrMissing": null});
+    return clone;
   }
 
   Expression or(Expression expression) {
@@ -131,30 +138,36 @@ abstract class Expression {
   }
 
   Expression from(String alias) {
-    internalExpressionStack.add({"from": alias});
-    return this;
-  }
-
-  toJson() {
-    return internalExpressionStack;
+    Expression fromExpression = this.clone();
+    fromExpression.internalExpressionStack.add({"from": alias});
+    return fromExpression;
   }
 
   Expression _addExpression(String selector, Expression expression,
       {String secondSelector, Expression secondExpression}) {
+    Expression clone = this.clone();
     if (secondSelector != null && secondExpression != null) {
-      internalExpressionStack.add({
-        selector: expression.internalExpressionStack,
-        secondSelector: secondExpression.internalExpressionStack
+      clone.internalExpressionStack.add({
+        selector: expression.expressionStack,
+        secondSelector: secondExpression.expressionStack
       });
     } else {
-      internalExpressionStack
-          .add({selector: expression.internalExpressionStack});
+      clone.internalExpressionStack.add({selector: expression.expressionStack});
     }
-    return this;
+    return clone;
   }
 
   Expression _addList(String selector, List<Expression> listExpression) {
-    internalExpressionStack.add({selector: listExpression});
-    return this;
+    Expression clone = this.clone();
+    List json = [];
+    listExpression.forEach((expression) {
+      json.add(expression.expressionStack);
+    });
+    clone.internalExpressionStack.add({selector: json});
+    return clone;
   }
+
+  Expression clone();
+
+  List<Map<String, dynamic>> toJson() => expressionStack;
 }

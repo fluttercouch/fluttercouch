@@ -1,11 +1,38 @@
-class Result {
-  Map<String, dynamic> _internalMap;
-  List<dynamic> _internalList;
+import 'dart:async';
+import 'dart:collection';
 
-  Result() {
-    this._internalMap = new Map<String, dynamic>();
-    this._internalList = new List<dynamic>();
-  }
+import 'package:flutter/services.dart';
+import 'package:uuid/uuid.dart';
+
+import '../listener_token.dart';
+
+import 'query.dart';
+import 'from.dart';
+import 'functions.dart';
+import 'group_by.dart';
+import 'having.dart';
+import 'join.dart';
+import 'joins.dart';
+import 'limit.dart';
+import 'order_by.dart';
+import 'ordering.dart';
+import 'parameters.dart';
+import 'query_builder.dart';
+import 'result.dart';
+import 'result_set.dart';
+import 'select.dart';
+import 'select_result.dart';
+import 'where.dart';
+
+import 'expression/expression.dart';
+import 'expression/meta.dart';
+import 'expression/meta_expression.dart';
+import 'expression/property_expression.dart';
+import 'expression/variable_expression.dart';
+
+class Result {
+  Map<String, dynamic> _internalMap = {};
+  List<dynamic> _internalList = [];
 
   bool contains(String key) {
     if (_internalMap != null) {
@@ -109,12 +136,12 @@ class Result {
     return _internalMap;
   }
 
-  setMap(Map<String, dynamic> map) {
+  void setMap(Map<String, dynamic> map) {
     _internalMap.clear();
     _internalMap.addAll(map);
   }
 
-  setList(List<dynamic> list) {
+  void setList(List<dynamic> list) {
     _internalList.clear();
     _internalList.addAll(list);
   }
