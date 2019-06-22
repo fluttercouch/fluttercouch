@@ -167,18 +167,22 @@ public class SwiftFluttercouchPlugin: NSObject, FlutterPlugin, CBManagerDelegate
                 result(FlutterError(code: "errArgs", message: "Query Error: Invalid Arguments", details: call.arguments.debugDescription))
                 return
             }
-            let query = mCBManager.getQuery(queryId: queryId) ?? QueryJson(json: options, manager: mCBManager).toCouchbaseQuery()
+            
+            guard let query = mCBManager.getQuery(queryId: queryId) ?? QueryJson(json: options, manager: mCBManager).toCouchbaseQuery() else {
+                result(FlutterError(code: "errQuery", message: "Error generating query", details: nil))
+                return
+            }
             
             databaseDispatchQueue.async {
                 do {
-                    if let results = try query?.execute() {
-                        let json = QueryJson.resultSetToJson(results: results)
+                    let json = QueryJson.resultSetToJson(results: try query.execute())
+                    DispatchQueue.main.async {
                         result(json)
-                    } else {
-                        result(FlutterError(code: "errQuery", message: "Error executing query", details: "Something went wrong with the query"))
                     }
                 } catch {
-                    result(FlutterError(code: "errQuery", message: "Error executing query", details: error.localizedDescription))
+                    DispatchQueue.main.async {
+                        result(FlutterError(code: "errQuery", message: "Error executing query", details: error.localizedDescription))
+                    }
                 }
             }
         case "storeQuery":
@@ -204,8 +208,10 @@ public class SwiftFluttercouchPlugin: NSObject, FlutterPlugin, CBManagerDelegate
                         json["error"] = error.localizedDescription
                     }
                     
-                    // Will only send events when there is something listening
-                    self?.mQueryEventListener.mEventSink?(NSDictionary(dictionary: json as [AnyHashable : Any]))
+                    DispatchQueue.main.async {
+                        // Will only send events when there is something listening
+                        self?.mQueryEventListener.mEventSink?(NSDictionary(dictionary: json as [AnyHashable : Any]))
+                    }
                 }
                 
                 mCBManager.addQuery(queryId: queryId, query: query, listenerToken: token)

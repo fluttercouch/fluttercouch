@@ -17,10 +17,12 @@ class MutableDocument extends Document {
   ///   - value: The value.
   ///   - key: The key.
   /// - Returns: The self object.
-  void setValue(String key, Object value) {
+  MutableDocument setValue(String key, Object value) {
     if (value != null) {
       super.internalState[key] = value;
     }
+
+    return this;
   }
 
   /// Set a List object for the given key.
@@ -28,8 +30,8 @@ class MutableDocument extends Document {
   /// - Parameters:
   ///   - value: The List Object object.
   ///   - key: The key.
-  void setList(String key, List<dynamic> value) {
-    setValue(key, value);
+  MutableDocument setList(String key, List<dynamic> value) {
+    return setValue(key, value);
   }
 
   /// Set a List object for the given key.
@@ -37,15 +39,16 @@ class MutableDocument extends Document {
   /// - Parameters:
   ///   - value: The List Object object.
   ///   - key: The key.
-  void setArray(String key, List<dynamic> value) => setList(key, value);
+  MutableDocument setArray(String key, List<dynamic> value) =>
+      setList(key, value);
 
   /// Set a Map Object object for the given key. A nil value will be converted to an NSNull.
   ///
   /// - Parameters:
   ///   - value: The Map Object object.
   ///   - key: The key.
-  void setMap(String key, Map<dynamic, dynamic> value) {
-    setValue(key, value);
+  MutableDocument setMap(String key, Map<dynamic, dynamic> value) {
+    return setValue(key, value);
   }
 
   /// Set a boolean value for the given key.
@@ -53,8 +56,8 @@ class MutableDocument extends Document {
   /// - Parameters:
   ///   - value: The boolean value.
   ///   - key: The key.
-  void setBoolean(String key, bool value) {
-    setValue(key, value);
+  MutableDocument setBoolean(String key, bool value) {
+    return setValue(key, value);
   }
 
   /// Set a double value for the given key.
@@ -62,8 +65,8 @@ class MutableDocument extends Document {
   /// - Parameters:
   ///   - value: The double value.
   ///   - key: The key.
-  void setDouble(String key, double value) {
-    setValue(key, value);
+  MutableDocument setDouble(String key, double value) {
+    return setValue(key, value);
   }
 
   /// Set an int value for the given key.
@@ -71,8 +74,8 @@ class MutableDocument extends Document {
   /// - Parameters:
   ///   - value: The int value.
   ///   - key: The key.
-  void setInt(String key, int value) {
-    setValue(key, value);
+  MutableDocument setInt(String key, int value) {
+    return setValue(key, value);
   }
 
   /// Set a String value for the given key.
@@ -80,15 +83,17 @@ class MutableDocument extends Document {
   /// - Parameters:
   ///   - value: The String value.
   ///   - key: The Document object.
-  void setString(String key, String value) {
-    setValue(key, value);
+  MutableDocument setString(String key, String value) {
+    return setValue(key, value);
   }
 
   /// Removes a given key and its value.
   ///
   /// - Parameter key: The key.
-  void remove(String key) {
+  MutableDocument remove(String key) {
     super.internalState.remove(key);
+
+    return this;
   }
 
   /// Returns the same MutableDocument object.
@@ -96,7 +101,7 @@ class MutableDocument extends Document {
   /// - Returns: The MutableDocument object.
   @override
   MutableDocument toMutable() {
-    return this;
+    return MutableDocument(this.internalState, this.id);
   }
 
   /// Get a property's value as a List Object, which is a mapping object of an array value.

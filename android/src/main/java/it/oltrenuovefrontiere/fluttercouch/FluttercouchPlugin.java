@@ -3,6 +3,8 @@ package it.oltrenuovefrontiere.fluttercouch;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
@@ -241,6 +243,7 @@ public class FluttercouchPlugin implements CBManagerDelegate {
             final JSONObject json = call.arguments();
 
             final String id;
+            Query queryFromJson;
             switch (call.method) {
                 case ("executeQuery"):
                     try {
@@ -250,20 +253,35 @@ public class FluttercouchPlugin implements CBManagerDelegate {
                         return;
                     }
 
+                    queryFromJson = mCBManager.getQuery(id);
+                    if (queryFromJson == null) {
+                        queryFromJson = new QueryJson(json,mCBManager).toCouchbaseQuery();
+                    }
+
+                    if (queryFromJson == null) {
+                        result.error("errQuery", "Error generating query", null);
+                        return;
+                    }
+
+                    final Query query = queryFromJson;
                     AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
                         @Override
                         public void run() {
-                            Query queryFromJson = mCBManager.getQuery(id);
-                            if (queryFromJson == null) {
-                                queryFromJson = new QueryJson(json,mCBManager).toCouchbaseQuery();
-                            }
-
                             try {
-                                ResultSet results = queryFromJson.execute();
-                                List<Map<String,Object>> resultsList = QueryJson.resultsToJson(results);
-                                result.success(resultsList);
-                            } catch (CouchbaseLiteException e) {
-                                result.error("errExecutingQuery", "error executing query ", e.toString());
+                                final List<Map<String,Object>> resultsList = QueryJson.resultsToJson(query.execute());
+                                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        result.success(resultsList);
+                                    }
+                                });
+                            } catch (final CouchbaseLiteException e) {
+                                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        result.error("errQuery", "Error executing query", e.toString());
+                                    }
+                                });
                             }
                         }
                     });
@@ -276,7 +294,7 @@ public class FluttercouchPlugin implements CBManagerDelegate {
                         return;
                     }
 
-                    Query queryFromJson = mCBManager.getQuery(id);
+                    queryFromJson = mCBManager.getQuery(id);
                     if (queryFromJson == null) {
                         queryFromJson = new QueryJson(json,mCBManager).toCouchbaseQuery();
 
@@ -284,7 +302,7 @@ public class FluttercouchPlugin implements CBManagerDelegate {
                             ListenerToken mListenerToken = queryFromJson.addChangeListener(AsyncTask.THREAD_POOL_EXECUTOR, new QueryChangeListener() {
                                 @Override
                                 public void changed(QueryChange change) {
-                                    HashMap<String,Object> json = new HashMap<String,Object>();
+                                    final HashMap<String,Object> json = new HashMap<String,Object>();
                                     json.put("query",id);
 
                                     if (change.getResults() != null) {
@@ -295,10 +313,16 @@ public class FluttercouchPlugin implements CBManagerDelegate {
                                         json.put("error",change.getError().getLocalizedMessage());
                                     }
 
-                                    final EventChannel.EventSink eventSink = mQueryEventListener.mEventSink;
-                                    if (eventSink != null) {
-                                        eventSink.success(json);
-                                    }
+                                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            final EventChannel.EventSink eventSink = mQueryEventListener.mEventSink;
+                                            if (eventSink != null) {
+                                                eventSink.success(json);
+                                            }
+                                        }
+                                    });
+
                                 }
                             });
 
