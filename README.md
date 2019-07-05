@@ -13,7 +13,7 @@ None of the Dart object holds the actual state (which is hold in the native code
 In order to use Fluttercouch, add this code to pubspec.yaml in your project directory.
 ```dart
 dependencies:
-  fluttercouch: ^0.5.1
+  fluttercouch: ^0.5.0
 ```
 
 NOTES:
