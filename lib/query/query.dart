@@ -55,8 +55,6 @@ class Query {
 
       rethrow;
     }
-
-    return null;
   }
 
   /// Adds a query change listener and posts changes to [callback].

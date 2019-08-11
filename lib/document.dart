@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'mutable_document.dart';
 
 /// Couchbase Lite document. The Document is immutable.
@@ -14,6 +16,7 @@ class Document {
 
   Map<dynamic, dynamic> internalState;
   String _id;
+  Map<String, Map<String, Uint8List>> attachments;
 
   /// The document's ID.
   String get id => _id;
