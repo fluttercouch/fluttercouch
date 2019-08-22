@@ -78,6 +78,8 @@ stopReplicator();
 ```
 
 You can listen for replication events passing a function to the listenReplicatorEvents method. The listenReplicatorEvents calls the function with a parameter containing the event type.
+
+__NOTE__: The replicator must have been initialized with `initReplicator()` before trying to register any replication listener.
 ```dart
 listenReplicationEvents((dynamic event) {
     switch(event) {
