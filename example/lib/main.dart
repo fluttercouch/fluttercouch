@@ -60,9 +60,9 @@ class Home extends StatelessWidget {
             new Text("This is an example app"),
             new ScopedModelDescendant<AppModel>(
               builder: (context, child, model) => new Text(
-                    'Ciao',
-                    style: Theme.of(context).textTheme.display1,
-                  ),
+                'Ciao',
+                style: Theme.of(context).textTheme.display1,
+              ),
             ),
           ],
         ),
