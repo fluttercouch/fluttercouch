@@ -1,7 +1,6 @@
 export 'database.dart';
 export 'document.dart';
 export 'mutable_document.dart';
-export 'listener_token.dart';
 export 'query/query.dart';
 export 'query/from.dart';
 export 'query/functions.dart';
@@ -29,19 +28,30 @@ export 'query/expression/variable_expression.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+import 'package:fluttercouch/database.dart';
 import 'package:fluttercouch/document.dart';
 
 class Fluttercouch {
   static const MethodChannel _methodChannel =
-      const MethodChannel('dev.lucachristille.fluttercouch/methodChannel');
+  const MethodChannel('dev.lucachristille.fluttercouch/methodChannel');
 
   static const EventChannel _replicationEventChannel = const EventChannel(
       "dev.lucachristille.fluttercouch/replicationEventChannel");
 
+  static Map<String, Database> _databases = new Map();
+
   Stream _replicationStream = _replicationEventChannel.receiveBroadcastStream();
 
-  Future<String> initDatabaseWithName(String _name) =>
-      _methodChannel.invokeMethod('initDatabaseWithName', _name);
+  Future<String> initDatabaseWithName(String _name, {DatabaseConfiguration configuration}) {
+    String directory = null;
+    if (configuration != null) {
+      directory = configuration.getDirectory();
+    }
+    _methodChannel.invokeMethod('initDatabaseWithName', {
+      "name": _name,
+      "directory": directory
+    });
+  }
 
   Future<String> saveDocument(Document _doc) =>
       _methodChannel.invokeMethod('saveDocument', _doc.toMap());
@@ -94,10 +104,25 @@ class Fluttercouch {
   Future<Null> deleteDatabaseWithName(String _name) =>
       _methodChannel.invokeMethod('deleteDatabaseWithName', _name);
 
+  Future<Null> compactDatabaseWithName(String _name) =>
+    _methodChannel.invokeMethod("compactDatabase", _name);
+
   Future<int> getDocumentCount() =>
       _methodChannel.invokeMethod('getDocumentCount');
 
   StreamSubscription listenReplicationEvents(Function(String) function) {
     return _replicationStream.listen(function);
+  }
+
+  static registerDatabase(String name, Database database) {
+    _databases[name] = database;
+  }
+
+  static Database getRegisteredDatabase(String name) {
+    if (_databases.containsKey(name)) {
+      return _databases[name];
+    } else {
+      return null;
+    }
   }
 }

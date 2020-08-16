@@ -36,11 +36,8 @@ class CBManager {
     private ReplicatorConfiguration mReplConfig;
     private Replicator mReplicator;
     private String defaultDatabase = "defaultDatabase";
-    private DatabaseConfiguration mDBConfig;
 
-    private CBManager() {
-        mDBConfig = new DatabaseConfiguration();
-    }
+    private CBManager() {}
 
     private CBManager(boolean enableLogging) {
         this();
@@ -108,15 +105,15 @@ class CBManager {
     //    mDBConfig.setEncryptionKey(key);
    // }
 
-    public void initDatabaseWithName(String _name) throws CouchbaseLiteException {
+    public void initDatabaseWithName(String _name, DatabaseConfiguration dbConfig) throws CouchbaseLiteException {
         if (!mDatabase.containsKey(_name)) {
             defaultDatabase = _name;
-            mDatabase.put(_name, new Database(_name, mDBConfig));
+            mDatabase.put(_name, new Database(_name, dbConfig));
         }
     }
 
     public void deleteDatabaseWithName(String _name) throws CouchbaseLiteException {
-        Database.delete(_name,new File(mDBConfig.getDirectory()));
+        Database.delete(_name,new File(mDatabase.get(_name).getConfig().getDirectory()));
     }
 
     public void closeDatabaseWithName(String _name) throws CouchbaseLiteException {

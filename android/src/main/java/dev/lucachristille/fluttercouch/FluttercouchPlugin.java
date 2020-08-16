@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import com.couchbase.lite.CouchbaseLite;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
+import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.ListenerToken;
 import com.couchbase.lite.Query;
 import com.couchbase.lite.QueryChange;
@@ -79,12 +80,19 @@ public class FluttercouchPlugin implements FlutterPlugin {
 
         @Override
         public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-            String _name;
             switch (call.method) {
                 case ("initDatabaseWithName"):
-                    _name = call.arguments();
+                    String _name = call.argument("name");
+                    String _directory = null;
+                    if (call.hasArgument("directory")) {
+                        _directory = call.argument("directory");
+                    }
                     try {
-                        mCBManager.initDatabaseWithName(_name);
+                        DatabaseConfiguration dbConfig = new DatabaseConfiguration();
+                        if (_directory != null) {
+                            dbConfig.setDirectory(_directory);
+                        }
+                        mCBManager.initDatabaseWithName(_name, dbConfig);
                         result.success(_name);
                     } catch (Exception e) {
                         result.error("errInit", "error initializing database with name " + _name, e.toString());

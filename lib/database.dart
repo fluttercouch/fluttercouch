@@ -8,23 +8,34 @@ class Database extends Fluttercouch {
   Database(String name, {DatabaseConfiguration config}) {
     this._name = name;
     this._config = config;
-    initDatabaseWithName(_name);
+    try {
+      initDatabaseWithName(_name, configuration: _config);
+    } catch (e) {
+
+    }
+    Fluttercouch.registerDatabase(this._name, this);
   }
 
-  ListenerToken addChangeListener(DatabaseChangeListener listener) {}
+  /*ListenerToken addChangeListener(DatabaseChangeListener listener) {}
 
   ListenerToken addDocumentChangeListener(
       String id, DocumentChangeListener listener) {}
+*/
+  close() {
+    closeDatabaseWithName.call(this._name);
+  }
 
-  close() {}
-
-  compact() {}
+  compact() {
+    compactDatabaseWithName.call(this._name);
+  }
 
   //createIndex(String name, Index index) {}
 
-  deleteDatabase() {}
+  deleteDatabase() {
+    deleteDatabaseWithName.call(this._name);
+  }
 
-  delete(Document document)
+  delete(Document document) {}
 
   //bool delete(Document document, ConcurrencyControl concurrencyControl) {}
 

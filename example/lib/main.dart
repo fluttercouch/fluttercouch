@@ -13,7 +13,7 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with Fluttercouch {
+class _MyAppState extends State<MyApp> {
   String _isOK = 'Unable to initialize';
 
   @override
@@ -26,9 +26,11 @@ class _MyAppState extends State<MyApp> with Fluttercouch {
   Future<void> initFluttercouchState() async {
     // Platform messages may fail, so we use a try/catch PlatformException.
     String result = "";
-    
+
     try {
-      String databaseName = await initDatabaseWithName("getting-started");
+      Database db = new Database("getting-started");
+      db.compact();
+      /*String databaseName = await initDatabaseWithName("getting-started");
       MutableDocument mutableDoc = MutableDocument()
       .setDouble("version", 2.7)
       .setString("type", "SDK");
@@ -39,6 +41,7 @@ class _MyAppState extends State<MyApp> with Fluttercouch {
       result = "Initialized version " + doc.getDouble("version").toString();
 
       //platformVersion = await Fluttercouch.platformVersion;
+      */
     } on PlatformException {
       result = 'Failed initialization';
     }
