@@ -1,70 +1,67 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+
 import 'package:flutter/services.dart';
-import 'package:fluttercouch/document.dart';
 import 'package:fluttercouch/fluttercouch.dart';
-import 'package:fluttercouch/mutable_document.dart';
-import 'package:fluttercouch/query/query.dart';
-import 'package:scoped_model/scoped_model.dart';
 
-class AppModel extends Model with Fluttercouch {
-  String _databaseName;
-  Document docExample;
-  Query query;
+void main() {
+  runApp(MyApp());
+}
 
-  AppModel() {
-    initPlatformState();
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with Fluttercouch {
+  String _isOK = 'Unable to initialize';
+
+  @override
+  void initState() {
+    super.initState();
+    initFluttercouchState();
   }
 
-  initPlatformState() async {
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initFluttercouchState() async {
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    String result = "";
+    
     try {
-      _databaseName = await initDatabaseWithName("infodiocesi");
-      setReplicatorEndpoint("ws://localhost:4984/infodiocesi");
-      setReplicatorType("PUSH_AND_PULL");
-      setReplicatorBasicAuthentication(<String, String>{
-        "username": "defaultUser",
-        "password": "defaultPassword"
-      });
-      setReplicatorContinuous(true);
-      initReplicator();
-      startReplicator();
-      docExample = await getDocumentWithId("diocesi_tab");
-      notifyListeners();
-      MutableDocument mutableDoc = MutableDocument();
-      mutableDoc.setString("prova", "");
-    } on PlatformException {}
+      String databaseName = await initDatabaseWithName("getting-started");
+      MutableDocument mutableDoc = MutableDocument()
+      .setDouble("version", 2.7)
+      .setString("type", "SDK");
+
+      saveDocumentWithId("first-document", mutableDoc);
+
+      Document doc = await getDocumentWithId("first-document");
+      result = "Initialized version " + doc.getDouble("version").toString();
+
+      //platformVersion = await Fluttercouch.platformVersion;
+    } on PlatformException {
+      result = 'Failed initialization';
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      _isOK = result;
+    });
   }
-}
 
-void main() => runApp(new MyApp());
-
-class MyApp extends StatelessWidget {
+  @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-        title: 'Fluttercouch example application',
-        home: new ScopedModel<AppModel>(
-          model: new AppModel(),
-          child: new Home(),
-        ));
-  }
-}
-
-class Home extends StatelessWidget {
-  Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text('Fluttercouch example application'),
-      ),
-      body: new Center(
-        child: new Column(
-          children: <Widget>[
-            new Text("This is an example app"),
-            new ScopedModelDescendant<AppModel>(
-              builder: (context, child, model) => new Text(
-                'Ciao',
-                style: Theme.of(context).textTheme.display1,
-              ),
-            ),
-          ],
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Plugin example app'),
+        ),
+        body: Center(
+          child: Text('Running on: $_isOK\n'),
         ),
       ),
     );

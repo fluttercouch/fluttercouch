@@ -1,3 +1,4 @@
+export 'database.dart';
 export 'document.dart';
 export 'mutable_document.dart';
 export 'listener_token.dart';
@@ -30,12 +31,12 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:fluttercouch/document.dart';
 
-abstract class Fluttercouch {
+class Fluttercouch {
   static const MethodChannel _methodChannel =
-      const MethodChannel('it.oltrenuovefrontiere.fluttercouch');
+      const MethodChannel('dev.lucachristille.fluttercouch/methodChannel');
 
   static const EventChannel _replicationEventChannel = const EventChannel(
-      "it.oltrenuovefrontiere.fluttercouch/replicationEventChannel");
+      "dev.lucachristille.fluttercouch/replicationEventChannel");
 
   Stream _replicationStream = _replicationEventChannel.receiveBroadcastStream();
 
