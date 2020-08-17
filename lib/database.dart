@@ -4,16 +4,19 @@ import 'package:fluttercouch/fluttercouch.dart';
 class Database extends Fluttercouch {
   String _name;
   DatabaseConfiguration _config;
+  bool _initialized = false;
 
   Database(String name, {DatabaseConfiguration config}) {
     this._name = name;
     this._config = config;
-    try {
-      initDatabaseWithName(_name, configuration: _config);
-    } catch (e) {
-
-    }
-    Fluttercouch.registerDatabase(this._name, this);
+    Future<Map<String, String>> result =
+        initDatabaseWithName(_name, configuration: _config);
+    result.then((response) {
+      this._name = response["name"];
+      this._config.setDirectory(response["directory"]);
+      this._initialized = true;
+      Fluttercouch.registerDatabase(this._name, this);
+    });
   }
 
   /*ListenerToken addChangeListener(DatabaseChangeListener listener) {}
@@ -35,7 +38,9 @@ class Database extends Fluttercouch {
     deleteDatabaseWithName.call(this._name);
   }
 
-  delete(Document document) {}
+  delete(Document document) {
+    return deleteDocument(document.id, name: this._name);
+  }
 
   //bool delete(Document document, ConcurrencyControl concurrencyControl) {}
 
@@ -45,27 +50,39 @@ class Database extends Fluttercouch {
     return this._config;
   }
 
-  double getCount() {}
+  Future<int> getCount() async {
+    return getDocumentCount(name: this._name);
+  }
 
-  Document getDocument(String id) {}
+  Future<Document> getDocument(String id) {
+    return getDocumentWithId(id);
+  }
 
   DateTime getDocumentExpiration(String id) {}
 
   //List<String> getIndexes() {}
 
-  String getName() {}
-
-  String getPath() {}
-
-  purge(Document document) {
-
+  String getName() {
+    return this._name;
   }
+
+  String getPath() {
+    return this._config.getDirectory();
+  }
+
+  purge(Document document) {}
 
   //purge(String id) {}
 
   removeChangeListener(ListenerToken token) {}
 
-  save(MutableDocument document) {}
+  save(MutableDocument document) {
+    if (document.id == null) {
+      saveDocument(document);
+    } else {
+      saveDocumentWithId(document.id, document);
+    }
+  }
 
   //save(MutableDocument document, ConcurrencyControl concurrencyControl) {}
 
@@ -82,6 +99,7 @@ class Database extends Fluttercouch {
 
 class DatabaseConfiguration {
   String _directory;
+
   // Encryption Key is not currently supported
 
   /*
@@ -109,9 +127,7 @@ abstract class DocumentChangeListener {
   changed(DocumentChange change);
 }
 
-abstract class ListenerToken {
-
-}
+abstract class ListenerToken {}
 
 class DatabaseChange {
   Database _database;

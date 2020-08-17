@@ -116,10 +116,29 @@ class CBManager {
         Database.delete(_name,new File(mDatabase.get(_name).getConfig().getDirectory()));
     }
 
+    public void compactDatabaseWithName(String _name) throws CouchbaseLiteException {
+        if (!mDatabase.containsKey(_name)) {
+            mDatabase.get(_name).compact();
+        }
+    }
+
     public void closeDatabaseWithName(String _name) throws CouchbaseLiteException {
         Database _db = mDatabase.remove(_name);
         if (_db != null) {
             _db.close();
+        }
+    }
+
+    public void deleteDocument(String _id, String _name) throws CouchbaseLiteException {
+        Database _db;
+        if (_name != null) {
+            _db = getDatabase(_name);
+        } else {
+            _db = getDatabase();
+        }
+        Document doc = _db.getDocument(_id);
+        if (doc != null) {
+            _db.delete(doc);
         }
     }
 

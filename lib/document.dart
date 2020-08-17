@@ -172,6 +172,6 @@ class Document {
   ///
   /// - Returns: The MutableDocument object.
   MutableDocument toMutable() {
-    return MutableDocument(internalState, id);
+    return MutableDocument(state: internalState, withID: id);
   }
 }

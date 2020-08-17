@@ -1,12 +1,7 @@
 import 'document.dart';
 
 class MutableDocument extends Document {
-  MutableDocument([Map<dynamic, dynamic> data, String id]) : super(data, id) {
-    this.id = id;
-  }
-
-  @override
-  String id;
+  MutableDocument({String withID, Map<dynamic, dynamic> state}) : super(state, withID);
 
   /// Set a value for the given key. Allowed value types are Array, Map,
   /// Number types, null, String, Array Object, Map and nil.
@@ -101,7 +96,7 @@ class MutableDocument extends Document {
   /// - Returns: The MutableDocument object.
   @override
   MutableDocument toMutable() {
-    return MutableDocument(this.internalState, this.id);
+    return MutableDocument(state: this.internalState, withID: this.id);
   }
 
   /// Get a property's value as a List Object, which is a mapping object of an array value.
@@ -131,7 +126,6 @@ class MutableDocument extends Document {
     if (_result is Map) {
       return Map.castFrom<dynamic, dynamic, K, V>(_result);
     }
-
     return null;
   }
 }

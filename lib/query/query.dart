@@ -19,9 +19,9 @@ class Query {
 
   static const JSONMethodCodec _jsonMethod = const JSONMethodCodec();
   static const MethodChannel _channel = const MethodChannel(
-      'it.oltrenuovefrontiere.fluttercouchJson', _jsonMethod);
+      'dev.lucachristille.fluttercouch/jsonChannel', _jsonMethod);
   static const EventChannel _queryEventChannel = const EventChannel(
-      "it.oltrenuovefrontiere.fluttercouch/queryEventChannel", _jsonMethod);
+      "dev.lucachristille.fluttercouch/queryEventChannel", _jsonMethod);
   static final Stream _stream = _queryEventChannel.receiveBroadcastStream();
 
   /// Executes the query.

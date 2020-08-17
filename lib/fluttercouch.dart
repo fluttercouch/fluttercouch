@@ -42,12 +42,12 @@ class Fluttercouch {
 
   Stream _replicationStream = _replicationEventChannel.receiveBroadcastStream();
 
-  Future<String> initDatabaseWithName(String _name, {DatabaseConfiguration configuration}) {
+  Future<Map<String, String>> initDatabaseWithName(String _name, {DatabaseConfiguration configuration}) async {
     String directory = null;
     if (configuration != null) {
       directory = configuration.getDirectory();
     }
-    _methodChannel.invokeMethod('initDatabaseWithName', {
+    return _methodChannel.invokeMapMethod<String, String>('initDatabaseWithName', {
       "name": _name,
       "directory": directory
     });
@@ -63,7 +63,18 @@ class Fluttercouch {
   Future<Document> getDocumentWithId(String _id) async {
     Map<dynamic, dynamic> _docResult;
     _docResult = await _methodChannel.invokeMethod('getDocumentWithId', _id);
-    return Document(_docResult["doc"], _docResult["id"]);
+    if (_docResult.length == 0) {
+      return null;
+    } else {
+      return Document(_docResult["doc"], _docResult["id"]);
+    }
+  }
+
+  Future<Null> deleteDocument(String _id, {String name}) {
+    _methodChannel.invokeMethod("deleteDocument", {
+      "id": _id,
+      "name": name
+    });
   }
 
   Future<Null> setReplicatorEndpoint(String _endpoint) =>
@@ -107,8 +118,8 @@ class Fluttercouch {
   Future<Null> compactDatabaseWithName(String _name) =>
     _methodChannel.invokeMethod("compactDatabase", _name);
 
-  Future<int> getDocumentCount() =>
-      _methodChannel.invokeMethod('getDocumentCount');
+  Future<int> getDocumentCount({String name}) =>
+      _methodChannel.invokeMethod('getDocumentCount', { "name": name });
 
   StreamSubscription listenReplicationEvents(Function(String) function) {
     return _replicationStream.listen(function);

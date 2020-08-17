@@ -28,21 +28,30 @@ class _MyAppState extends State<MyApp> {
     String result = "";
 
     try {
-      Database db = new Database("getting-started");
-      db.compact();
-      /*String databaseName = await initDatabaseWithName("getting-started");
-      MutableDocument mutableDoc = MutableDocument()
-      .setDouble("version", 2.7)
-      .setString("type", "SDK");
+      DatabaseConfiguration dbConfig = DatabaseConfiguration();
+      Database db = new Database("getting-started", config: dbConfig);
+      Query query = QueryBuilder.select([SelectResult.expression(Meta.id)])
+          .from(db.getName());
+      ResultSet resultSet = await query.execute();
+      for (Result result in resultSet) {
+        String id = result.getString(index: 0);
 
-      saveDocumentWithId("first-document", mutableDoc);
+        Document document = await db.getDocument(id);
+        if (document != null) {
+          db.delete(document);
+        }
+      }
+      MutableDocument mutableDoc = MutableDocument(withID: "first_id")
+          .setDouble("version", 2.7)
+          .setString("type", "SDK");
 
-      Document doc = await getDocumentWithId("first-document");
-      result = "Initialized version " + doc.getDouble("version").toString();
+      db.save(mutableDoc);
 
-      //platformVersion = await Fluttercouch.platformVersion;
-      */
-    } on PlatformException {
+      Document doc = await db.getDocument("first_id");
+
+      int docCount = await db.getCount();
+      docCount = docCount;
+    } catch (e) {
       result = 'Failed initialization';
     }
 

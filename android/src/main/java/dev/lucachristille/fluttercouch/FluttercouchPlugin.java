@@ -70,7 +70,7 @@ public class FluttercouchPlugin implements FlutterPlugin {
         channel.setMethodCallHandler(null);
     }
 
-    private class FluttercouchMethodCallHandler implements MethodCallHandler {
+    private static class FluttercouchMethodCallHandler implements MethodCallHandler {
 
         private CBManager mCBManager;
 
@@ -93,9 +93,21 @@ public class FluttercouchPlugin implements FlutterPlugin {
                             dbConfig.setDirectory(_directory);
                         }
                         mCBManager.initDatabaseWithName(_name, dbConfig);
-                        result.success(_name);
+                        HashMap<String, String> response = new HashMap<String, String>();
+                        response.put("name", _name);
+                        response.put("directory", dbConfig.getDirectory());
+                        result.success(response);
                     } catch (Exception e) {
                         result.error("errInit", "error initializing database with name " + _name, e.toString());
+                    }
+                    break;
+                case ("compactDatabase"):
+                    _name = call.arguments();
+                    try {
+                        mCBManager.compactDatabaseWithName(_name);
+                        result.success(null);
+                    } catch (Exception e) {
+                        result.error("errCompact", "error compacting database with name " + _name, e.toString());
                     }
                     break;
                 case ("closeDatabaseWithName"):
@@ -145,6 +157,16 @@ public class FluttercouchPlugin implements FlutterPlugin {
                         result.success(mCBManager.getDocumentWithId(_id));
                     } catch (CouchbaseLiteException e) {
                         result.error("errGet", "error getting the document with id: " + _id, e.toString());
+                    }
+                    break;
+                case ("deleteDocument"):
+                    _name = call.argument("name");
+                    _id = call.argument("id");
+                    try {
+                        mCBManager.deleteDocument(_id, _name);
+                        result.success(null);
+                    } catch (CouchbaseLiteException e) {
+                        result.error("errDelDoc", "error deleting the document with id: " + _id, e.toString());
                     }
                     break;
                 case ("setReplicatorEndpoint"):
@@ -223,8 +245,16 @@ public class FluttercouchPlugin implements FlutterPlugin {
                     }
                     break;
                 case ("getDocumentCount"):
+                    _name = null;
+                    if (call.hasArgument("name")) {
+                        _name = call.argument("name");
+                    }
                     try {
-                        result.success(mCBManager.getDocumentCount());
+                        if (_name != null) {
+                            result.success(mCBManager.getDatabase(_name).getCount());
+                        } else {
+                            result.success(mCBManager.getDocumentCount());
+                        }
                     } catch (Exception e) {
                         result.error("errGet", "error getting the document count.", e.toString());
                     }
@@ -235,7 +265,7 @@ public class FluttercouchPlugin implements FlutterPlugin {
         }
     }
 
-    private class JSONCallHandler implements MethodCallHandler {
+    private static class JSONCallHandler implements MethodCallHandler {
 
         private CBManager mCBManager;
 
