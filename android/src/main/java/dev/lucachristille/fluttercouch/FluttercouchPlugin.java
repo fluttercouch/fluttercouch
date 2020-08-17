@@ -12,8 +12,6 @@ import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.ListenerToken;
 import com.couchbase.lite.Query;
-import com.couchbase.lite.QueryChange;
-import com.couchbase.lite.QueryChangeListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,35 +38,34 @@ public class FluttercouchPlugin implements FlutterPlugin {
     /// This local reference serves to register the plugin with the Flutter Engine and unregister it
     /// when the Flutter Engine is detached from the Activity
 
-    private MethodChannel channel;
+    private MethodChannel methodChannel;
     private MethodChannel jsonChannel;
-    private EventChannel replicationEventChannel;
-    private EventChannel queryEventChannel;
-    private EventChannel documentChangeEventChannel;
+    private EventChannel eventsChannel;
+    private EventsHandler eventsHandler;
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
         CouchbaseLite.init(flutterPluginBinding.getApplicationContext());
 
-        channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "dev.lucachristille.fluttercouch/methodChannel");
-        channel.setMethodCallHandler(new FluttercouchMethodCallHandler());
+        methodChannel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "dev.lucachristille.fluttercouch/methodChannel");
+        methodChannel.setMethodCallHandler(new FluttercouchMethodCallHandler());
 
         jsonChannel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "dev.lucachristille.fluttercouch/jsonChannel", JSONMethodCodec.INSTANCE);
         jsonChannel.setMethodCallHandler(new JSONCallHandler());
 
-        queryEventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(), "dev.lucachristille.fluttercouch/queryEventChannel");
-        queryEventChannel.setStreamHandler(new QueryEventListener());
-
-        replicationEventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(), "dev.lucachristille.fluttercouch/replicationEventChannel");
-        replicationEventChannel.setStreamHandler(new ReplicationEventListener());
+        eventsChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(), "dev.lucachristille.fluttercouch/eventsChannel");
+        eventsHandler = new EventsHandler();
+        eventsChannel.setStreamHandler(eventsHandler);
     }
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-        channel.setMethodCallHandler(null);
+        methodChannel.setMethodCallHandler(null);
+        jsonChannel.setMethodCallHandler(null);
+        eventsChannel.setStreamHandler(null);
     }
 
-    private static class FluttercouchMethodCallHandler implements MethodCallHandler {
+    private class FluttercouchMethodCallHandler implements MethodCallHandler {
 
         private CBManager mCBManager;
 
@@ -78,9 +75,15 @@ public class FluttercouchPlugin implements FlutterPlugin {
 
         @Override
         public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
+            String _dbName;
+            if (call.hasArgument("dbName")) {
+                _dbName = call.argument("dbName");
+            } else {
+                _dbName = mCBManager.getDatabase().getName();
+            }
+
             switch (call.method) {
                 case ("initDatabaseWithName"):
-                    String _name = call.argument("name");
                     String _directory = null;
                     if (call.hasArgument("directory")) {
                         _directory = call.argument("directory");
@@ -90,40 +93,37 @@ public class FluttercouchPlugin implements FlutterPlugin {
                         if (_directory != null) {
                             dbConfig.setDirectory(_directory);
                         }
-                        mCBManager.initDatabaseWithName(_name, dbConfig);
-                        HashMap<String, String> response = new HashMap<String, String>();
-                        response.put("name", _name);
+                        mCBManager.initDatabaseWithName(_dbName, dbConfig);
+                        HashMap<String, String> response = new HashMap<>();
+                        response.put("dbName", _dbName);
                         response.put("directory", dbConfig.getDirectory());
                         result.success(response);
                     } catch (Exception e) {
-                        result.error("errInit", "error initializing database with name " + _name, e.toString());
+                        result.error("errInit", "error initializing database with name " + _dbName, e.toString());
                     }
                     break;
                 case ("compactDatabase"):
-                    _name = call.arguments();
                     try {
-                        mCBManager.compactDatabaseWithName(_name);
+                        mCBManager.compactDatabaseWithName(_dbName);
                         result.success(null);
                     } catch (Exception e) {
-                        result.error("errCompact", "error compacting database with name " + _name, e.toString());
+                        result.error("errCompact", "error compacting database with name " + _dbName, e.toString());
                     }
                     break;
                 case ("closeDatabaseWithName"):
-                    _name = call.arguments();
                     try {
-                        mCBManager.closeDatabaseWithName(_name);
-                        result.success(_name);
+                        mCBManager.closeDatabaseWithName(_dbName);
+                        result.success(_dbName);
                     } catch (Exception e) {
-                        result.error("errClose", "error closing database with name " + _name, e.toString());
+                        result.error("errClose", "error closing database with name " + _dbName, e.toString());
                     }
                     break;
                 case ("deleteDatabaseWithName"):
-                    _name = call.arguments();
                     try {
-                        mCBManager.deleteDatabaseWithName(_name);
+                        mCBManager.deleteDatabaseWithName(_dbName);
                         result.success(null);
                     } catch (Exception e) {
-                        result.error("errDelete", "error deleting database with name " + _name, e.toString());
+                        result.error("errDelete", "error deleting database with name " + _dbName, e.toString());
                     }
                     break;
                 case ("saveDocument"):
@@ -150,7 +150,7 @@ public class FluttercouchPlugin implements FlutterPlugin {
                     }
                     break;
                 case ("getDocumentWithId"):
-                    String _id = call.arguments();
+                    String _id = call.argument("id");
                     try {
                         result.success(mCBManager.getDocumentWithId(_id));
                     } catch (CouchbaseLiteException e) {
@@ -158,10 +158,9 @@ public class FluttercouchPlugin implements FlutterPlugin {
                     }
                     break;
                 case ("deleteDocument"):
-                    _name = call.argument("name");
                     _id = call.argument("id");
                     try {
-                        mCBManager.deleteDocument(_id, _name);
+                        mCBManager.deleteDocument(_id, _dbName);
                         result.success(null);
                     } catch (CouchbaseLiteException e) {
                         result.error("errDelDoc", "error deleting the document with id: " + _id, e.toString());
@@ -243,20 +242,21 @@ public class FluttercouchPlugin implements FlutterPlugin {
                     }
                     break;
                 case ("getDocumentCount"):
-                    _name = null;
-                    if (call.hasArgument("name")) {
-                        _name = call.argument("name");
-                    }
                     try {
-                        if (_name != null) {
-                            result.success(mCBManager.getDatabase(_name).getCount());
-                        } else {
-                            result.success(mCBManager.getDocumentCount());
-                        }
+                        result.success(mCBManager.getDatabase(_dbName).getCount());
                     } catch (Exception e) {
                         result.error("errGet", "error getting the document count.", e.toString());
                     }
                     break;
+                case("registerDocumentChangeListener"):
+                    String id = call.argument("id");
+                    String token = call.argument("token");
+                    try {
+                        mCBManager.addDocumentChangeListener(_dbName, id, token, eventsHandler);
+                        result.success(token);
+                    } catch (Exception e) {
+                        result.error("errDocList", "error adding document change listener to document " + id + " on db " + _dbName, e.toString());
+                    }
                 default:
                     result.notImplemented();
             }
@@ -272,7 +272,7 @@ public class FluttercouchPlugin implements FlutterPlugin {
         }
 
         @Override
-        public void onMethodCall(MethodCall call, final Result result) {
+        public void onMethodCall(MethodCall call, @NonNull final Result result) {
             final JSONObject json = call.arguments();
 
             final String id;
@@ -297,25 +297,12 @@ public class FluttercouchPlugin implements FlutterPlugin {
                     }
 
                     final Query query = queryFromJson;
-                    AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                final List<Map<String, Object>> resultsList = QueryJson.resultsToJson(query.execute());
-                                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        result.success(resultsList);
-                                    }
-                                });
-                            } catch (final CouchbaseLiteException e) {
-                                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        result.error("errQuery", "Error executing query", e.toString());
-                                    }
-                                });
-                            }
+                    AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+                        try {
+                            final List<Map<String, Object>> resultsList = QueryJson.resultsToJson(query.execute());
+                            new Handler(Looper.getMainLooper()).post(() -> result.success(resultsList));
+                        } catch (final CouchbaseLiteException e) {
+                            new Handler(Looper.getMainLooper()).post(() -> result.error("errQuery", "Error executing query", e.toString()));
                         }
                     });
                     break;
@@ -332,31 +319,23 @@ public class FluttercouchPlugin implements FlutterPlugin {
                         queryFromJson = new QueryJson(json, mCBManager).toCouchbaseQuery();
 
                         if (queryFromJson != null) {
-                            ListenerToken mListenerToken = queryFromJson.addChangeListener(AsyncTask.THREAD_POOL_EXECUTOR, new QueryChangeListener() {
-                                @Override
-                                public void changed(QueryChange change) {
-                                    final HashMap<String, Object> json = new HashMap<String, Object>();
-                                    json.put("query", id);
+                            ListenerToken mListenerToken = queryFromJson.addChangeListener(AsyncTask.THREAD_POOL_EXECUTOR, change -> {
+                                final HashMap<String, Object> json1 = new HashMap<>();
+                                json1.put("query", id);
 
-                                    if (change.getResults() != null) {
-                                        json.put("results", QueryJson.resultsToJson(change.getResults()));
-                                    }
+                                json1.put("results", QueryJson.resultsToJson(change.getResults()));
 
-                                    if (change.getError() != null) {
-                                        json.put("error", change.getError().getLocalizedMessage());
-                                    }
-
-                                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            //final EventChannel.EventSink eventSink = mQueryEventListener.mEventSink;
-                                            //if (eventSink != null) {
-                                            //    eventSink.success(json);
-                                            //}
-                                        }
-                                    });
-
+                                if (change.getError() != null) {
+                                    json1.put("error", change.getError().getLocalizedMessage());
                                 }
+
+                                new Handler(Looper.getMainLooper()).post(() -> {
+                                    //final EventChannel.EventSink eventSink = mQueryEventListener.mEventSink;
+                                    //if (eventSink != null) {
+                                    //    eventSink.success(json);
+                                    //}
+                                });
+
                             });
 
                             mCBManager.addQuery(id, queryFromJson, mListenerToken);

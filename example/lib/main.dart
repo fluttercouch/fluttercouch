@@ -41,6 +41,7 @@ class _MyAppState extends State<MyApp> {
           db.delete(document);
         }
       }
+
       MutableDocument mutableDoc = MutableDocument(withID: "first_id")
           .setDouble("version", 2.7)
           .setString("type", "SDK")
@@ -48,7 +49,14 @@ class _MyAppState extends State<MyApp> {
 
       db.save(mutableDoc);
 
+      db.addDocumentsChangeListener("first_id", (change) {
+        change = change;
+      });
+
       Document doc = await db.getDocument("first_id");
+      MutableDocument doc2 = doc.toMutable();
+      doc2.setDate("newDate", DateTime.now());
+      db.save(doc2);
 
       int docCount = await db.getCount();
       docCount = docCount;

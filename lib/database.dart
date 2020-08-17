@@ -1,10 +1,14 @@
 import 'package:fluttercouch/document.dart';
 import 'package:fluttercouch/fluttercouch.dart';
+import 'package:fluttercouch/listener_token.dart';
 
 class Database extends Fluttercouch {
   String _name;
   DatabaseConfiguration _config;
   bool _initialized = false;
+
+  Stream _eventsStream = Fluttercouch.eventChannel.receiveBroadcastStream();
+  Map<ListenerToken, Function> _documentsChangeListeners = new Map();
 
   Database(String name, {DatabaseConfiguration config}) {
     this._name = name;
@@ -12,11 +16,20 @@ class Database extends Fluttercouch {
     Future<Map<String, String>> result =
         initDatabaseWithName(_name, configuration: _config);
     result.then((response) {
-      this._name = response["name"];
+      this._name = response["dbName"];
       this._config.setDirectory(response["directory"]);
       this._initialized = true;
       Fluttercouch.registerDatabase(this._name, this);
     });
+    _eventsStream.listen(_onEvent, onError: _onEventError);
+  }
+
+  _onEvent(Object event) {
+    event = event;
+  }
+
+  _onEventError(Object error) {
+
   }
 
   /*ListenerToken addChangeListener(DatabaseChangeListener listener) {}
@@ -39,7 +52,7 @@ class Database extends Fluttercouch {
   }
 
   delete(Document document) {
-    return deleteDocument(document.id, name: this._name);
+    return deleteDocument(document.id, dbName: this._name);
   }
 
   //bool delete(Document document, ConcurrencyControl concurrencyControl) {}
@@ -51,11 +64,11 @@ class Database extends Fluttercouch {
   }
 
   Future<int> getCount() async {
-    return getDocumentCount(name: this._name);
+    return getDocumentCount(dbName: this._name);
   }
 
   Future<Document> getDocument(String id) {
-    return getDocumentWithId(id);
+    return getDocumentWithId(id, dbName: this._name);
   }
 
   DateTime getDocumentExpiration(String id) {}
@@ -82,6 +95,13 @@ class Database extends Fluttercouch {
     } else {
       saveDocumentWithId(document.id, document);
     }
+  }
+
+  addDocumentsChangeListener(String id, DocumentChangeListener listener) {
+    ListenerToken token = new ListenerToken.v5(this._name + "::" + "document_change_listener", id);
+    registerDocumentChangeListener(id, token.tokenId, dbName: this.getName()).then((resultToken) {
+      _documentsChangeListeners[token] = listener;
+    });
   }
 
   //save(MutableDocument document, ConcurrencyControl concurrencyControl) {}
@@ -118,16 +138,6 @@ class DatabaseConfiguration {
     return this._directory;
   }
 }
-
-abstract class DatabaseChangeListener {
-  changed(DatabaseChange change);
-}
-
-abstract class DocumentChangeListener {
-  changed(DocumentChange change);
-}
-
-abstract class ListenerToken {}
 
 class DatabaseChange {
   Database _database;

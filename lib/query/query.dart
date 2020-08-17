@@ -62,9 +62,8 @@ class Query {
   /// Adds a query change listener and posts changes to [callback].
   ///
   /// Returns the listener token object for removing the listener.
-  Future<ListenerToken> addChangeListener(
-      Function(QueryChange) callback) async {
-    var token = ListenerToken();
+  Future<ListenerToken> addChangeListener(Function(QueryChange) callback) async {
+    /*var token = ListenerToken();
     tokens[token] =
         _stream.where((data) => data["query"] == queryId).listen((data) {
       Map<String, dynamic> qcJson = data;
@@ -96,8 +95,10 @@ class Query {
 
       return null;
     }
-
     return token;
+    */
+
+    return null;
   }
 
   /// Removes a change listener wih the given listener token.

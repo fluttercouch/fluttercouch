@@ -2,12 +2,16 @@ package dev.lucachristille.fluttercouch;
 
 import android.content.res.AssetManager;
 
+import androidx.annotation.NonNull;
+
 import com.couchbase.lite.BasicAuthenticator;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.Document;
 // import com.couchbase.lite.EncryptionKey;
+import com.couchbase.lite.DocumentChange;
+import com.couchbase.lite.DocumentChangeListener;
 import com.couchbase.lite.Endpoint;
 import com.couchbase.lite.ListenerToken;
 import com.couchbase.lite.LogFileConfiguration;
@@ -26,6 +30,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+
+import io.flutter.plugin.common.EventChannel;
 
 class CBManager {
     private static CBManager instance;
@@ -36,6 +43,7 @@ class CBManager {
     private ReplicatorConfiguration mReplConfig;
     private Replicator mReplicator;
     private String defaultDatabase = "defaultDatabase";
+    private HashMap<String, ListenerToken> listenerTokens = new HashMap<>();
 
     private CBManager() {}
 
@@ -245,5 +253,15 @@ class CBManager {
         }
 
         return query;
+    }
+
+    ListenerToken addDocumentChangeListener(String _dbName, String id, String token, EventsHandler eventsHandler) {
+        return this.getDatabase(_dbName).addDocumentChangeListener(id, new DocumentChangeListener() {
+            @Override
+            public void changed(@NonNull DocumentChange change) {
+                FluttercouchEvent event = new FluttercouchEvent(FluttercouchEvent.DOCUMENT_CHANGE_EVENT, token, change);
+                eventsHandler.success(event);
+            }
+        });
     }
 }

@@ -30,17 +30,18 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:fluttercouch/database.dart';
 import 'package:fluttercouch/document.dart';
+import 'package:fluttercouch/listener_token.dart';
+
+typedef DocumentChangeListener = void Function(DocumentChange change);
 
 class Fluttercouch {
   static const MethodChannel _methodChannel =
   const MethodChannel('dev.lucachristille.fluttercouch/methodChannel');
 
-  static const EventChannel _replicationEventChannel = const EventChannel(
-      "dev.lucachristille.fluttercouch/replicationEventChannel");
+  static const EventChannel eventChannel = const EventChannel(
+      "dev.lucachristille.fluttercouch/eventsChannel");
 
   static Map<String, Database> _databases = new Map();
-
-  Stream _replicationStream = _replicationEventChannel.receiveBroadcastStream();
 
   Future<Map<String, String>> initDatabaseWithName(String _name, {DatabaseConfiguration configuration}) async {
     String directory = null;
@@ -48,7 +49,7 @@ class Fluttercouch {
       directory = configuration.getDirectory();
     }
     return _methodChannel.invokeMapMethod<String, String>('initDatabaseWithName', {
-      "name": _name,
+      "dbName": _name,
       "directory": directory
     });
   }
@@ -60,9 +61,12 @@ class Fluttercouch {
       _methodChannel.invokeMethod('saveDocumentWithId',
           <String, dynamic>{'id': _id, 'map': _doc.toMap()});
 
-  Future<Document> getDocumentWithId(String _id) async {
+  Future<Document> getDocumentWithId(String _id, {String dbName}) async {
     Map<dynamic, dynamic> _docResult;
-    _docResult = await _methodChannel.invokeMethod('getDocumentWithId', _id);
+    _docResult = await _methodChannel.invokeMethod('getDocumentWithId', {
+      "id": _id,
+      "dbName": dbName
+    });
     if (_docResult.length == 0) {
       return null;
     } else {
@@ -70,10 +74,10 @@ class Fluttercouch {
     }
   }
 
-  Future<Null> deleteDocument(String _id, {String name}) {
+  Future<Null> deleteDocument(String _id, {String dbName}) {
     _methodChannel.invokeMethod("deleteDocument", {
       "id": _id,
-      "name": name
+      "dbName": dbName
     });
   }
 
@@ -106,23 +110,27 @@ class Fluttercouch {
   Future<Null> stopReplicator() =>
       _methodChannel.invokeMethod('stopReplicator');
 
-  Future<String> closeDatabaseWithName(String _name) =>
-      _methodChannel.invokeMethod('closeDatabaseWithName', _name);
+  Future<String> closeDatabaseWithName(String dbName) =>
+      _methodChannel.invokeMethod('closeDatabaseWithName', dbName);
 
   Future<String> closeDatabase() =>
       _methodChannel.invokeMethod('closeDatabase');
 
-  Future<Null> deleteDatabaseWithName(String _name) =>
-      _methodChannel.invokeMethod('deleteDatabaseWithName', _name);
+  Future<Null> deleteDatabaseWithName(String dbName) =>
+      _methodChannel.invokeMethod('deleteDatabaseWithName', dbName);
 
-  Future<Null> compactDatabaseWithName(String _name) =>
-    _methodChannel.invokeMethod("compactDatabase", _name);
+  Future<Null> compactDatabaseWithName(String dbName) =>
+    _methodChannel.invokeMethod("compactDatabase", dbName);
 
-  Future<int> getDocumentCount({String name}) =>
-      _methodChannel.invokeMethod('getDocumentCount', { "name": name });
+  Future<int> getDocumentCount({String dbName}) =>
+      _methodChannel.invokeMethod('getDocumentCount', { "name": dbName });
 
-  StreamSubscription listenReplicationEvents(Function(String) function) {
-    return _replicationStream.listen(function);
+  Future<String> registerDocumentChangeListener(String id, String token, {String dbName}) {
+    return _methodChannel.invokeMethod("registerDocumentChangeListener", {
+      "id": id,
+      "dbName": dbName,
+      "token": token
+    });
   }
 
   static registerDatabase(String name, Database database) {
