@@ -6,7 +6,6 @@ class MutableDocument extends Document {
   /// Set a value for the given key. Allowed value types are Array, Map,
   /// Number types, null, String, Array Object, Map and nil.
   /// The Arrays and Maps must contain only the above types.
-  /// TODO A Date object will be converted to an ISO-8601 format string.
   ///
   /// - Parameters:
   ///   - value: The value.
@@ -27,6 +26,10 @@ class MutableDocument extends Document {
   ///   - key: The key.
   MutableDocument setList(String key, List<dynamic> value) {
     return setValue(key, value);
+  }
+
+  MutableDocument setDate(String key, DateTime value) {
+    return setValue(key, value.toIso8601String());
   }
 
   /// Set a List object for the given key.

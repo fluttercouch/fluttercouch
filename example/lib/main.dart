@@ -43,7 +43,8 @@ class _MyAppState extends State<MyApp> {
       }
       MutableDocument mutableDoc = MutableDocument(withID: "first_id")
           .setDouble("version", 2.7)
-          .setString("type", "SDK");
+          .setString("type", "SDK")
+          .setDate("date", DateTime.now());
 
       db.save(mutableDoc);
 

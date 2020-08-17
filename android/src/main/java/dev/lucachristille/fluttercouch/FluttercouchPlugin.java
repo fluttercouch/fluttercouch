@@ -1,7 +1,5 @@
 package dev.lucachristille.fluttercouch;
 
-import android.content.Context;
-import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
@@ -32,7 +30,6 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 /**
  * FluttercouchPlugin
@@ -47,21 +44,22 @@ public class FluttercouchPlugin implements FlutterPlugin {
     private MethodChannel jsonChannel;
     private EventChannel replicationEventChannel;
     private EventChannel queryEventChannel;
+    private EventChannel documentChangeEventChannel;
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
         CouchbaseLite.init(flutterPluginBinding.getApplicationContext());
 
-        channel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "dev.lucachristille.fluttercouch/methodChannel");
+        channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "dev.lucachristille.fluttercouch/methodChannel");
         channel.setMethodCallHandler(new FluttercouchMethodCallHandler());
 
-        jsonChannel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "dev.lucachristille.fluttercouch/jsonChannel", JSONMethodCodec.INSTANCE);
+        jsonChannel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "dev.lucachristille.fluttercouch/jsonChannel", JSONMethodCodec.INSTANCE);
         jsonChannel.setMethodCallHandler(new JSONCallHandler());
 
-        queryEventChannel = new EventChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "dev.lucachristille.fluttercouch/queryEventChannel");
+        queryEventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(), "dev.lucachristille.fluttercouch/queryEventChannel");
         queryEventChannel.setStreamHandler(new QueryEventListener());
 
-        replicationEventChannel = new EventChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "dev.lucachristille.fluttercouch/replicationEventChannel");
+        replicationEventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(), "dev.lucachristille.fluttercouch/replicationEventChannel");
         replicationEventChannel.setStreamHandler(new ReplicationEventListener());
     }
 

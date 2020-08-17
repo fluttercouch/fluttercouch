@@ -161,6 +161,16 @@ class Document {
     return null;
   }
 
+  DateTime getDate(String key) {
+    var _result = getValue(key);
+    if (_result is String) {
+      _result = DateTime.tryParse(_result);
+      return _result;
+    }
+
+    return null;
+  }
+
   /// Gets content of the current object as a Dictionary.
   ///
   /// - Returns: The Dictionary representing the content of the current object.
