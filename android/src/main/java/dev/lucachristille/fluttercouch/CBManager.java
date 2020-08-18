@@ -259,7 +259,10 @@ class CBManager {
         return this.getDatabase(_dbName).addDocumentChangeListener(id, new DocumentChangeListener() {
             @Override
             public void changed(@NonNull DocumentChange change) {
-                FluttercouchEvent event = new FluttercouchEvent(FluttercouchEvent.DOCUMENT_CHANGE_EVENT, token, change);
+                HashMap<String, String> payload = new HashMap<>();
+                payload.put("database", change.getDatabase().getName());
+                payload.put("documentID", change.getDocumentID());
+                FluttercouchEvent event = new FluttercouchEvent(FluttercouchEvent.DOCUMENT_CHANGE_EVENT, token, payload);
                 eventsHandler.success(event);
             }
         });

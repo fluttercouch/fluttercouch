@@ -49,7 +49,9 @@ class _MyAppState extends State<MyApp> {
 
       db.save(mutableDoc);
 
-      db.addDocumentsChangeListener("first_id", (change) {
+      db.addDocumentsChangeListener("first_id", (DocumentChange change) async {
+        Document changedDocument = await change.getDatabase().getDocument(change.getDocumentID());
+        print(changedDocument.getDate("newDate"));
         change = change;
       });
 

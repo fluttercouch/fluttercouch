@@ -8,7 +8,7 @@ class Database extends Fluttercouch {
   bool _initialized = false;
 
   Stream _eventsStream = Fluttercouch.eventChannel.receiveBroadcastStream();
-  Map<ListenerToken, Function> _documentsChangeListeners = new Map();
+  Map<String, Function> _documentsChangeListeners = new Map();
 
   Database(String name, {DatabaseConfiguration config}) {
     this._name = name;
@@ -24,7 +24,21 @@ class Database extends Fluttercouch {
     _eventsStream.listen(_onEvent, onError: _onEventError);
   }
 
-  _onEvent(Object event) {
+  _onEvent(dynamic data) {
+    Map<String, String> event = Map.castFrom<dynamic, dynamic, String, String>(data);
+    if (event.containsKey("type")) {
+      switch(event["type"]) {
+        case "document_change_event":
+          DocumentChange change = DocumentChange();
+          change._database = Fluttercouch.getRegisteredDatabase(event["database"]);
+          change._documentID = event["documentID"];
+          DocumentChangeListener documentChangeListener = this._documentsChangeListeners[event["listenerToken"]];
+          if (documentChangeListener != null) {
+            documentChangeListener(change);
+          }
+          break;
+      }
+    }
     event = event;
   }
 
@@ -99,9 +113,8 @@ class Database extends Fluttercouch {
 
   addDocumentsChangeListener(String id, DocumentChangeListener listener) {
     ListenerToken token = new ListenerToken.v5(this._name + "::" + "document_change_listener", id);
-    registerDocumentChangeListener(id, token.tokenId, dbName: this.getName()).then((resultToken) {
-      _documentsChangeListeners[token] = listener;
-    });
+    _documentsChangeListeners[token.tokenId] = listener;
+    registerDocumentChangeListener(id, token.tokenId, dbName: this.getName());
   }
 
   //save(MutableDocument document, ConcurrencyControl concurrencyControl) {}

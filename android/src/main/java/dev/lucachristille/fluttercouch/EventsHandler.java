@@ -28,7 +28,7 @@ public class EventsHandler implements EventChannel.StreamHandler {
     }
 
     public void success(FluttercouchEvent event) {
-        mEventSink.success(event);
+        mEventSink.success(event.toMap());
     }
 
     public void error(String errorCode, String errorMessage, Object errorDetails) {
