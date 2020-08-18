@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -266,5 +267,15 @@ class CBManager {
                 eventsHandler.success(event);
             }
         });
+    }
+
+    void setDocumentExpiration(String _dbName, String id, Date expiration) throws CouchbaseLiteException {
+        Database _db = this.getDatabase(_dbName);
+        _db.setDocumentExpiration(id, expiration);
+    }
+
+    Date getDocumentExpiration(String _dbName, String id) throws CouchbaseLiteException {
+        Database _db = this.getDatabase(_dbName);
+        return _db.getDocumentExpiration(id);
     }
 }

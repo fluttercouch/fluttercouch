@@ -133,6 +133,21 @@ class Fluttercouch {
     });
   }
 
+  Future<Null> setDocumentExpirationOfDB(String id, DateTime expiration, {String dbName}) {
+    return _methodChannel.invokeMethod("setDocumentExpiration", {
+      "id": id,
+      "expiration": expiration.toIso8601String(),
+      "dbName": dbName
+    });
+  }
+
+  Future<String> getDocumentExpirationOfDB(String id, {String dbName}) {
+    return _methodChannel.invokeMethod("getDocumentExpiration", {
+      "id": id,
+      "dbName": dbName
+    });
+  }
+
   static registerDatabase(String name, Database database) {
     _databases[name] = database;
   }

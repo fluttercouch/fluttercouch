@@ -1,10 +1,12 @@
 package dev.lucachristille.fluttercouch;
 
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import com.couchbase.lite.CouchbaseLite;
 import com.couchbase.lite.CouchbaseLiteException;
@@ -17,6 +19,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +80,7 @@ public class FluttercouchPlugin implements FlutterPlugin {
 
         @Override
         public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
+            DateFormat iso8601format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
             String _dbName;
             if (call.hasArgument("dbName")) {
                 _dbName = call.argument("dbName");
@@ -256,6 +262,27 @@ public class FluttercouchPlugin implements FlutterPlugin {
                         result.success(token);
                     } catch (Exception e) {
                         result.error("errDocList", "error adding document change listener to document " + id + " on db " + _dbName, e.toString());
+                    }
+                    break;
+                case("setDocumentExpiration"):
+                    id = call.argument("id");
+                    String date = call.argument("expiration");
+                    try {
+
+                        Date expiration = iso8601format.parse(date);
+                        mCBManager.setDocumentExpiration(_dbName, id, expiration);
+                        result.success(null);
+                    } catch (Exception e) {
+                        result.error("errSetDocExp", "error setting document expiration for document " + id + " on db " + _dbName, e.toString());
+                    }
+                    break;
+                case("getDocumentExpiration"):
+                    id = call.argument("id");
+                    try {
+                        Date expiration = mCBManager.getDocumentExpiration(_dbName, id);
+                        result.success(iso8601format.format(expiration));
+                    } catch (Exception e) {
+                        result.error("errGetDocExp", "error getting document expiration for document " + id + " on db " + _dbName, e.toString());
                     }
                 default:
                     result.notImplemented();

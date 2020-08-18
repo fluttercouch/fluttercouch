@@ -85,7 +85,14 @@ class Database extends Fluttercouch {
     return getDocumentWithId(id, dbName: this._name);
   }
 
-  DateTime getDocumentExpiration(String id) {}
+  Future<Null> setDocumentExpiration(String id, DateTime expiration) {
+    return setDocumentExpirationOfDB(id, expiration, dbName: this._name);
+  }
+
+  Future<DateTime> getDocumentExpiration(String id) async {
+    String date = await getDocumentExpirationOfDB(id, dbName: this._name);
+    return DateTime.parse(date);
+  }
 
   //List<String> getIndexes() {}
 
@@ -120,8 +127,6 @@ class Database extends Fluttercouch {
   //save(MutableDocument document, ConcurrencyControl concurrencyControl) {}
 
   //save(MutableDocument document, ConflictHandler conflictHandler) {}
-
-  setDocumentExpiration(String id, DateTime expiration) {}
 
   static copy(String path, String name, DatabaseConfiguration config) {}
 
