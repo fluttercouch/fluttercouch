@@ -60,6 +60,9 @@ class _MyAppState extends State<MyApp> {
       doc2.setDate("newDate", DateTime.now());
       db.save(doc2);
 
+      await db.setDocumentExpiration("first_id", DateTime.now().add(Duration(hours: 1)));
+      DateTime expiration = await db.getDocumentExpiration("first_id");
+
       int docCount = await db.getCount();
       docCount = docCount;
     } catch (e) {

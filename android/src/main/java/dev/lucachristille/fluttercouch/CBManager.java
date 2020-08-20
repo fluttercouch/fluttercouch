@@ -5,6 +5,7 @@ import android.content.res.AssetManager;
 import androidx.annotation.NonNull;
 
 import com.couchbase.lite.BasicAuthenticator;
+import com.couchbase.lite.ConcurrencyControl;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseConfiguration;
@@ -28,6 +29,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -84,6 +86,12 @@ class CBManager {
     public String saveDocumentWithId(String _id, Map<String, Object> _map) throws CouchbaseLiteException {
         MutableDocument mutableDoc = new MutableDocument(_id, _map);
         mDatabase.get(defaultDatabase).save(mutableDoc);
+        return mutableDoc.getId();
+    }
+
+    public String saveDocumentWithIdAndConcurrencyControl(String _id, Map<String, Object> _map, String concurrencyControlString) throws CouchbaseLiteException {
+        MutableDocument mutableDoc = new MutableDocument(_id, _map);
+        mDatabase.get(defaultDatabase).save(mutableDoc, ConcurrencyControl.valueOf(concurrencyControlString));
         return mutableDoc.getId();
     }
 
@@ -266,5 +274,15 @@ class CBManager {
                 eventsHandler.success(event);
             }
         });
+    }
+
+    void setDocumentExpiration(String _dbName, String id, Date expiration) throws CouchbaseLiteException {
+        Database _db = this.getDatabase(_dbName);
+        _db.setDocumentExpiration(id, expiration);
+    }
+
+    Date getDocumentExpiration(String _dbName, String id) throws CouchbaseLiteException {
+        Database _db = this.getDatabase(_dbName);
+        return _db.getDocumentExpiration(id);
     }
 }
