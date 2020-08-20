@@ -155,6 +155,21 @@ public class FluttercouchPlugin implements FlutterPlugin {
                         result.error("errArg", "invalid arguments", null);
                     }
                     break;
+                case ("saveDocumentWithIdAndConcurrencyControl"):
+                    if (call.hasArgument("id") && call.hasArgument("map") && call.hasArgument("concurrencyControl")) {
+                        String _id = call.argument("id");
+                        Map<String, Object> _map = call.argument("map");
+                        String concurrencyControlString = call.argument("concurrencyControl");
+                        try {
+                            String returnedId = mCBManager.saveDocumentWithIdAndConcurrencyControl(_id, _map, concurrencyControlString);
+                            result.success(returnedId);
+                        } catch (CouchbaseLiteException e) {
+                            result.error("errSave", "error saving document with id " + _id, e.toString());
+                        }
+                    } else {
+                        result.error("errArg", "invalid arguments", null);
+                    }
+                    break;
                 case ("getDocumentWithId"):
                     String _id = call.argument("id");
                     try {

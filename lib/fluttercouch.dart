@@ -31,8 +31,10 @@ import 'package:flutter/services.dart';
 import 'package:fluttercouch/database.dart';
 import 'package:fluttercouch/document.dart';
 import 'package:fluttercouch/listener_token.dart';
+import 'package:fluttercouch/mutable_document.dart';
 
 typedef DocumentChangeListener = void Function(DocumentChange change);
+typedef ConflictHandler = bool Function(MutableDocument newDoc, Document curdoc);
 
 class Fluttercouch {
   static const MethodChannel _methodChannel =
@@ -61,6 +63,17 @@ class Fluttercouch {
       _methodChannel.invokeMethod('saveDocumentWithId',
           <String, dynamic>{'id': _id, 'map': _doc.toMap()});
 
+  Future<String> saveDocumentWithIdAndConcurrencyControl(String _id, Document _doc, ConcurrencyControl concurrencyControl) {
+    String concurrencyControlString;
+    if (concurrencyControl == ConcurrencyControl.FAIL_ON_CONFLICT) {
+      concurrencyControlString = "FAIL_ON_CONFLICT";
+    } else if (concurrencyControl == ConcurrencyControl.LAST_WRITE_WINS) {
+      concurrencyControlString = "LAST_WRITE_WINS";
+    }
+    return _methodChannel.invokeMethod('saveDocumentWithIdAndConcurrencyControl',
+    <String, dynamic>{'id': _id, 'map': _doc.toMap(), 'concurrencyControl': concurrencyControlString});
+  }
+
   Future<Document> getDocumentWithId(String _id, {String dbName}) async {
     Map<dynamic, dynamic> _docResult;
     _docResult = await _methodChannel.invokeMethod('getDocumentWithId', {
@@ -71,6 +84,15 @@ class Fluttercouch {
       return null;
     } else {
       return Document(_docResult["doc"], _docResult["id"]);
+    }
+  }
+
+  static Future<dynamic> nativeCallHandler(MethodCall methodCall) async {
+    switch (methodCall.method) {
+      case "invoke_document_conflict_resolver":
+        return false;
+      default:
+        throw MissingPluginException("notImplemented");
     }
   }
 
@@ -157,6 +179,12 @@ class Fluttercouch {
       return _databases[name];
     } else {
       return null;
+    }
+  }
+
+  static initMethodCallHandler() {
+    if (!_methodChannel.checkMethodCallHandler(nativeCallHandler)) {
+      _methodChannel.setMethodCallHandler(nativeCallHandler);
     }
   }
 }

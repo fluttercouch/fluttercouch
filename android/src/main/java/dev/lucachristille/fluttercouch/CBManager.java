@@ -5,6 +5,7 @@ import android.content.res.AssetManager;
 import androidx.annotation.NonNull;
 
 import com.couchbase.lite.BasicAuthenticator;
+import com.couchbase.lite.ConcurrencyControl;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseConfiguration;
@@ -85,6 +86,12 @@ class CBManager {
     public String saveDocumentWithId(String _id, Map<String, Object> _map) throws CouchbaseLiteException {
         MutableDocument mutableDoc = new MutableDocument(_id, _map);
         mDatabase.get(defaultDatabase).save(mutableDoc);
+        return mutableDoc.getId();
+    }
+
+    public String saveDocumentWithIdAndConcurrencyControl(String _id, Map<String, Object> _map, String concurrencyControlString) throws CouchbaseLiteException {
+        MutableDocument mutableDoc = new MutableDocument(_id, _map);
+        mDatabase.get(defaultDatabase).save(mutableDoc, ConcurrencyControl.valueOf(concurrencyControlString));
         return mutableDoc.getId();
     }
 
