@@ -32,6 +32,7 @@ import 'package:fluttercouch/database.dart';
 import 'package:fluttercouch/document.dart';
 import 'package:fluttercouch/listener_token.dart';
 import 'package:fluttercouch/mutable_document.dart';
+import 'package:uuid/uuid.dart';
 
 typedef DocumentChangeListener = void Function(DocumentChange change);
 typedef ConflictHandler = bool Function(MutableDocument newDoc, Document curdoc);
@@ -44,6 +45,8 @@ class Fluttercouch {
       "dev.lucachristille.fluttercouch/eventsChannel");
 
   static Map<String, Database> _databases = new Map();
+  static Map<String, ConflictHandler> _conflictHandlers = new Map();
+  static Map<String, Exception> _exceptionsRethrowing = new Map();
 
   Future<Map<String, String>> initDatabaseWithName(String _name, {DatabaseConfiguration configuration}) async {
     String directory = null;
@@ -56,14 +59,14 @@ class Fluttercouch {
     });
   }
 
-  Future<String> saveDocument(Document _doc) =>
+  Future<Null> saveDocument(Document _doc) =>
       _methodChannel.invokeMethod('saveDocument', _doc.toMap());
 
-  Future<String> saveDocumentWithId(String _id, Document _doc) =>
+  Future<Null> saveDocumentWithId(String _id, Document _doc) =>
       _methodChannel.invokeMethod('saveDocumentWithId',
           <String, dynamic>{'id': _id, 'map': _doc.toMap()});
 
-  Future<String> saveDocumentWithIdAndConcurrencyControl(String _id, Document _doc, ConcurrencyControl concurrencyControl) {
+  Future<bool> saveDocumentWithIdAndConcurrencyControl(String _id, Document _doc, ConcurrencyControl concurrencyControl) {
     String concurrencyControlString;
     if (concurrencyControl == ConcurrencyControl.FAIL_ON_CONFLICT) {
       concurrencyControlString = "FAIL_ON_CONFLICT";
@@ -72,6 +75,15 @@ class Fluttercouch {
     }
     return _methodChannel.invokeMethod('saveDocumentWithIdAndConcurrencyControl',
     <String, dynamic>{'id': _id, 'map': _doc.toMap(), 'concurrencyControl': concurrencyControlString});
+  }
+
+  Future<bool> saveDocumentWithIdAndConflictHandler(String _id, Document _doc, ConflictHandler conflictHandler, {String databaseName}) async {
+    String uuid = new Uuid().v5(databaseName + "::" + "customer_conflict_handler", _id);
+    Fluttercouch._conflictHandlers[uuid] = conflictHandler;
+    var result = await _methodChannel.invokeMethod('saveDocumentWithIdAndConcurrencyControl',
+        <String, dynamic>{'id': _id, 'map': _doc.toMap(), 'conflictHandlerUUID': uuid});
+    Fluttercouch._conflictHandlers.remove(uuid);
+    return result;
   }
 
   Future<Document> getDocumentWithId(String _id, {String dbName}) async {
@@ -90,7 +102,21 @@ class Fluttercouch {
   static Future<dynamic> nativeCallHandler(MethodCall methodCall) async {
     switch (methodCall.method) {
       case "invoke_document_conflict_resolver":
-        return false;
+        Map<String, dynamic> result;
+        Map<String, dynamic> arguments = Map.castFrom<dynamic, dynamic, String, dynamic>(methodCall.arguments);
+        String uuid = arguments["uuid"];
+        MutableDocument newDoc = MutableDocument(withID: arguments["id"], state: arguments["newDoc"]);
+        Document curDoc = Document(arguments["curDoc"], arguments["id"]);
+        ConflictHandler conflictHandler = Fluttercouch._conflictHandlers[uuid];
+        try {
+          result["returnValue"] = conflictHandler(newDoc, curDoc) ? "true" : "false";
+          result["id"] = arguments["id"];
+          result["newDoc"] = newDoc.toMap();
+        } catch (e) {
+          Fluttercouch._exceptionsRethrowing[arguments["uuid"]] = e;
+          result["returnValue"] = "exception";
+        }
+        return result;
       default:
         throw MissingPluginException("notImplemented");
     }

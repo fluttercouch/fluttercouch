@@ -3,6 +3,7 @@ package dev.lucachristille.fluttercouch;
 import android.content.res.AssetManager;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.couchbase.lite.BasicAuthenticator;
 import com.couchbase.lite.ConcurrencyControl;
@@ -10,13 +11,10 @@ import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.Document;
-// import com.couchbase.lite.EncryptionKey;
 import com.couchbase.lite.DocumentChange;
 import com.couchbase.lite.DocumentChangeListener;
 import com.couchbase.lite.Endpoint;
 import com.couchbase.lite.ListenerToken;
-import com.couchbase.lite.LogFileConfiguration;
-import com.couchbase.lite.LogLevel;
 import com.couchbase.lite.MutableDocument;
 import com.couchbase.lite.Replicator;
 import com.couchbase.lite.ReplicatorConfiguration;
@@ -24,17 +22,17 @@ import com.couchbase.lite.SessionAuthenticator;
 import com.couchbase.lite.URLEndpoint;
 import com.couchbase.lite.Query;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
-import io.flutter.plugin.common.EventChannel;
+import io.flutter.plugin.common.MethodChannel;
 
 class CBManager {
     private static CBManager instance;
@@ -95,9 +93,63 @@ class CBManager {
         return mutableDoc.getId();
     }
 
-    public Map<String, Object> getDocumentWithId(String _id) throws CouchbaseLiteException {
+    @SuppressWarnings("unchecked")
+    public String saveDocumentWithIdAndCustomerHandler(String _id, Map<String, Object> _map, String conflictHandlerUUID, MethodChannel methodChannel) throws NullPointerException, CouchbaseLiteException {
+        final HashMap<String, Object> conflictHandlingResults = new HashMap<>();
+        MutableDocument mutableDoc = new MutableDocument(_id, _map);
+        mDatabase.get(defaultDatabase).save(mutableDoc, (newDoc, curDoc) -> {
+            HashMap<String, Object> arguments = new HashMap<>();
+            arguments.put("uuid", conflictHandlerUUID);
+            arguments.put("id", newDoc.getId());
+            arguments.put("newDoc", newDoc.toMap());
+            if (curDoc != null) {
+                arguments.put("curDoc", curDoc.toMap());
+            } else {
+                arguments.put("curDoc", null);
+            }
+            final FutureTask<Object> ft = new FutureTask<Object>(() -> {}, new Object());
+            methodChannel.invokeMethod("invoke_document_conflict_resolver", arguments, new MethodChannel.Result()  {
+                @Override
+                public void success(@Nullable Object result) {
+                    HashMap<String, Object> resultMap = (HashMap<String, Object>) result;
+                    conflictHandlingResults.put("returnValue", Objects.requireNonNull(resultMap).get("returnValue"));
+                    conflictHandlingResults.put("newDoc", resultMap.get("newDoc"));
+                    ft.run();
+                }
+
+                @Override
+                public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+                    conflictHandlingResults.put("returnValue", "exception");
+                    ft.run();
+                }
+
+                @Override
+                public void notImplemented() {
+                    conflictHandlingResults.put("returnValue", "notImplemented");
+                    ft.run();
+                }
+            });
+
+            try {
+                ft.get();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (conflictHandlingResults.get("returnValue") == "true") {
+                newDoc.setData((HashMap<String, Object>) Objects.requireNonNull(conflictHandlingResults.get("newDoc")));
+                return true;
+            } else {
+                return false;
+            }
+        });
+        return (String) conflictHandlingResults.get("returnValue");
+    }
+
+    public Map<String, Object> getDocumentWithId(String _id) {
         Database defaultDb = getDatabase();
-        HashMap<String, Object> resultMap = new HashMap<String, Object>();
+        HashMap<String, Object> resultMap = new HashMap<>();
         if (defaultDatabase != null) {
             try {
                 Document document = defaultDb.getDocument(_id);
@@ -128,11 +180,11 @@ class CBManager {
         }
     }
 
-    public void deleteDatabaseWithName(String _name) throws CouchbaseLiteException {
+    public void deleteDatabaseWithName(String _name) throws CouchbaseLiteException, NullPointerException {
         Database.delete(_name,new File(mDatabase.get(_name).getConfig().getDirectory()));
     }
 
-    public void compactDatabaseWithName(String _name) throws CouchbaseLiteException {
+    public void compactDatabaseWithName(String _name) throws CouchbaseLiteException, NullPointerException {
         if (!mDatabase.containsKey(_name)) {
             mDatabase.get(_name).compact();
         }
@@ -163,7 +215,7 @@ class CBManager {
         mReplConfig = new ReplicatorConfiguration(mDatabase.get(defaultDatabase), targetEndpoint);
     }
 
-    public void setReplicatorType(String _type) throws CouchbaseLiteException {
+    public void setReplicatorType(String _type) {
         ReplicatorConfiguration.ReplicatorType settedType = ReplicatorConfiguration.ReplicatorType.PULL;
         if (_type.equals("PUSH")) {
             settedType = ReplicatorConfiguration.ReplicatorType.PUSH;

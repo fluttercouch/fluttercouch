@@ -53,7 +53,7 @@ public class FluttercouchPlugin implements FlutterPlugin {
         CouchbaseLite.init(flutterPluginBinding.getApplicationContext());
 
         methodChannel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "dev.lucachristille.fluttercouch/methodChannel");
-        methodChannel.setMethodCallHandler(new FluttercouchMethodCallHandler());
+        methodChannel.setMethodCallHandler(new FluttercouchMethodCallHandler(methodChannel));
 
         jsonChannel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "dev.lucachristille.fluttercouch/jsonChannel", JSONMethodCodec.INSTANCE);
         jsonChannel.setMethodCallHandler(new JSONCallHandler());
@@ -73,9 +73,11 @@ public class FluttercouchPlugin implements FlutterPlugin {
     private class FluttercouchMethodCallHandler implements MethodCallHandler {
 
         private CBManager mCBManager;
+        private MethodChannel methodChannel;
 
-        FluttercouchMethodCallHandler() {
+        FluttercouchMethodCallHandler(MethodChannel methodChannel) {
             this.mCBManager = CBManager.getInstance();
+            this.methodChannel = methodChannel;
         }
 
         @Override
@@ -170,13 +172,24 @@ public class FluttercouchPlugin implements FlutterPlugin {
                         result.error("errArg", "invalid arguments", null);
                     }
                     break;
+                case ("saveDocumentWithIdAndConflictHandler"):
+                    if (call.hasArgument("id") && call.hasArgument("map") && call.hasArgument("conflictHandlerUUID")) {
+                        String _id = call.argument("id");
+                        Map<String, Object> _map = call.argument("map");
+                        String conflictHandlerUUID = call.argument("conflictHandlerUUID");
+                        try {
+                            String returnedId = mCBManager.saveDocumentWithIdAndCustomerHandler(_id, _map, conflictHandlerUUID, this.methodChannel);
+                            result.success(returnedId);
+                        } catch (CouchbaseLiteException e) {
+                            result.error("errSave", "error saving document with id " + _id, e.toString());
+                        }
+                    } else {
+                        result.error("errArg", "invalid arguments", null);
+                    }
+                    break;
                 case ("getDocumentWithId"):
                     String _id = call.argument("id");
-                    try {
                         result.success(mCBManager.getDocumentWithId(_id));
-                    } catch (CouchbaseLiteException e) {
-                        result.error("errGet", "error getting the document with id: " + _id, e.toString());
-                    }
                     break;
                 case ("deleteDocument"):
                     _id = call.argument("id");
@@ -198,12 +211,8 @@ public class FluttercouchPlugin implements FlutterPlugin {
                     break;
                 case ("setReplicatorType"):
                     String _type = call.arguments();
-                    try {
                         mCBManager.setReplicatorType(_type);
                         result.success(null);
-                    } catch (CouchbaseLiteException e) {
-                        result.error("errReplType", "error setting replication type to " + _type, e.toString());
-                    }
                     break;
                 case ("setReplicatorBasicAuthentication"):
                     Map<String, String> _auth = call.arguments();
