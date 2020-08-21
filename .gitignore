@@ -8,3 +8,7 @@ pubspec.lock
 
 build/
 .idea/workspace.xml
+
+docker-compose.yaml
+
+sync-gateway.json
