@@ -3,24 +3,24 @@ import 'package:fluttercouch/fluttercouch.dart';
 import 'package:fluttercouch/listener_token.dart';
 
 class Database {
-  String _name;
-  DatabaseConfiguration _config;
+  final String name;
+  final DatabaseConfiguration _config = new DatabaseConfiguration();
   bool _initialized = false;
   _Fluttercouch _fluttercouch = new _Fluttercouch();
 
-  Stream _eventsStream = Fluttercouch.eventChannel.receiveBroadcastStream();
-  Map<String, Function> _documentsChangeListeners = new Map();
+  final Stream _eventsStream = Fluttercouch.eventChannel.receiveBroadcastStream();
+  final Map<String, Function> _documentsChangeListeners = new Map();
 
-  Database(String name, {DatabaseConfiguration config}) {
-    this._name = name;
-    this._config = config;
+  Database(this.name, {DatabaseConfiguration config}) {
+    if (config != null) {
+    this._config.setDirectory(config.getDirectory());
+    }
     Future<Map<String, String>> result =
-        _fluttercouch.initDatabaseWithName(_name, configuration: _config);
+        _fluttercouch.initDatabaseWithName(name, configuration: _config);
     result.then((response) {
-      this._name = response["dbName"];
       this._config.setDirectory(response["directory"]);
       this._initialized = true;
-      Fluttercouch.registerDatabase(this._name, this);
+      Fluttercouch.registerDatabase(this.name, this);
     });
     _eventsStream.listen(_onEvent, onError: _onEventError);
     Fluttercouch.initMethodCallHandler();
@@ -54,21 +54,21 @@ class Database {
       String id, DocumentChangeListener listener) {}
 */
   close() {
-    _fluttercouch.closeDatabaseWithName.call(this._name);
+    _fluttercouch.closeDatabaseWithName.call(this.name);
   }
 
   compact() {
-    _fluttercouch.compactDatabaseWithName.call(this._name);
+    _fluttercouch.compactDatabaseWithName.call(this.name);
   }
 
   //createIndex(String name, Index index) {}
 
   deleteDatabase() {
-    _fluttercouch.deleteDatabaseWithName.call(this._name);
+    _fluttercouch.deleteDatabaseWithName.call(this.name);
   }
 
   delete(Document document) {
-    return _fluttercouch.deleteDocument(document.id, dbName: this._name);
+    return _fluttercouch.deleteDocument(document.id, dbName: this.name);
   }
 
   //bool delete(Document document, ConcurrencyControl concurrencyControl) {}
@@ -80,26 +80,26 @@ class Database {
   }
 
   Future<int> getCount() async {
-    return _fluttercouch.getDocumentCount(dbName: this._name);
+    return _fluttercouch.getDocumentCount(dbName: this.name);
   }
 
   Future<Document> getDocument(String id) {
-    return _fluttercouch.getDocumentWithId(id, dbName: this._name);
+    return _fluttercouch.getDocumentWithId(id, dbName: this.name);
   }
 
   Future<Null> setDocumentExpiration(String id, DateTime expiration) {
-    return _fluttercouch.setDocumentExpirationOfDB(id, expiration, dbName: this._name);
+    return _fluttercouch.setDocumentExpirationOfDB(id, expiration, dbName: this.name);
   }
 
   Future<DateTime> getDocumentExpiration(String id) async {
-    String date = await _fluttercouch.getDocumentExpirationOfDB(id, dbName: this._name);
+    String date = await _fluttercouch.getDocumentExpirationOfDB(id, dbName: this.name);
     return DateTime.parse(date);
   }
 
   //List<String> getIndexes() {}
 
   String getName() {
-    return this._name;
+    return this.name;
   }
 
   String getPath() {
@@ -124,7 +124,7 @@ class Database {
   }
 
   addDocumentsChangeListener(String id, DocumentChangeListener listener) {
-    ListenerToken token = new ListenerToken.v5(this._name + "::" + "document_change_listener", id);
+    ListenerToken token = new ListenerToken.v5(this.name + "::" + "document_change_listener", id);
     _documentsChangeListeners[token.tokenId] = listener;
     _fluttercouch.registerDocumentChangeListener(id, token.tokenId, dbName: this.getName());
   }

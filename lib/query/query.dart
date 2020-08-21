@@ -52,11 +52,8 @@ class Query {
       for (var token in List.from(tokens.keys)) {
         await removeChangeListener(token);
       }
-
       rethrow;
     }
-
-    return null;
   }
 
   /// Adds a query change listener and posts changes to [callback].

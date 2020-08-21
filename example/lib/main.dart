@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:flutter/services.dart';
 import 'package:fluttercouch/fluttercouch.dart';
 
 void main() {
@@ -65,6 +64,15 @@ class _MyAppState extends State<MyApp> {
 
       int docCount = await db.getCount();
       docCount = docCount;
+
+      Replicator replicator;
+      Uri uri = new Uri(scheme: "wss", host: "10.0.0.2", port: 4984, pathSegments: ["db"]);
+      Endpoint endpoint = new URLEndpoint(uri);
+      ReplicatorConfiguration config = new ReplicatorConfiguration(db, endpoint);
+
+      config.setReplicatorType(ReplicatorType.PUSH_AND_PULL);
+      replicator = new Replicator(config);
+      replicator.start();
     } catch (e) {
       result = 'Failed initialization';
     }

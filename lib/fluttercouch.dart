@@ -24,15 +24,32 @@ export 'query/expression/meta_expression.dart';
 export 'query/expression/meta.dart';
 export 'query/expression/property_expression.dart';
 export 'query/expression/variable_expression.dart';
+export 'replication/replicator.dart';
+export 'replication/authenticator.dart';
+export 'replication/basic_authenticator.dart';
+export 'replication/conflict.dart';
+export 'replication/document_replication.dart';
+export 'replication/endpoint.dart';
+export 'replication/replicator_change.dart';
+export 'replication/replicator_configuration.dart';
+export 'replication/session_authenticator.dart';
+export 'replication/status.dart';
+export 'replication/url_endpoint.dart';
 
 import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:fluttercouch/database.dart';
 import 'package:fluttercouch/document.dart';
-import 'package:fluttercouch/listener_token.dart';
 import 'package:fluttercouch/mutable_document.dart';
+import 'package:fluttercouch/replication/basic_authenticator.dart';
+import 'package:fluttercouch/replication/session_authenticator.dart';
+import 'package:fluttercouch/replication/url_endpoint.dart';
 import 'package:uuid/uuid.dart';
+
+import 'replication/authenticator.dart';
+import 'replication/endpoint.dart';
+import 'replication/replicator.dart';
 
 typedef DocumentChangeListener = void Function(DocumentChange change);
 typedef ConflictHandler = bool Function(MutableDocument newDoc, Document curdoc);
@@ -47,9 +64,10 @@ class Fluttercouch {
   static Map<String, Database> _databases = new Map();
   static Map<String, ConflictHandler> _conflictHandlers = new Map();
   static Map<String, Exception> _exceptionsRethrowing = new Map();
+  static Map<String, Replicator> _replicators = new Map();
 
   Future<Map<String, String>> initDatabaseWithName(String _name, {DatabaseConfiguration configuration}) async {
-    String directory = null;
+    String directory;
     if (configuration != null) {
       directory = configuration.getDirectory();
     }
@@ -123,7 +141,7 @@ class Fluttercouch {
   }
 
   Future<Null> deleteDocument(String _id, {String dbName}) {
-    _methodChannel.invokeMethod("deleteDocument", {
+    return _methodChannel.invokeMethod("deleteDocument", {
       "id": _id,
       "dbName": dbName
     });
@@ -148,6 +166,44 @@ class Fluttercouch {
   Future<Null> setReplicatorPinnedServerCertificate(String _assetKey) =>
       _methodChannel.invokeMethod(
           'setReplicatorPinnedServerCertificate', _assetKey);
+
+  Future<Null> setReplicatorAuthenticator(String _uuid, Authenticator authenticator) {
+    if (authenticator is BasicAuthenticator) {
+      return _methodChannel.invokeMethod('setReplicatorBasicAuthentication', <String, String>{
+        "uuid": _uuid,
+        "username": authenticator.getUsername(),
+        "password": authenticator.getPassword()
+      });
+    }
+    if (authenticator is SessionAuthenticator) {
+      return _methodChannel.invokeMethod('setReplicatorSessionAuthentication', <String, String>{
+        "uuid": _uuid,
+        "sessionID": authenticator.getSessionID(),
+        "getCookieName": authenticator.getCookieName()
+      });
+    }
+    return null;
+  }
+  
+  Future<Null> setReplicatorChannels(String _uuid, List<String> channels) {
+    return _methodChannel.invokeMethod('setReplicatorChannels', <String, dynamic>{
+      "uuid": _uuid,
+      "channels": channels
+    });
+  }
+
+  Future<String> constructReplicatorConfiguration(String uuid, Database database, Endpoint endpoint) {
+    if (endpoint is URLEndpoint) {
+      return _methodChannel.invokeMethod(
+          'constructReplicatorConfiguration', <String, String>{
+        "uuid": uuid,
+        "dbName": database.getName(),
+        "endpointType": "urlendpoint",
+        "endpointConfig": endpoint.getURL()
+      }
+      );
+    }
+  }
 
   Future<Null> initReplicator() =>
       _methodChannel.invokeMethod("initReplicator");
@@ -200,9 +256,21 @@ class Fluttercouch {
     _databases[name] = database;
   }
 
+  static registerReplicator(String uuid, Replicator replicator) {
+    _replicators[uuid] = replicator;
+  }
+
   static Database getRegisteredDatabase(String name) {
     if (_databases.containsKey(name)) {
       return _databases[name];
+    } else {
+      return null;
+    }
+  }
+
+  static Replicator getRegisteredReplicator(String uuid) {
+    if (_replicators.containsKey(uuid)) {
+      return _replicators[uuid];
     } else {
       return null;
     }
