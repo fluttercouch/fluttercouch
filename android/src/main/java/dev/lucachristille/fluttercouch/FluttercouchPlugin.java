@@ -1,12 +1,10 @@
 package dev.lucachristille.fluttercouch;
 
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 
 import com.couchbase.lite.CouchbaseLite;
 import com.couchbase.lite.CouchbaseLiteException;
@@ -189,7 +187,7 @@ public class FluttercouchPlugin implements FlutterPlugin {
                     break;
                 case ("getDocumentWithId"):
                     String _id = call.argument("id");
-                        result.success(mCBManager.getDocumentWithId(_id));
+                    result.success(mCBManager.getDocumentWithId(_id));
                     break;
                 case ("deleteDocument"):
                     _id = call.argument("id");
@@ -211,26 +209,8 @@ public class FluttercouchPlugin implements FlutterPlugin {
                     break;
                 case ("setReplicatorType"):
                     String _type = call.arguments();
-                        mCBManager.setReplicatorType(_type);
-                        result.success(null);
-                    break;
-                case ("setReplicatorBasicAuthentication"):
-                    Map<String, String> _auth = call.arguments();
-                    try {
-                        mCBManager.setReplicatorBasicAuthentication(_auth);
-                        result.success(null);
-                    } catch (Exception e) {
-                        result.error("errAuth", "error setting authentication for replicator", e.toString());
-                    }
-                    break;
-                case ("setReplicatorSessionAuthentication"):
-                    String _sessionID = call.arguments();
-                    try {
-                        mCBManager.setReplicatorSessionAuthentication(_sessionID);
-                        result.success(null);
-                    } catch (Exception e) {
-                        result.error("errAuth", "invalid session ID", e.toString());
-                    }
+                    mCBManager.setReplicatorType(_type);
+                    result.success(null);
                     break;
                 case ("setReplicatorPinnedServerCertificate"):
                     String assetKey = call.arguments();
@@ -278,7 +258,7 @@ public class FluttercouchPlugin implements FlutterPlugin {
                         result.error("errGet", "error getting the document count.", e.toString());
                     }
                     break;
-                case("registerDocumentChangeListener"):
+                case ("registerDocumentChangeListener"):
                     String id = call.argument("id");
                     String token = call.argument("token");
                     try {
@@ -288,7 +268,7 @@ public class FluttercouchPlugin implements FlutterPlugin {
                         result.error("errDocList", "error adding document change listener to document " + id + " on db " + _dbName, e.toString());
                     }
                     break;
-                case("setDocumentExpiration"):
+                case ("setDocumentExpiration"):
                     id = call.argument("id");
                     String date = call.argument("expiration");
                     try {
@@ -300,7 +280,7 @@ public class FluttercouchPlugin implements FlutterPlugin {
                         result.error("errSetDocExp", "error setting document expiration for document " + id + " on db " + _dbName, e.toString());
                     }
                     break;
-                case("getDocumentExpiration"):
+                case ("getDocumentExpiration"):
                     id = call.argument("id");
                     try {
                         Date expiration = mCBManager.getDocumentExpiration(_dbName, id);
@@ -308,6 +288,58 @@ public class FluttercouchPlugin implements FlutterPlugin {
                     } catch (Exception e) {
                         result.error("errGetDocExp", "error getting document expiration for document " + id + " on db " + _dbName, e.toString());
                     }
+                case ("setReplicatorBasicAuthentication"):
+                    String uuid = call.argument("uuid");
+                    boolean configuration = call.argument("configuration");
+                    String username = call.argument("username");
+                    String password = call.argument("password");
+                    try {
+                        assert endpointType != null;
+                        mCBManager.setReplicatorBasicAuthentication(uuid, configuration, username, password);
+                    } catch (URISyntaxException e) {
+                        result.error("errReplConfig", "Error parsing uri", e.toString());
+                    }
+                    result.success(uuid);
+                    break;
+                case ("setReplicatorSessionAuthentication"):
+                    break;
+                case ("setReplChannels"):
+                    break;
+                case ("setReplDocumentsIDs"):
+                    break;
+                case ("setReplHeaders"):
+                    break;
+                case ("setReplType"):
+                    String uuid = call.argument("uuid");
+                    String configuration = call.argument("configuration");
+                    break;
+                case ("setReplContinuous"):
+                    break;
+                case ("constructReplicatorConfiguration"):
+                    uuid = call.argument("uuid");
+                    String dbName = call.argument("dbName");
+                    String endpointType = call.argument("endpointType");
+                    HashMap<String, String> endpointConfig = call.argument("endpointConfig");
+                    try {
+                        assert endpointType != null;
+                        mCBManager.constructReplicatorConfigurationFromDatabaseEndpoint(uuid, dbName, endpointType, endpointConfig);
+                    } catch (URISyntaxException e) {
+                        result.error("errReplConfig", "Error parsing uri", e.toString());
+                    }
+                    result.success(uuid);
+                    break;
+                case ("setReplConflictResolver"):
+                    break;
+                case ("setReplPullFilter"):
+                    break;
+                case ("setReplPushFilter"):
+                    break;
+                case ("constructReplicator"):
+                    uuid = call.argument("uuid");
+                    String replicatorConfigurationUuid = call.argument("replicatorConfigurationUuid");
+                    mCBManager.constructReplicator(uuid, replicatorConfigurationUuid);
+                    result.success(null);
+                    break;
                 default:
                     result.notImplemented();
             }

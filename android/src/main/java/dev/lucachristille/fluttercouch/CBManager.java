@@ -22,6 +22,8 @@ import com.couchbase.lite.SessionAuthenticator;
 import com.couchbase.lite.URLEndpoint;
 import com.couchbase.lite.Query;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -44,6 +46,8 @@ class CBManager {
     private Replicator mReplicator;
     private String defaultDatabase = "defaultDatabase";
     private HashMap<String, ListenerToken> listenerTokens = new HashMap<>();
+    private HashMap<String, ReplicatorConfiguration> mReplicatorConfigurations = new HashMap<>();
+    private HashMap<String, Replicator> mReplicators = new HashMap<>();
 
     private CBManager() {}
 
@@ -227,20 +231,13 @@ class CBManager {
         mReplConfig.setReplicatorType(settedType);
     }
 
-    public void setReplicatorBasicAuthentication(Map<String, String> _auth) throws Exception {
-        if (_auth.containsKey("username") && _auth.containsKey("password")) {
-            mReplConfig.setAuthenticator(new BasicAuthenticator(_auth.get("username"), _auth.get("password")));
-        } else {
-            throw new Exception();
-        }
+    public void setReplicatorBasicAuthentication(String uuid, String username, String password) {
+            Objects.requireNonNull(this.mReplicatorConfigurations.get(uuid)).setAuthenticator(new BasicAuthenticator(username, password));
+            this.mReplicatorConfigurations.get(uuid).
     }
 
-    public void setReplicatorSessionAuthentication(String sessionID) throws Exception {
-        if (sessionID != null) {
-            mReplConfig.setAuthenticator(new SessionAuthenticator(sessionID));
-        } else {
-            throw new Exception();
-        }
+    public void setReplicatorSessionAuthentication(String uuid, String sessionID, String cookieName) {
+            Objects.requireNonNull(this.mReplicatorConfigurations.get(uuid)).setAuthenticator(new SessionAuthenticator(sessionID, cookieName));
     }
 
     public void setReplicatorPinnedServerCertificate(String assetKey) throws Exception {
@@ -266,21 +263,16 @@ class CBManager {
         }
     }
 
-    public void setReplicatorContinuous(boolean _continuous) {
-        mReplConfig.setContinuous(_continuous);
+    public void setReplicatorContinuous(String uuid, boolean _continuous) {
+        Objects.requireNonNull(this.mReplicatorConfigurations.get(uuid)).setContinuous(_continuous);
     }
 
-    public void initReplicator() {
-        mReplicator = new Replicator(mReplConfig);
+    public void startReplicator(String uuid) {
+        Objects.requireNonNull(this.mReplicators.get(uuid)).start();
     }
 
-    public void startReplicator() {
-        mReplicator.start();
-    }
-
-    public void stopReplicator() {
-        mReplicator.stop();
-        mReplicator = null;
+    public void stopReplicator(String uuid) {
+        Objects.requireNonNull(this.mReplicators.get(uuid)).stop();
     }
 
     public long getDocumentCount() throws Exception {
@@ -336,5 +328,21 @@ class CBManager {
     Date getDocumentExpiration(String _dbName, String id) throws CouchbaseLiteException {
         Database _db = this.getDatabase(_dbName);
         return _db.getDocumentExpiration(id);
+    }
+
+    void constructReplicatorConfigurationFromDatabaseEndpoint(String uuid, String dbName, @NotNull String endpointType, HashMap<String, String> endpointConfig) throws URISyntaxException {
+        Database db = getDatabase(dbName);
+        Endpoint endpoint = null;
+        if (endpointType.equals("urlEndpoint")) {
+            URI uri = new URI(endpointConfig.get("uri"));
+            endpoint = new URLEndpoint(uri);
+        }
+        if (endpoint != null) {
+            this.mReplicatorConfigurations.put(uuid, new ReplicatorConfiguration(db, endpoint));
+        }
+    }
+
+    void constructReplicator(String uuid, String replicatorConfigurationUuid) {
+        this.mReplicators.put(uuid, new Replicator(Objects.requireNonNull(this.mReplicatorConfigurations.get(replicatorConfigurationUuid))));
     }
 }

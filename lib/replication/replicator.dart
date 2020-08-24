@@ -2,108 +2,48 @@ import 'package:uuid/uuid.dart';
 
 import '../fluttercouch.dart';
 import '../listener_token.dart';
-import 'authenticator.dart';
 import 'document_replication.dart';
-import 'endpoint.dart';
 import 'replicator_change.dart';
 import 'replicator_configuration.dart';
 
 typedef ReplicatorChangeListener = void Function(ReplicatorChange change);
-typedef DocumentReplicationListener = void Function(DocumentReplication replication);
+typedef DocumentReplicationListener = void Function(
+    DocumentReplication replication);
 
 class Replicator {
   final ReplicatorConfiguration config;
-  final Map<String, ReplicatorChangeListener> _replicatorChangeListeners = new Map();
-  final Map<String, DocumentReplicationListener> _documentReplicationListeners = new Map();
   final String _uuid = new Uuid().v1();
-  final _fluttercouch = new _Fluttercouch();
+  final _fluttercouch = Fluttercouch();
 
   Replicator([this.config]) {
     _fluttercouch.initReplicator().then((response) {
-      Fluttercouch.registerReplicator(_uuid, this);
+      _fluttercouch.registerReplicator(_uuid, this);
     });
   }
 
   ReplicatorConfiguration getConfig() => config;
 
-  Authenticator getAuthenticator() => config.getAuthenticator();
-
-  List<String> getChannels() => config.getChannels();
-
-  ConflictResolver getConflictResolver() => config.getConflictResolver();
-
-  List<String> getDocumentIDs() => config.getDocumentIDs();
-
-  Map<String, String> getHeaders() => config.getHeaders();
-
-  // byte[] getPinnedCertificate()
-
-  ReplicationFilter getPullFilter() => config.getPullFilter();
-
-  ReplicationFilter getPushFilter() => config.getPushFilter();
-
-  ReplicatorType getReplicatorType() => config.getReplicatorType();
-
-  Endpoint getTarget() => config.getTarget();
-
-  bool isContinuous() => config.isContinuous();
-
-  ReplicatorConfiguration setAuthenticator(Authenticator authenticator) {
-    config.setAuthenticator(authenticator);
-    return config;
+  ListenerToken addChangeListener(
+      ReplicatorChangeListener replicatorChangeListener) {
+    ListenerToken listenerToken = new ListenerToken(_fluttercouch
+        .registerReplicatorChangeListener(replicatorChangeListener));
+    _fluttercouch.addReplicatorChangeListener(
+        this._uuid, listenerToken.tokenId);
+    return listenerToken;
   }
 
-  ReplicatorConfiguration setChannels(List<String> channels) {
-    config.setChannels(channels);
-    return config;
-  }
-
-  ReplicatorConfiguration setConflictResolver(ConflictResolver conflictResolver) {
-    config.setConflictResolver(conflictResolver);
-    return config;
-  }
-
-  ReplicatorConfiguration setContinuous(bool continuous) {
-    config.setContinuous(continuous);
-    return config;
-  }
-
-  ReplicatorConfiguration setDocumentIDs(List<String> documentsIDs) {
-    config.setDocumentIDs(documentsIDs);
-    return config;
-  }
-
-  ReplicatorConfiguration setHeaders(Map<String, String> headers) {
-    config.setHeaders(headers);
-    return config;
-  }
-
-  /*ReplicatorConfiguration setPinnedServerCertificate(String pinnedServerCertificate) {
-    return _config;
-  }*/
-
-  ReplicatorConfiguration setPullFilter(ReplicationFilter pullFilter) {
-    config.setPullFilter(pullFilter);
-    return config;
-  }
-
-  ReplicatorConfiguration setPushFilter(ReplicationFilter pushFilter) {
-    config.setPushFilter(pushFilter);
-    return config;
-  }
-
-  ReplicatorConfiguration setReplicatorType(ReplicatorType replicatorType) {
-    config.setReplicatorType(replicatorType);
-    return config;
+  ListenerToken addDocumentReplicationListener(
+      DocumentReplicationListener documentReplicationListener) {
+    ListenerToken listenerToken = new ListenerToken(_fluttercouch
+        .registerDocumentReplicationListener(documentReplicationListener));
+    _fluttercouch.addDocumentReplicationListener(
+        this._uuid, listenerToken.tokenId);
+    return listenerToken;
   }
 
   void removeChangeListener(ListenerToken token) {
-    if (_replicatorChangeListeners.containsKey(token.tokenId)) {
-      _replicatorChangeListeners.remove(token.tokenId);
-    }
-    if (_documentReplicationListeners.containsKey(token.tokenId)) {
-      _replicatorChangeListeners.remove(token.tokenId);
-    }
+    _fluttercouch.unregisterReplicatorChangeListener(token.tokenId);
+    _fluttercouch.removeReplicatorChangeListener(this._uuid, token.tokenId);
   }
 
   void resetCheckpoint() {}
@@ -112,6 +52,3 @@ class Replicator {
 
   void stop() {}
 }
-
-class _Fluttercouch extends Fluttercouch {}
-

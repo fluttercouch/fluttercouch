@@ -8,7 +8,8 @@ import 'conflict.dart';
 import 'endpoint.dart';
 
 typedef ConflictResolver = Document Function(Conflict conflict);
-typedef ReplicationFilter = bool Function(Document document, Set<DocumentFlag> flags);
+typedef ReplicationFilter = bool Function(
+    Document document, Set<DocumentFlag> flags);
 
 class ReplicatorConfiguration {
   Authenticator _authenticator;
@@ -24,16 +25,17 @@ class ReplicatorConfiguration {
   bool _continuous;
   final Database database;
   String _uuid = new Uuid().v1();
-  final _fluttercouch = new _Fluttercouch();
-
-  final Stream _eventsStream = Fluttercouch.eventChannel.receiveBroadcastStream();
+  final _fluttercouch = new Fluttercouch();
 
   ReplicatorConfiguration(this.database, this.target) {
     _fluttercouch.constructReplicatorConfiguration(_uuid, database, target);
   }
-  
-  factory ReplicatorConfiguration.from(ReplicatorConfiguration replicatorConfiguration) {
-    ReplicatorConfiguration result = ReplicatorConfiguration(replicatorConfiguration.getDatabase(), replicatorConfiguration.getTarget());
+
+  factory ReplicatorConfiguration.from(
+      ReplicatorConfiguration replicatorConfiguration) {
+    ReplicatorConfiguration result = ReplicatorConfiguration(
+        replicatorConfiguration.getDatabase(),
+        replicatorConfiguration.getTarget());
     result.setAuthenticator(replicatorConfiguration.getAuthenticator());
     result.setChannels(replicatorConfiguration.getChannels());
     result.setDocumentIDs(replicatorConfiguration.getDocumentIDs());
@@ -44,14 +46,6 @@ class ReplicatorConfiguration {
     result.setReplicatorType(replicatorConfiguration.getReplicatorType());
     result.setContinuous(replicatorConfiguration.isContinuous());
     return result;
-  }
-
-  _onEvent(Object data) {
-
-  }
-
-  _onEventError(Object data) {
-
   }
 
   Authenticator getAuthenticator() => _authenticator;
@@ -80,34 +74,38 @@ class ReplicatorConfiguration {
 
   ReplicatorConfiguration setAuthenticator(Authenticator authenticator) {
     _authenticator = authenticator;
-    _fluttercouch.setReplicatorAuthenticator(_uuid, authenticator);
+    _fluttercouch.setReplAuthenticator(_uuid, authenticator);
     return this;
   }
 
   ReplicatorConfiguration setChannels(List<String> channels) {
     _channels = this._channels;
-    _fluttercouch.setReplicatorChannels(_uuid, channels);
+    _fluttercouch.setReplChannels(_uuid, channels);
     return this;
   }
 
-  ReplicatorConfiguration setConflictResolver(ConflictResolver conflictResolver) {
+  ReplicatorConfiguration setConflictResolver(
+      ConflictResolver conflictResolver) {
     _conflictResolver = this._conflictResolver;
-    _eventsStream.liste(_onEvent, _onEventError);
-    return this;
-  }
-
-  ReplicatorConfiguration setContinuous(bool continuous) {
-    _continuous = continuous;
+    _fluttercouch.setReplConflictResolver(_uuid);
     return this;
   }
 
   ReplicatorConfiguration setDocumentIDs(List<String> documentsIDs) {
     _documentIDs = documentsIDs;
+    _fluttercouch.setReplDocumentsIDs(_uuid, _documentIDs);
+    return this;
+  }
+
+  ReplicatorConfiguration setContinuous(bool continuous) {
+    _continuous = continuous;
+    _fluttercouch.setReplContinuous(_uuid, _continuous);
     return this;
   }
 
   ReplicatorConfiguration setHeaders(Map<String, String> headers) {
     _headers = headers;
+    _fluttercouch.setReplHeaders(_uuid, _headers);
     return this;
   }
 
@@ -116,30 +114,24 @@ class ReplicatorConfiguration {
   }*/
 
   ReplicatorConfiguration setPullFilter(ReplicationFilter pullFilter) {
-    _pullFilter = _pullFilter;
+    _pullFilter = pullFilter;
+    _fluttercouch.setReplPullFilter(_uuid);
     return this;
   }
 
   ReplicatorConfiguration setPushFilter(ReplicationFilter pushFilter) {
     _pushFilter = pushFilter;
+    _fluttercouch.setReplPushFilter(_uuid);
     return this;
   }
 
   ReplicatorConfiguration setReplicatorType(ReplicatorType replicatorType) {
     _replicatorType = _replicatorType;
+    _fluttercouch.setReplType(_uuid, _replicatorType);
     return this;
   }
 }
 
-class _Fluttercouch extends Fluttercouch {}
+enum ReplicatorType { PUSH, PULL, PUSH_AND_PULL }
 
-enum ReplicatorType {
-  PUSH,
-  PULL,
-  PUSH_AND_PULL
-}
-
-enum DocumentFlag {
-  DocumentsFlagsAccessRemoved,
-  DocumentFlagsDeleted
-}
+enum DocumentFlag { DocumentsFlagsAccessRemoved, DocumentFlagsDeleted }
