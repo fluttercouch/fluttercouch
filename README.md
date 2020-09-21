@@ -165,8 +165,7 @@ The Fluttercouch plugin is still under development and any contribution is welco
 
 ## Current development
 
-By now, the library can create (in Android device and iOs devices) a database locally and replicate a couchbase server by connecting to a sync gateway. It can retrieve a Document by id and extract any “usual” field (no blob) and save it back to the Database.
-Queries are still missing, but are under development.
-The iOs native code will be implemented after Android implementation is confirmed as a good approach for queries too, so that middleware code would not be written twice.
+By now, the library can create (in Android and iOs devices) a database locally and replicate a couchbase database connecting to sync gateway. It can retrieve a Document by id and extract any “usual” field (no blob) and save it back to the Database.
+Queries have been developed, but some more testing and documentation is needed.
 
 Any suggestion or feedback is appreciated.
