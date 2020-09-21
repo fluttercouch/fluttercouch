@@ -1,3 +1,4 @@
+import 'blob.dart';
 import 'document.dart';
 
 class MutableDocument extends Document {
@@ -92,6 +93,38 @@ class MutableDocument extends Document {
   /// - Parameter key: The key.
   MutableDocument remove(String key) {
     super.internalState.remove(key);
+
+    return this;
+  }
+
+  /// Adds an attachment stored in the form of a [Blob] object.
+  ///
+  /// - Parameters:
+  ///     - [blob]: Attachment data and unique name.
+  MutableDocument addAttachment(Blob blob) {
+    return addBlob(blob);
+  }
+
+  /// Adds a [Blob] to the document.
+  ///
+  /// - Parameters:
+  ///     - [blob]: Attachment data and unique name.
+  MutableDocument addBlob(Blob blob) {
+    if (super.attachments == null) {
+      super.attachments = Map();
+    }
+
+    if (blob.getUniqueName() == null ||
+        blob.getUniqueName().isEmpty ||
+        blob.getContentType() == null ||
+        blob.getContentType().isEmpty ||
+        blob.getData() == null) {
+      throw CorruptBlobException();
+    }
+
+    super.attachments[blob.getUniqueName()] = {
+      blob.getContentType(): blob.getData()
+    };
 
     return this;
   }

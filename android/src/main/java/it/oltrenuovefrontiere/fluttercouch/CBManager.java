@@ -3,6 +3,7 @@ package it.oltrenuovefrontiere.fluttercouch;
 import android.content.res.AssetManager;
 
 import com.couchbase.lite.BasicAuthenticator;
+import com.couchbase.lite.Blob;
 import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DatabaseConfiguration;
@@ -65,8 +66,27 @@ class CBManager {
         return mutableDoc.getId();
     }
 
+    public String saveDocumentWithBlobs(Map<String, Object> _map, Map<String, Map<String, byte[]>> blobs) throws CouchbaseLiteException {
+        MutableDocument mutableDoc = new MutableDocument(_map);
+        mutableDoc = addBlobsToDocument(mutableDoc, blobs);
+        mDatabase.get(defaultDatabase).save(mutableDoc);
+        return mutableDoc.getId();
+    }
+
+
     public String saveDocumentWithId(String _id, Map<String, Object> _map) throws CouchbaseLiteException {
         MutableDocument mutableDoc = new MutableDocument(_id, _map);
+        mDatabase.get(defaultDatabase).save(mutableDoc);
+        return mutableDoc.getId();
+    }
+
+    public String saveDocumentWithIdAndBlobs(
+            String _id,
+            Map<String, Object> _map,
+            Map<String, Map<String, byte[]>> blobs
+    ) throws CouchbaseLiteException {
+        MutableDocument mutableDoc = new MutableDocument(_id, _map);
+        mutableDoc = addBlobsToDocument(mutableDoc, blobs);
         mDatabase.get(defaultDatabase).save(mutableDoc);
         return mutableDoc.getId();
     }
@@ -88,7 +108,21 @@ class CBManager {
                 e.printStackTrace();
             }
         }
+
         return resultMap;
+    }
+
+    public Map<String, byte[]> getBlob(String docId, String blobName) throws CouchbaseLiteException {
+        Database defaultDb = getDatabase();
+        Map<String, byte[]> blobData = new HashMap<>();
+        try {
+            Blob b = defaultDb.getDocument(docId).getBlob(blobName);
+            blobData.put(b.getContentType(), b.getContent());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return blobData;
     }
 
     // ENCRYPTION IS ONLY COMPATIBLE WITH ENTERPRISE EDITION - NOT SUPPORTING //
@@ -105,7 +139,7 @@ class CBManager {
     }
 
     public void deleteDatabaseWithName(String _name) throws CouchbaseLiteException {
-        Database.delete(_name,new File(mDBConfig.getDirectory()));
+        Database.delete(_name, new File(mDBConfig.getDirectory()));
     }
 
     public void closeDatabaseWithName(String _name) throws CouchbaseLiteException {
@@ -201,8 +235,8 @@ class CBManager {
     }
 
     void addQuery(String queryId, Query query, ListenerToken token) {
-        mQueries.put(queryId,query);
-        mQueryListenerTokens.put(queryId,token);
+        mQueries.put(queryId, query);
+        mQueryListenerTokens.put(queryId, token);
     }
 
     Query getQuery(String queryId) {
@@ -217,5 +251,27 @@ class CBManager {
         }
 
         return query;
+    }
+
+    private MutableDocument addBlobsToDocument(MutableDocument mutableDoc, Map<String, Map<String, byte[]>> blobs) {
+
+        if (blobs != null) {
+            for (Map.Entry<String, Map<String, byte[]>> entry : blobs.entrySet()) {
+                String key = entry.getKey();
+                String mimeType = null;
+                byte[] data = null;
+
+                for (Map.Entry<String, byte[]> entry2 : entry.getValue().entrySet()) {
+                    mimeType = entry2.getKey();
+                    data = entry2.getValue();
+                }
+
+                if (mimeType != null && data != null) {
+                    mutableDoc.setBlob(key, new Blob(mimeType, data));
+                }
+            }
+        }
+
+        return mutableDoc;
     }
 }

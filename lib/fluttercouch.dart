@@ -26,9 +26,12 @@ export 'query/expression/property_expression.dart';
 export 'query/expression/variable_expression.dart';
 
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:fluttercouch/document.dart';
+
+import 'blob.dart';
 
 abstract class Fluttercouch {
   static const MethodChannel _methodChannel =
@@ -42,12 +45,49 @@ abstract class Fluttercouch {
   Future<String> initDatabaseWithName(String _name) =>
       _methodChannel.invokeMethod('initDatabaseWithName', _name);
 
-  Future<String> saveDocument(Document _doc) =>
-      _methodChannel.invokeMethod('saveDocument', _doc.toMap());
+  Future<String> saveDocument(Document _doc) {
+    if (_doc.attachments == null || _doc.attachments.isEmpty) {
+      return _methodChannel.invokeMethod('saveDocument', _doc.toMap());
+    } else {
+      return _methodChannel.invokeMethod('saveDocumentWithBlobs',
+          <String, dynamic>{'map': _doc.toMap(), 'blobs': _doc.attachments});
+    }
+  }
 
-  Future<String> saveDocumentWithId(String _id, Document _doc) =>
-      _methodChannel.invokeMethod('saveDocumentWithId',
+  Future<String> saveDocumentWithId(String _id, Document _doc) {
+    if (_doc.attachments == null || _doc.attachments.isEmpty) {
+      return _methodChannel.invokeMethod('saveDocumentWithId',
           <String, dynamic>{'id': _id, 'map': _doc.toMap()});
+    } else {
+      return _methodChannel.invokeMethod(
+          'saveDocumentWithIdAndBlobs', <String, dynamic>{
+        'id': _id,
+        'map': _doc.toMap(),
+        'blobs': _doc.attachments
+      });
+    }
+  }
+
+  Future<Blob> getAttachment(String _docId, String _attachmentName) {
+    return getBlob(_docId, _attachmentName);
+  }
+
+  Future<Blob> getBlob(String _docId, String _blobName) async {
+    Blob b;
+    Map<String, Uint8List> blobData = Map();
+    Map<dynamic, dynamic> data = await _methodChannel.invokeMethod(
+        'getBlob', <String, dynamic>{'id': _docId, 'blobName': _blobName});
+
+    data.forEach((key, value) {
+      blobData[key as String] = value as Uint8List;
+    });
+
+    blobData.forEach((contentType, data) {
+      b = Blob(_blobName, contentType, data);
+    });
+
+    return b;
+  }
 
   Future<Document> getDocumentWithId(String _id) async {
     Map<dynamic, dynamic> _docResult;

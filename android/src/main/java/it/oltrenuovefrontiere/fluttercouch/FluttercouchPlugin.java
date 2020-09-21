@@ -65,9 +65,9 @@ public class FluttercouchPlugin implements CBManagerDelegate {
         mRegistrar = registrar;
 
         if (BuildConfig.DEBUG) {
-            mCBManager = new CBManager(this,true);
+            mCBManager = new CBManager(this, true);
         } else {
-            mCBManager = new CBManager(this,false);
+            mCBManager = new CBManager(this, false);
         }
     }
 
@@ -127,6 +127,20 @@ public class FluttercouchPlugin implements CBManagerDelegate {
                         result.error("errSave", "error saving document", e.toString());
                     }
                     break;
+                case ("saveDocumentWithBlobs"):
+                    if (call.hasArgument("map") && call.hasArgument("blobs")) {
+                        try {
+                            Map<String, Object> map = call.argument("map");
+                            Map<String, Map<String, byte[]>> blobs = call.argument("blobs");
+                            String returnedId = mCBManager.saveDocumentWithBlobs(map, blobs);
+                            result.success(returnedId);
+                        } catch (CouchbaseLiteException e) {
+                            result.error("errSave", "error saving document", e.toString());
+                        }
+                    } else {
+                        result.error("errArg", "invalid arguments", null);
+                    }
+                    break;
                 case ("saveDocumentWithId"):
                     if (call.hasArgument("id") && call.hasArgument("map")) {
                         String _id = call.argument("id");
@@ -136,6 +150,42 @@ public class FluttercouchPlugin implements CBManagerDelegate {
                             result.success(returnedId);
                         } catch (CouchbaseLiteException e) {
                             result.error("errSave", "error saving document with id " + _id, e.toString());
+                        }
+                    } else {
+                        result.error("errArg", "invalid arguments", null);
+                    }
+                    break;
+                case ("saveDocumentWithIdAndBlobs"):
+                    if (call.hasArgument("id") && call.hasArgument("map") && call.hasArgument("blobs")) {
+                        String _id = call.argument("id");
+                        Map<String, Object> _map = call.argument("map");
+                        Map<String, Map<String, byte[]>> blobs = call.argument("blobs");
+                        try {
+                            String returnedId = mCBManager.saveDocumentWithIdAndBlobs(_id, _map, blobs);
+                            result.success(returnedId);
+                        } catch (CouchbaseLiteException e) {
+                            result.error("errSave", "error saving document with id " + _id, e.toString());
+                        }
+                    } else {
+                        result.error("errArg", "invalid arguments", null);
+                    }
+                    break;
+                case ("getBlob"):
+                    if (call.hasArgument("id") && call.hasArgument("blobName")) {
+                        String docId = call.argument("id");
+                        String blobName = call.argument("blobName");
+                        try {
+                            Map<String, byte[]> blob = mCBManager.getBlob(docId, blobName);
+                            result.success(blob);
+                        } catch (CouchbaseLiteException e) {
+                            result.error(
+                                    "errSave",
+                                    "error getting attachment with name "
+                                            + blobName
+                                            + " from the document with ID: "
+                                            + docId,
+                                    e.toString()
+                            );
                         }
                     } else {
                         result.error("errArg", "invalid arguments", null);
@@ -255,7 +305,7 @@ public class FluttercouchPlugin implements CBManagerDelegate {
 
                     queryFromJson = mCBManager.getQuery(id);
                     if (queryFromJson == null) {
-                        queryFromJson = new QueryJson(json,mCBManager).toCouchbaseQuery();
+                        queryFromJson = new QueryJson(json, mCBManager).toCouchbaseQuery();
                     }
 
                     if (queryFromJson == null) {
@@ -268,7 +318,7 @@ public class FluttercouchPlugin implements CBManagerDelegate {
                         @Override
                         public void run() {
                             try {
-                                final List<Map<String,Object>> resultsList = QueryJson.resultsToJson(query.execute());
+                                final List<Map<String, Object>> resultsList = QueryJson.resultsToJson(query.execute());
                                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                                     @Override
                                     public void run() {
@@ -296,21 +346,21 @@ public class FluttercouchPlugin implements CBManagerDelegate {
 
                     queryFromJson = mCBManager.getQuery(id);
                     if (queryFromJson == null) {
-                        queryFromJson = new QueryJson(json,mCBManager).toCouchbaseQuery();
+                        queryFromJson = new QueryJson(json, mCBManager).toCouchbaseQuery();
 
                         if (queryFromJson != null) {
                             ListenerToken mListenerToken = queryFromJson.addChangeListener(AsyncTask.THREAD_POOL_EXECUTOR, new QueryChangeListener() {
                                 @Override
                                 public void changed(QueryChange change) {
-                                    final HashMap<String,Object> json = new HashMap<String,Object>();
-                                    json.put("query",id);
+                                    final HashMap<String, Object> json = new HashMap<String, Object>();
+                                    json.put("query", id);
 
                                     if (change.getResults() != null) {
-                                        json.put("results",QueryJson.resultsToJson(change.getResults()));
+                                        json.put("results", QueryJson.resultsToJson(change.getResults()));
                                     }
 
                                     if (change.getError() != null) {
-                                        json.put("error",change.getError().getLocalizedMessage());
+                                        json.put("error", change.getError().getLocalizedMessage());
                                     }
 
                                     new Handler(Looper.getMainLooper()).post(new Runnable() {
